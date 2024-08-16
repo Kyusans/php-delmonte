@@ -18,21 +18,102 @@
 
     function signup($json)
     {
-      // {"username":"joe","password":"joe","email":"joe@gmail.com"}
       include "connection.php";
-      $json = json_decode($json, true);
-      if (recordExists($json['username'], "tbl_user", "user_username")) {
-        return -1;
-      } else if (recordExists($json['email'], "tbl_user", "user_email")) {
-        return -2;
+      $conn->beginTransaction();
+      try {
+        $json = json_decode($json, true);
+        $personalInformation = $json['personalInformation'];
+        $educationalBackground = $json['educationalBackground'];
+        $employmentHistory = $json['employmentHistory'];
+        $positionApplied = $json['positionApplied'];
+        if (recordExists($personalInformation['email'], "tbl_personal_information", "email")) {
+          // email already exist
+          return -1;
+        }
+        $sql = "INSERT INTO tbl_personal_information ( 
+              last_name, first_name, middle_name, contact_number, 
+              alternate_contact_number, email, alternate_email, 
+              present_address, permanent_address, date_of_birth, sex, sss_number, 
+              tin_number, philhealth_number, pagibig_number, personal_password) 
+              VALUES (:last_name, :first_name, :middle_name, :contact_number, 
+              :alternate_contact_number, :email, :alternate_email, 
+              :present_address, :permanent_address, :date_of_birth, :sex, :sss_number, 
+              :tin_number, :philhealth_number, :pagibig_number, :personal_password)";
+        $stmt = $conn->prepare($sql);
+
+        $stmt->bindParam(':last_name', $personalInformation['last_name']);
+        $stmt->bindParam(':first_name', $personalInformation['first_name']);
+        $stmt->bindParam(':middle_name', $personalInformation['middle_name']);
+        $stmt->bindParam(':contact_number', $personalInformation['contact_number']);
+        $stmt->bindParam(':alternate_contact_number', $personalInformation['alternate_contact_number']);
+        $stmt->bindParam(':email', $personalInformation['email']);
+        $stmt->bindParam(':alternate_email', $personalInformation['alternate_email']);
+        $stmt->bindParam(':present_address', $personalInformation['present_address']);
+        $stmt->bindParam(':permanent_address', $personalInformation['permanent_address']);
+        $stmt->bindParam(':date_of_birth', $personalInformation['date_of_birth']);
+        $stmt->bindParam(':sex', $personalInformation['sex']);
+        $stmt->bindParam(':sss_number', $personalInformation['sss_number']);
+        $stmt->bindParam(':tin_number', $personalInformation['tin_number']);
+        $stmt->bindParam(':philhealth_number', $personalInformation['philhealth_number']);
+        $stmt->bindParam(':pagibig_number', $personalInformation['pagibig_number']);
+        $stmt->bindParam(':personal_password', $personalInformation['personal_password']);
+        $stmt->execute();
+        $newId = $conn->lastInsertId();
+        if ($stmt->rowCount() > 0) {
+          $sql = "INSERT INTO tbl_educational_background (
+                  personal_info_id, courses_id, school_id, date_of_graduation, prc_license_number) 
+                  VALUES (:personal_info_id, :courses_id, :school_id, :date_of_graduation, :prc_license_number)";
+          foreach ($educationalBackground as $item) {
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':personal_info_id', $newId);
+            $stmt->bindParam(':courses_id', $item['courses_id']);
+            $stmt->bindParam(':school_id', $item['school_id']);
+            $stmt->bindParam(':date_of_graduation', $item['date_of_graduation']);
+            $stmt->bindParam(':prc_license_number', $item['prc_license_number']);
+            $stmt->execute();
+          }
+          if ($stmt->rowCount() > 0) {
+            $sql = "INSERT INTO tbl_employment_history ( 
+                    personal_info_id, employment_position_name, employment_company_name, employment_start_date, employment_end_date) 
+                    VALUES (:personal_info_id, :employment_position_name, :employment_company_name, :employment_start_date, :employment_end_date)";
+            foreach ($employmentHistory as $item) {
+              $stmt = $conn->prepare($sql);
+              $stmt->bindParam(':personal_info_id', $newId);
+              $stmt->bindParam(':employment_position_name', $item['employment_position_name']);
+              $stmt->bindParam(':employment_company_name', $item['employment_company_name']);
+              $stmt->bindParam(':employment_start_date', $item['employment_start_date']);
+              $stmt->bindParam(':employment_end_date', $item['employment_end_date']);
+              $stmt->execute();
+            }
+            if ($stmt->rowCount() > 0) {
+              $sql = "INSERT INTO tbl_position_applied (
+                      personal_info_id, apply_position_id)
+                      VALUES (:personal_info_id, :apply_position_id)";
+              foreach ($positionApplied as $item) {
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':personal_info_id', $newId);
+                $stmt->bindParam(':apply_position_id', $item['apply_position_id']);
+                $stmt->execute();
+                if ($stmt->rowCount() > 0) {
+                  $sql = "INSERT INTO tbl_consent(personal_info_id, subscribe_to_email_updates) 
+                          VALUES (:personal_info_id, :subscribe_to_email_updates)";
+                  $stmt = $conn->prepare($sql);
+                  $stmt->bindParam(':personal_info_id', $newId);
+                  $stmt->bindParam(':subscribe_to_email_updates', $json['subscribe_to_email_updates']);
+                  $stmt->execute();
+                  if ($stmt->rowCount() > 0) {
+                    $conn->commit();
+                    return 1;
+                  }
+                }
+              }
+            }
+          }
+        }
+      } catch (PDOException $th) {
+        $conn->rollBack();
+        return $th;
       }
-      $sql = "INSERT INTO tbl_user (user_username, user_password, user_email, user_level) VALUES (:username, :password, :email, 90)";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':username', $json['username']);
-      $stmt->bindParam(':password', $json['password']);
-      $stmt->bindParam(':email', $json['email']);
-      $stmt->execute();
-      return $stmt->rowCount() > 0 ? 1 : 0;
     }
   } //user
 
@@ -61,7 +142,7 @@
       $fileExt = explode(".", $fileName);
       $fileActualExt = strtolower(end($fileExt));
 
-      $allowed = ["jpg", "jpeg", "png", "gif"];
+      $allowed = ["jpg", "jpeg", "png"];
 
       if (in_array($fileActualExt, $allowed)) {
         if ($fileError === 0) {
@@ -87,8 +168,9 @@
   function getCurrentDate()
   {
     $today = new DateTime("now", new DateTimeZone('Asia/Manila'));
-    return $today->format('Y-m-d H:i:s');
+    return $today->format('Y-m-d h:i:s A');
   }
+
 
   $json = isset($_POST["json"]) ? $_POST["json"] : "0";
   $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
