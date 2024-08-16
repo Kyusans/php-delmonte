@@ -115,6 +115,15 @@
         return $th;
       }
     }
+
+    function getSchools()
+    {
+      include "connection.php";
+      $sql = "SELECT * FROM tbl_school";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
+    }
   } //user
 
   function recordExists($value, $table, $column)
@@ -183,6 +192,9 @@
       break;
     case "signup":
       echo $user->signup($json);
+      break;
+    case "getSchools":
+      echo $user->getSchools();
       break;
     default:
       echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA";
