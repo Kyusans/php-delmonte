@@ -132,6 +132,14 @@
       $stmt->execute();
       return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
     }
+
+    function sendEmail($json){
+      include "send_email.php";
+      // {"emailToSent":"xhifumine@gmail.com","emailSubject":"Kunwari MESSAGE","emailBody":"Kunwari message ni diri hehe <b>102345</b>"}
+      $data = json_decode($json, true);
+      $sendEmail = new SendEmail();
+      return $sendEmail->sendEmail($data['emailToSent'], $data['emailSubject'], $data['emailBody']);
+    }
   } //user
 
   function recordExists($value, $table, $column)
@@ -206,6 +214,9 @@
       break;
     case "getCourses":
       echo $user->getCourses();
+      break;
+    case "sendEmail":
+      echo $user->sendEmail($json);
       break;
     default:
       echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
