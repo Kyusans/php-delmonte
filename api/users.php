@@ -134,16 +134,48 @@
       return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
     }
 
-    function sendEmail($json)
+    function getPinCode($json)
     {
+      // {"email": "qkyusans@gmail"}
+      include "connection.php";
       include "send_email.php";
-      // {"emailToSent":"xhifumine@gmail.com","emailSubject":"Kunwari MESSAGE","emailBody":"Kunwari message ni diri hehe <b>102345</b>"}
-      $data = json_decode($json, true);
-      $sendEmail = new SendEmail();
-      return $sendEmail->sendEmail($data['emailToSent'], $data['emailSubject'], $data['emailBody']);
-    }
 
-    function getSkills(){
+      $data = json_decode($json, true);
+      if (recordExists($data['email'], "tbl_personal_information", "email")) return -1;
+
+      $conn->beginTransaction();
+      try {
+        $firstLetter = strtoupper(substr($data['email'], 0, 1));
+        $thirdLetter = strtoupper(substr($data['email'], 2, 1));
+        $pincode = $firstLetter . rand(100, 999) . $thirdLetter . rand(10000, 99999);
+
+        $currentDateTime = new DateTime("now", new DateTimeZone('Asia/Manila'));
+        $expirationDateTime = $currentDateTime->add(new DateInterval('PT15M'));
+        $expirationTimestamp = $expirationDateTime->format('Y-m-d H:i:s');
+
+        $sql = "INSERT INTO tbl_pincode (pin_email, pin_code, pin_expiration_date) VALUES (:email, :pincode, :pin_expiration_date)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $data['email']);
+        $stmt->bindParam(':pincode', $pincode);
+        $stmt->bindParam(':pin_expiration_date', $expirationTimestamp);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0) {
+          $sendEmail = new SendEmail();
+          $sendEmail->sendEmail($data['email'], $pincode . " - Your PIN Code", "Please use the following code to complete the first step:<br /><br /> <b>$pincode</b>");
+          $conn->commit();
+          return json_encode(["pincode" => $pincode, "expirationDate" => $expirationTimestamp]);
+        } else {
+          $conn->rollBack();
+          return 0;
+        }
+      } catch (\Throwable $th) {
+        $conn->rollBack();
+        return 0;
+      }
+    }
+    function getSkills()
+    {
       include "connection.php";
       $sql = "SELECT * FROM tbl_personal_skills";
       $stmt = $conn->prepare($sql);
@@ -163,6 +195,17 @@
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
+    }
+
+    function isEmailExist($json){
+      // {"email": "qkyusans@gmail"}
+      include "connection.php";
+      $data = json_decode($json, true);
+      if(recordExists($data['email'], "tbl_personal_information", "email")){
+        return -1;
+      }else{
+        return 1;
+      }
     }
   } //user
 
@@ -220,7 +263,7 @@
     return $today->format('Y-m-d h:i:s A');
   }
 
-
+  $input = json_decode(file_get_contents('php://input'), true);
   $json = isset($_POST["json"]) ? $_POST["json"] : "0";
   $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
 
@@ -239,14 +282,17 @@
     case "getCourses":
       echo $user->getCourses();
       break;
-    case "sendEmail":
-      echo $user->sendEmail($json);
+    case "getPinCode":
+      echo $user->getPinCode($json);
       break;
     case "getActiveJob":
       echo $user->getActiveJob();
       break;
     case "getSkills":
       echo $user->getSkills();
+      break;
+    case "isEmailExist":
+      echo $user->isEmailExist($json);
       break;
     default:
       echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
