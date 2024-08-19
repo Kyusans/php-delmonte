@@ -1,4 +1,4 @@
- <?php
+<?php
   include "headers.php";
 
   class User
@@ -263,6 +263,7 @@
     return $today->format('Y-m-d h:i:s A');
   }
 
+  $input = json_decode(file_get_contents('php://input'), true);
   $input = json_decode(file_get_contents('php://input'), true);
   $json = isset($_POST["json"]) ? $_POST["json"] : "0";
   $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
