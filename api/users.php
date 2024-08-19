@@ -116,16 +116,17 @@
       }
     }
 
-    function getSchools()
+    function getInstitution()
     {
       include "connection.php";
-      $sql = "SELECT * FROM tbl_school";
+      $sql = "SELECT * FROM tbl_institution";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
     }
 
-    function getCourses(){
+    function getCourses()
+    {
       include "connection.php";
       $sql = "SELECT * FROM tbl_courses";
       $stmt = $conn->prepare($sql);
@@ -133,12 +134,27 @@
       return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
     }
 
-    function sendEmail($json){
+    function sendEmail($json)
+    {
       include "send_email.php";
       // {"emailToSent":"xhifumine@gmail.com","emailSubject":"Kunwari MESSAGE","emailBody":"Kunwari message ni diri hehe <b>102345</b>"}
       $data = json_decode($json, true);
       $sendEmail = new SendEmail();
       return $sendEmail->sendEmail($data['emailToSent'], $data['emailSubject'], $data['emailBody']);
+    }
+
+    function getActiveJob()
+    {
+      include "connection.php";
+      $sql = "SELECT a.*, COUNT(b.apply_position_id) as Total_Applied 
+              FROM tbl_apply_position a  
+              LEFT JOIN tbl_position_applied b 
+              ON a.apply_position_id = b.apply_position_id 
+              WHERE a.apply_position_status = 1 
+              GROUP BY a.apply_position_id ";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
     }
   } //user
 
@@ -209,14 +225,17 @@
     case "signup":
       echo $user->signup($json);
       break;
-    case "getSchools":
-      echo $user->getSchools();
+    case "getInstitution":
+      echo $user->getInstitution();
       break;
     case "getCourses":
       echo $user->getCourses();
       break;
     case "sendEmail":
       echo $user->sendEmail($json);
+      break;
+    case "getActiveJob":
+      echo $user->getActiveJob();
       break;
     default:
       echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
