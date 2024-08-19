@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 17, 2024 at 04:58 PM
+-- Generation Time: Aug 19, 2024 at 03:05 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `db_delmonte`
+-- Database: `dbdelmonte`
 --
 
 -- --------------------------------------------------------
@@ -29,21 +29,22 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `tbl_apply_position` (
   `apply_position_id` int(20) NOT NULL,
-  `apply_position_name` varchar(250) NOT NULL
+  `apply_position_name` varchar(250) NOT NULL,
+  `apply_position_status` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_apply_position`
 --
 
-INSERT INTO `tbl_apply_position` (`apply_position_id`, `apply_position_name`) VALUES
-(1, 'Livestock Production Supervisor'),
-(2, 'Production Supervisor'),
-(3, 'Marketing Intern'),
-(4, 'Commercial Capability Development Intern'),
-(5, 'Production Shift Supervisor (Tetra Line)'),
-(6, 'Quality Assurance Analyst'),
-(7, 'Human Resources Supervisor');
+INSERT INTO `tbl_apply_position` (`apply_position_id`, `apply_position_name`, `apply_position_status`) VALUES
+(1, 'Livestock Production Supervisor', 1),
+(2, 'Production Supervisor', 0),
+(3, 'Marketing Intern', 1),
+(4, 'Commercial Capability Development Intern', 1),
+(5, 'Production Shift Supervisor (Tetra Line)', 0),
+(6, 'Quality Assurance Analyst', 0),
+(7, 'Human Resources Supervisor', 0);
 
 -- --------------------------------------------------------
 
@@ -223,6 +224,34 @@ CREATE TABLE `tbl_employment_history` (
   `employment_start_date` date NOT NULL,
   `employment_end_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_forgot_password`
+--
+
+CREATE TABLE `tbl_forgot_password` (
+  `forgot_password_id` int(11) NOT NULL,
+  `personal_info_id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `pin_code` varchar(6) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `expires_at` datetime NOT NULL,
+  `status` enum('pending','used','expired') DEFAULT 'pending'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Triggers `tbl_forgot_password`
+--
+DELIMITER $$
+CREATE TRIGGER `set_default_expires_at` BEFORE INSERT ON `tbl_forgot_password` FOR EACH ROW BEGIN
+    IF NEW.expires_at IS NULL THEN
+        SET NEW.expires_at = NOW() + INTERVAL 15 MINUTE;
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -2692,6 +2721,13 @@ CREATE TABLE `tbl_personal_information` (
   `active_status` int(20) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tbl_personal_information`
+--
+
+INSERT INTO `tbl_personal_information` (`personal_info_id`, `last_name`, `first_name`, `middle_name`, `contact_number`, `alternate_contact_number`, `email`, `alternate_email`, `present_address`, `permanent_address`, `date_of_birth`, `sex`, `sss_number`, `tin_number`, `philhealth_number`, `pagibig_number`, `personal_password`, `pin_code`, `active_status`) VALUES
+(6, 'macario', 'mel', 'sabido', '096768745321', '096498231232', 'mel@gmail.com', 'mel@gmail.com', 'balay', 'balay', '2024-08-08', 'Male', '031245', '123123', '123123', '123123', 'mel', '', 0);
+
 -- --------------------------------------------------------
 
 --
@@ -2758,6 +2794,16 @@ CREATE TABLE `tbl_position_applied` (
   `apply_position_id` int(20) NOT NULL,
   `date_time_applied` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_position_applied`
+--
+
+INSERT INTO `tbl_position_applied` (`position_applied_id`, `personal_info_id`, `apply_position_id`, `date_time_applied`) VALUES
+(1, 6, 4, '2024-08-19 08:44:25'),
+(2, 6, 3, '2024-08-19 08:44:42'),
+(3, 6, 1, '2024-08-19 08:50:16'),
+(4, 6, 1, '2024-08-19 08:50:18');
 
 -- --------------------------------------------------------
 
@@ -2835,6 +2881,13 @@ ALTER TABLE `tbl_educational_background`
 --
 ALTER TABLE `tbl_employment_history`
   ADD PRIMARY KEY (`employment_history_id`),
+  ADD KEY `personal_info_id` (`personal_info_id`);
+
+--
+-- Indexes for table `tbl_forgot_password`
+--
+ALTER TABLE `tbl_forgot_password`
+  ADD PRIMARY KEY (`forgot_password_id`),
   ADD KEY `personal_info_id` (`personal_info_id`);
 
 --
@@ -2938,6 +2991,12 @@ ALTER TABLE `tbl_employment_history`
   MODIFY `employment_history_id` int(20) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `tbl_forgot_password`
+--
+ALTER TABLE `tbl_forgot_password`
+  MODIFY `forgot_password_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `tbl_passing`
 --
 ALTER TABLE `tbl_passing`
@@ -2947,7 +3006,7 @@ ALTER TABLE `tbl_passing`
 -- AUTO_INCREMENT for table `tbl_personal_information`
 --
 ALTER TABLE `tbl_personal_information`
-  MODIFY `personal_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `personal_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tbl_personal_skills`
@@ -2965,7 +3024,7 @@ ALTER TABLE `tbl_personal_training`
 -- AUTO_INCREMENT for table `tbl_position_applied`
 --
 ALTER TABLE `tbl_position_applied`
-  MODIFY `position_applied_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `position_applied_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tbl_skills`
@@ -3009,6 +3068,12 @@ ALTER TABLE `tbl_educational_background`
 --
 ALTER TABLE `tbl_employment_history`
   ADD CONSTRAINT `tbl_employment_history_ibfk_1` FOREIGN KEY (`personal_info_id`) REFERENCES `tbl_personal_information` (`personal_info_id`);
+
+--
+-- Constraints for table `tbl_forgot_password`
+--
+ALTER TABLE `tbl_forgot_password`
+  ADD CONSTRAINT `tbl_forgot_password_ibfk_1` FOREIGN KEY (`personal_info_id`) REFERENCES `tbl_personal_information` (`personal_info_id`);
 
 --
 -- Constraints for table `tbl_position_applied`

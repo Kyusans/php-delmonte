@@ -143,6 +143,14 @@
       return $sendEmail->sendEmail($data['emailToSent'], $data['emailSubject'], $data['emailBody']);
     }
 
+    function getSkills(){
+      include "connection.php";
+      $sql = "SELECT * FROM tbl_personal_skills";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
+    }
+
     function getActiveJob()
     {
       include "connection.php";
@@ -236,6 +244,9 @@
       break;
     case "getActiveJob":
       echo $user->getActiveJob();
+      break;
+    case "getSkills":
+      echo $user->getSkills();
       break;
     default:
       echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
