@@ -143,7 +143,8 @@
       return $sendEmail->sendEmail($data['emailToSent'], $data['emailSubject'], $data['emailBody']);
     }
 
-    function getSkills(){
+    function getSkills()
+    {
       include "connection.php";
       $sql = "SELECT * FROM tbl_personal_skills";
       $stmt = $conn->prepare($sql);
@@ -220,7 +221,7 @@
     return $today->format('Y-m-d h:i:s A');
   }
 
-
+  $input = json_decode(file_get_contents('php://input'), true);
   $json = isset($_POST["json"]) ? $_POST["json"] : "0";
   $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
 
@@ -250,5 +251,6 @@
       break;
     default:
       echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
+      http_response_code(400);
       break;
   }
