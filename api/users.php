@@ -134,7 +134,8 @@ class User
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
 
-  function getCourseGraduate() {
+  function getCourseGraduate()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tbl_course_graduate";
     $stmt = $conn->prepare($sql);
@@ -202,6 +203,47 @@ class User
       return -1;
     } else {
       return 1;
+    }
+  }
+
+  function getAllDataForDropdownSignup()
+  {
+    include "connection.php";
+    $conn->beginTransaction();
+    try {
+      $data = [];
+
+      $sql = "SELECT * FROM tbl_institution";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['institution'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tbl_courses";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['courses'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tbl_course_graduate";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['courseGraduate'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tbl_personal_skills";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['skills'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tbl_personal_training";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['training'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $conn->commit();
+
+      return json_encode($data);
+    } catch (\Throwable $th) {
+      $conn->rollBack();
+      return 0;
     }
   }
 } //user
@@ -293,6 +335,9 @@ switch ($operation) {
     break;
   case "getCourseGraduate":
     echo $user->getCourseGraduate($json);
+    break;
+  case "getAllDataForDropdownSignup":
+    echo $user->getAllDataForDropdownSignup();
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
