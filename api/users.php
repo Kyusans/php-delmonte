@@ -25,7 +25,7 @@ class User
     // "skills":[{"skills":2},{"skills":5},{"skills":1},{"skills":7},{"skills":3}],
     // "trainings":[{"training":1},{"training":4},{"training":2},{"training":3}],
     // "positionId": "1",
-    // "isSubscribeToEmail":"false"}
+    // "isSubscribeToEmail": 1}
     include "connection.php";
     $conn->beginTransaction();
     try {
@@ -35,16 +35,16 @@ class User
       $employmentHistory = $json['employmentHistory'];
       $skills = $json['skills'];
       $trainings = $json['trainings'];
+      $createdDateTime = getCurrentDate();
 
-      $sql = "INSERT INTO tbl_personal_information ( 
-              last_name, first_name, middle_name, contact_number, 
-              alternate_contact_number, email, alternate_email, 
-              present_address, permanent_address, date_of_birth, sex, sss_number, 
-              tin_number, philhealth_number, pagibig_number, personal_password) 
-              VALUES (:last_name, :first_name, :middle_name, :contact_number, 
-              :alternate_contact_number, :email, :alternate_email, 
-              :present_address, :permanent_address, :date_of_birth, :sex, :sss_number, 
-              :tin_number, :philhealth_number, :pagibig_number, :personal_password)";
+      $sql = "INSERT INTO tblcandidates(cand_lastname, cand_firstname, cand_middlename, cand_contactNo,
+              cand_alternateContactNo, cand_email, cand_alternateEmail, cand_presentAddress, 
+              cand_permanentAddress, cand_dateofBirth, cand_sex, cand_sssNo, cand_tinNo,
+              cand_philhealthNo, cand_pagibigNo, cand_password, cand_createdDatetime) 
+              VALUES(:last_name, :first_name, :middle_name, :contact_number, :alternate_contact_number,
+              :email, :alternate_email, :present_address, :permanent_address, :date_of_birth,
+              :sex, :sss_number, :tin_number, :philhealth_number, :pagibig_number, 
+              :personal_password, :created_datetime)";
       $stmt = $conn->prepare($sql);
 
       $stmt->bindParam(':last_name', $personalInformation['lastName']);
@@ -53,7 +53,7 @@ class User
       $stmt->bindParam(':contact_number', $personalInformation['contact']);
       $stmt->bindParam(':alternate_contact_number', $personalInformation['alternateContact']);
       $stmt->bindParam(':email', $personalInformation['email']);
-      $stmt->bindParam(':alternate_email', $personalInformation['alternate_email']);
+      $stmt->bindParam(':alternate_email', $personalInformation['alternateEmail']);
       $stmt->bindParam(':present_address', $personalInformation['presentAddress']);
       $stmt->bindParam(':permanent_address', $personalInformation['permanentAddress']);
       $stmt->bindParam(':date_of_birth', $personalInformation['dob']);
@@ -63,12 +63,15 @@ class User
       $stmt->bindParam(':philhealth_number', $personalInformation['philhealth']);
       $stmt->bindParam(':pagibig_number', $personalInformation['pagibig']);
       $stmt->bindParam(':personal_password', $personalInformation['password']);
+      $stmt->bindParam(':created_datetime', $createdDateTime);
       $stmt->execute();
       $newId = $conn->lastInsertId();
       if ($stmt->rowCount() > 0) {
-        $sql = "INSERT INTO tbl_educational_background (
-                  personal_info_id, courses_id, course_date_graduated, course_graduate_id, institution_id, date_of_graduation, prc_license, prc_license_number) 
-                  VALUES (:personal_info_id, :courses_id, :course_date_graduated, :course_graduate_id, :institution_id, :date_of_graduation, :prc_license, :prc_license_number)";
+        $sql = "INSERT INTO tbleducbackground (
+                educ_personalId, educ_coursesId, educ_course_graduated, educ_coursegradId,
+                educ_institutionId, educ_dategraduate, 	educ_prcCert, educ_prcLicenseNo) 
+                VALUES (:personal_info_id, :courses_id, :course_date_graduated, :course_graduate_id,
+                :institution_id, :date_of_graduation, :prc_license, :prc_license_number)";
         foreach ($educationalBackground as $item) {
           $stmt = $conn->prepare($sql);
           $stmt->bindParam(':personal_info_id', $newId);
@@ -82,9 +85,9 @@ class User
           $stmt->execute();
         }
         if ($stmt->rowCount() > 0) {
-          $sql = "INSERT INTO tbl_employment_history ( 
-                    personal_info_id, employment_position_name, employment_company_name, employment_start_date, employment_end_date) 
-                    VALUES (:personal_info_id, :employment_position_name, :employment_company_name, :employment_start_date, :employment_end_date)";
+          $sql = "INSERT INTO tblemploymenthistory(empH_candId , empH_positionName, empH_companyName,
+                  empH_startDate, empH_endDate) VALUES (:personal_info_id, :employment_position_name,
+                  :employment_company_name, :employment_start_date, :employment_end_date)";
           foreach ($employmentHistory as $item) {
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':personal_info_id', $newId);
@@ -96,7 +99,7 @@ class User
           }
 
           if ($stmt->rowCount() > 0) {
-            $sql = "INSERT INTO tbl_training (personal_info_id, personal_training_id) 
+            $sql = "INSERT INTO tbltraining (training_candId , training_perTId ) 
                     VALUES (:personal_info_id, :personal_training_id)";
             foreach ($trainings as $item) {
               $stmt = $conn->prepare($sql);
@@ -106,7 +109,7 @@ class User
             }
 
             if ($stmt->rowCount() > 0) {
-              $sql = "INSERT INTO tbl_skills(personal_info_id, personal_skills_id) 
+              $sql = "INSERT INTO tblskills(skills_candId , skills_perSId) 
                       VALUES (:personal_info_id, :personal_skill_id)";
               foreach ($skills as $item) {
                 $stmt = $conn->prepare($sql);
@@ -115,15 +118,15 @@ class User
                 $stmt->execute();
               }
               if ($stmt->rowCount() > 0) {
-                $sql = "INSERT INTO tbl_position_applied (
-                  personal_info_id, apply_position_id)
-                  VALUES (:personal_info_id, :apply_position_id)";
+                $sql = "INSERT INTO tblpositionapplied(posA_candId, posA_jobMId, posA_datetime)
+                        VALUES (:personal_info_id, :apply_position_id, :created_datetime)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bindParam(':personal_info_id', $newId);
                 $stmt->bindParam(':apply_position_id', $json['positionId']);
+                $stmt->bindParam(':created_datetime', $createdDateTime);
                 $stmt->execute();
                 if ($stmt->rowCount() > 0) {
-                  $sql = "INSERT INTO tbl_consent(personal_info_id, subscribe_to_email_updates) 
+                  $sql = "INSERT INTO tblconsent(cons_candId , cons_subscribetoemailupdates) 
                       VALUES (:personal_info_id, :subscribe_to_email_updates)";
                   $stmt = $conn->prepare($sql);
                   $stmt->bindParam(':personal_info_id', $newId);
