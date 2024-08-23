@@ -151,7 +151,7 @@ class User
   function getInstitution()
   {
     include "connection.php";
-    $sql = "SELECT * FROM tbl_institution";
+    $sql = "SELECT * FROM tblinstitution";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
@@ -160,7 +160,7 @@ class User
   function getCourses()
   {
     include "connection.php";
-    $sql = "SELECT * FROM tbl_courses";
+    $sql = "SELECT * FROM tblcourses";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
@@ -169,7 +169,7 @@ class User
   function getCourseGraduate()
   {
     include "connection.php";
-    $sql = "SELECT * FROM tbl_course_graduate";
+    $sql = "SELECT * FROM tblcoursesgraduate";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
@@ -182,7 +182,7 @@ class User
     include "send_email.php";
 
     $data = json_decode($json, true);
-    if (recordExists($data['email'], "tbl_personal_information", "email")) return -1;
+    if (recordExists($data['email'], "tblcandidates", "email")) return -1;
 
     $firstLetter = strtoupper(substr($data['email'], 0, 1));
     $thirdLetter = strtoupper(substr($data['email'], 2, 1));
@@ -206,7 +206,7 @@ class User
   function getSkills()
   {
     include "connection.php";
-    $sql = "SELECT * FROM tbl_personal_skills";
+    $sql = "SELECT * FROM tblpersonalskills";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
@@ -215,12 +215,12 @@ class User
   function getActiveJob()
   {
     include "connection.php";
-    $sql = "SELECT a.*, COUNT(b.apply_position_id) as Total_Applied 
-              FROM tbl_apply_position a  
-              LEFT JOIN tbl_position_applied b 
-              ON a.apply_position_id = b.apply_position_id 
-              WHERE a.apply_position_status = 1 
-              GROUP BY a.apply_position_id ";
+    $sql = "SELECT a.*, COUNT(b.posA_id ) as Total_Applied 
+              FROM tbljobsmaster a  
+              LEFT JOIN tblpositionapplied b 
+              ON a.jobM_id   = b.posA_jobMId  
+              WHERE a.jobM_status = 1 
+              GROUP BY a.	jobM_id  ";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
@@ -231,7 +231,7 @@ class User
     // {"email": "qkyusans@gmail"}
     include "connection.php";
     $data = json_decode($json, true);
-    if (recordExists($data['email'], "tbl_personal_information", "email")) {
+    if (recordExists($data['email'], "tblcandidates", "email")) {
       return -1;
     } else {
       return 1;
@@ -245,27 +245,27 @@ class User
     try {
       $data = [];
 
-      $sql = "SELECT * FROM tbl_institution";
+      $sql = "SELECT * FROM tblinstitution";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['institution'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-      $sql = "SELECT * FROM tbl_courses";
+      $sql = "SELECT * FROM tblcourses";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['courses'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-      $sql = "SELECT * FROM tbl_course_graduate";
+      $sql = "SELECT * FROM tblcoursesgraduate";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['courseGraduate'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-      $sql = "SELECT * FROM tbl_personal_skills";
+      $sql = "SELECT * FROM tblpersonalskills";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['skills'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-      $sql = "SELECT * FROM tbl_personal_training";
+      $sql = "SELECT * FROM tblpersonaltraining";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['training'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
