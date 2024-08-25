@@ -182,7 +182,7 @@ class User
     include "send_email.php";
 
     $data = json_decode($json, true);
-    if (recordExists($data['email'], "tblcandidates", "email")) return -1;
+    if (recordExists($data['email'], "tblcandidates", "cand_email")) return -1;
 
     $firstLetter = strtoupper(substr($data['email'], 0, 1));
     $thirdLetter = strtoupper(substr($data['email'], 2, 1));
@@ -203,6 +203,7 @@ class User
 
     return json_encode(["pincode" => $pincode, "expirationDate" => $expirationTimestamp]);
   }
+
   function getSkills()
   {
     include "connection.php";
@@ -231,7 +232,7 @@ class User
     // {"email": "qkyusans@gmail"}
     include "connection.php";
     $data = json_decode($json, true);
-    if (recordExists($data['email'], "tblcandidates", "email")) {
+    if (recordExists($data['email'], "tblcandidates", "cand_email")) {
       return -1;
     } else {
       return 1;
