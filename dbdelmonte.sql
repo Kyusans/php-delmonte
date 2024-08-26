@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 23, 2024 at 04:25 AM
+-- Generation Time: Aug 25, 2024 at 10:00 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -2740,8 +2740,16 @@ INSERT INTO `tblinstitution` (`institution_id`, `institution_name`, `institution
 CREATE TABLE `tbljobseducation` (
   `jeduc_id` int(11) NOT NULL,
   `jeduc_jobId` int(11) NOT NULL,
+  `jeduc_text` text NOT NULL,
   `jeduc_categoryId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbljobseducation`
+--
+
+INSERT INTO `tbljobseducation` (`jeduc_id`, `jeduc_jobId`, `jeduc_text`, `jeduc_categoryId`) VALUES
+(1, 1, 'While a high school diploma or its equivalent is common, some employers may prefer candidates with an associate’s or bachelor’s degree in animal science, agriculture, or a related field', 0);
 
 -- --------------------------------------------------------
 
@@ -2752,8 +2760,16 @@ CREATE TABLE `tbljobseducation` (
 CREATE TABLE `tbljobsknowledge` (
   `jknow_id` int(11) NOT NULL,
   `jknow_jobId` int(11) NOT NULL,
+  `jknow_text` text NOT NULL,
   `jknow_knowledgeId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbljobsknowledge`
+--
+
+INSERT INTO `tbljobsknowledge` (`jknow_id`, `jknow_jobId`, `jknow_text`, `jknow_knowledgeId`) VALUES
+(1, 1, 'Proficiency in animal husbandry, including feeding, breeding, and healthcare of various types of livestock.', 0);
 
 -- --------------------------------------------------------
 
@@ -2773,7 +2789,7 @@ CREATE TABLE `tbljobsmaster` (
 --
 
 INSERT INTO `tbljobsmaster` (`jobM_id`, `jobM_title`, `jobM_description`, `jobM_status`) VALUES
-(1, 'Livestock Production Supervisor', '', 1),
+(1, 'Livestock Production Supervisor', 'A Livestock Supervisor oversees daily operations on farms that raise animals for consumption or product use. They manage feeding, health care, and humane treatment of livestock, supervise farm workers, and prepare reports on production and management. Additionally, they coordinate breeding, monitor animal health, and ensure compliance with regulations. If you’re interested in related roles, Livestock Production Managers oversee farm operations for milk, meat, wool, and other products, focusing on safety and yield optimization. ', 1),
 (2, 'Production Supervisor', '', 0),
 (3, 'Marketing Intern', '', 1),
 (4, 'Commercial Capability Development Intern', '', 1),
@@ -2793,6 +2809,15 @@ CREATE TABLE `tbljobsmasterduties` (
   `duties_text` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tbljobsmasterduties`
+--
+
+INSERT INTO `tbljobsmasterduties` (`duties_id`, `duties_jobId`, `duties_text`) VALUES
+(1, 1, 'Daily Operations: Managing the daily operations of the livestock farm, including feeding and health care of animals.'),
+(2, 1, 'Health Monitoring: Inspecting livestock for signs of illness, injury, or unusual behavior and notifying veterinarians or veterinary technicians of any issues.'),
+(3, 1, 'Humane Treatment: Ensuring all animals are treated humanely and in accordance with government regulations.');
+
 -- --------------------------------------------------------
 
 --
@@ -2802,8 +2827,16 @@ CREATE TABLE `tbljobsmasterduties` (
 CREATE TABLE `tbljobsskills` (
   `jskills_id` int(11) NOT NULL,
   `jskills_jobId` int(11) NOT NULL,
+  `jskills_text` text NOT NULL,
   `jskills_skillsId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbljobsskills`
+--
+
+INSERT INTO `tbljobsskills` (`jskills_id`, `jskills_jobId`, `jskills_text`, `jskills_skillsId`) VALUES
+(1, 1, 'Ability to oversee daily operations, manage farm laborers, and implement animal husbandry protocols.', 0);
 
 -- --------------------------------------------------------
 
@@ -2814,8 +2847,16 @@ CREATE TABLE `tbljobsskills` (
 CREATE TABLE `tbljobstrainings` (
   `jtrng_id` int(11) NOT NULL,
   `jtrng_jobId` int(11) NOT NULL,
+  `jtrng_text` text NOT NULL,
   `jtrng_trainingId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbljobstrainings`
+--
+
+INSERT INTO `tbljobstrainings` (`jtrng_id`, `jtrng_jobId`, `jtrng_text`, `jtrng_trainingId`) VALUES
+(1, 1, 'A genuine interest in the farming industry and a commitment to animal welfare.\r\nRemember that specific job requirements may vary depending on the organization and the type of livestock being raised. ', 0);
 
 -- --------------------------------------------------------
 
@@ -2826,9 +2867,16 @@ CREATE TABLE `tbljobstrainings` (
 CREATE TABLE `tbljobsworkexperience` (
   `jwork_id` int(11) NOT NULL,
   `jwork_jobId` int(11) NOT NULL,
-  `jwork_duration` int(50) NOT NULL,
-  `jwork_responsibilities` varchar(250) NOT NULL
+  `jwork_duration` text NOT NULL,
+  `jwork_responsibilities` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbljobsworkexperience`
+--
+
+INSERT INTO `tbljobsworkexperience` (`jwork_id`, `jwork_jobId`, `jwork_duration`, `jwork_responsibilities`) VALUES
+(1, 1, '8 hours a day', 'A genuine interest in the farming industry and a commitment to animal welfare.\r\nRemember that specific job requirements may vary depending on the organization and the type of livestock being raised. ');
 
 -- --------------------------------------------------------
 
@@ -2920,7 +2968,8 @@ INSERT INTO `tblpositionapplied` (`posA_id`, `posA_candId`, `posA_jobMId`, `posA
 (3, 6, 1, '2024-08-19 08:50:16', 0, '0000-00-00 00:00:00'),
 (4, 6, 1, '2024-08-19 08:50:18', 0, '0000-00-00 00:00:00'),
 (5, 7, 6, '2024-08-21 16:16:10', 0, '0000-00-00 00:00:00'),
-(6, 7, 3, '2024-08-21 16:16:10', 0, '0000-00-00 00:00:00');
+(6, 7, 3, '2024-08-21 16:16:10', 0, '0000-00-00 00:00:00'),
+(7, 7, 1, '2024-08-23 16:10:04', 0, '2024-08-23 10:09:49');
 
 -- --------------------------------------------------------
 
@@ -2946,16 +2995,15 @@ CREATE TABLE `tblsupervisor` (
   `sup_name` varchar(50) NOT NULL,
   `sup_email` varchar(50) NOT NULL,
   `sup_password` varchar(50) NOT NULL,
-  `sup_user_level` varchar(20) NOT NULL,
-  `user_level_id` int(11) NOT NULL
+  `sup_user_level` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblsupervisor`
 --
 
-INSERT INTO `tblsupervisor` (`sup_id`, `sup_name`, `sup_email`, `sup_password`, `sup_user_level`, `user_level_id`) VALUES
-(1, 'jake', 'jake@gmail.com', 'jake', 'supervisor', 3);
+INSERT INTO `tblsupervisor` (`sup_id`, `sup_name`, `sup_email`, `sup_password`, `sup_user_level`) VALUES
+(1, 'jake', 'jake@gmail.com', 'jake', 'supervisor');
 
 -- --------------------------------------------------------
 
@@ -3127,8 +3175,7 @@ ALTER TABLE `tblskills`
 -- Indexes for table `tblsupervisor`
 --
 ALTER TABLE `tblsupervisor`
-  ADD PRIMARY KEY (`sup_id`),
-  ADD KEY `user_level_id` (`user_level_id`);
+  ADD PRIMARY KEY (`sup_id`);
 
 --
 -- Indexes for table `tbltraining`
@@ -3200,13 +3247,13 @@ ALTER TABLE `tblforgotpassword`
 -- AUTO_INCREMENT for table `tbljobseducation`
 --
 ALTER TABLE `tbljobseducation`
-  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tbljobsknowledge`
 --
 ALTER TABLE `tbljobsknowledge`
-  MODIFY `jknow_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `jknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tbljobsmaster`
@@ -3218,25 +3265,25 @@ ALTER TABLE `tbljobsmaster`
 -- AUTO_INCREMENT for table `tbljobsmasterduties`
 --
 ALTER TABLE `tbljobsmasterduties`
-  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tbljobsskills`
 --
 ALTER TABLE `tbljobsskills`
-  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tbljobstrainings`
 --
 ALTER TABLE `tbljobstrainings`
-  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tbljobsworkexperience`
 --
 ALTER TABLE `tbljobsworkexperience`
-  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblpassing`
@@ -3260,7 +3307,7 @@ ALTER TABLE `tblpersonaltraining`
 -- AUTO_INCREMENT for table `tblpositionapplied`
 --
 ALTER TABLE `tblpositionapplied`
-  MODIFY `posA_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `posA_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tblskills`
@@ -3366,12 +3413,6 @@ ALTER TABLE `tblpositionapplied`
 ALTER TABLE `tblskills`
   ADD CONSTRAINT `tblskills_ibfk_1` FOREIGN KEY (`skills_candId`) REFERENCES `tblcandidates` (`cand_id`),
   ADD CONSTRAINT `tblskills_ibfk_2` FOREIGN KEY (`skills_perSId`) REFERENCES `tblpersonalskills` (`perS_id`);
-
---
--- Constraints for table `tblsupervisor`
---
-ALTER TABLE `tblsupervisor`
-  ADD CONSTRAINT `tblsupervisor_ibfk_1` FOREIGN KEY (`user_level_id`) REFERENCES `tbl_user_level` (`user_level_id`);
 
 --
 -- Constraints for table `tbltraining`

@@ -56,7 +56,8 @@ include "headers.php";
 
 class Admin
 {
-  function addJobMaster($json){
+  function addJobMaster($json)
+  {
 
     // {
     //   "jobMaster": {
@@ -114,7 +115,7 @@ class Admin
     //     }
     //   ]
     // }
-    
+
     include "connection.php";
     $conn->beginTransaction();
     $data = json_decode($json, true);
@@ -128,7 +129,6 @@ class Admin
     $jobWorkExperience = $data['jobWorkExperience'];
 
     try {
-
       $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description) VALUES (:jobM_title, :jobM_description)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobM_title", $jobMaster['title']);
@@ -189,8 +189,21 @@ class Admin
       return 1;
     } catch (PDOException $th) {
       $conn->rollBack();
-      return 0;
+      return $th;
     }
+  }
+
+  function getAllJobs()
+  {
+    include "connection.php";
+    $sql = "SELECT a.*, COUNT(b.posA_id ) as Total_Applied 
+              FROM tbljobsmaster a  
+              LEFT JOIN tblpositionapplied b 
+              ON a.jobM_id = b.posA_jobMId  
+              GROUP BY a.	jobM_id ";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
 } //admin
 
@@ -254,8 +267,11 @@ $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
 $user = new Admin();
 
 switch ($operation) {
-  case"addJobMaster":
+  case "addJobMaster":
     echo $user->addJobMaster($json);
+    break;
+  case "getAllJobs":
+    echo $user->getAllJobs();
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
