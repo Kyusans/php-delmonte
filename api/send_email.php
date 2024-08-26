@@ -34,7 +34,7 @@ class SendEmail
             $mail->isHTML(true);                                  // Set email format to HTML
             $mail->Subject = $emailSubject;
             $mail->Body    = $emailBody;
-            $mail->AltBody = 'Kunwari alt body diri hehe';
+            // $mail->AltBody = 'Kunwari alt body diri hehe';
 
             $mail->send();
             return 1; // Success
