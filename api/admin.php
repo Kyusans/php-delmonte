@@ -60,62 +60,38 @@ class Admin
   {
 
     // {
-    //   "jobMaster": {
-    //     "title": "Software Developer",
-    //     "description": "Responsible for developing and maintaining software applications."
-    //   },
+    //   "jobMaster": {"title": "Sample Job Title", "description": "A detailed job description that outlines the main duties, responsibilities, and qualifications required for this position."},
     //   "jobMasterDuties": [
-    //     {
-    //       "dutiesText": "Design and implement software solutions."
-    //     },
-    //     {
-    //       "dutiesText": "Collaborate with cross-functional teams."
-    //     }
+    //     {"duties": "Oversee daily operations and ensure smooth workflow across all departments, with a focus on efficiency and quality."},
+    //     {"duties": "Develop and implement strategic plans to achieve organizational goals, enhancing productivity and profitability."},
+    //     {"duties": "Lead and mentor a team of professionals, fostering a collaborative environment and encouraging continuous learning."}
     //   ],
     //   "jobEducation": [
-    //     {
-    //       "categoryId": 1
-    //     },
-    //     {
-    //       "categoryId": 2
-    //     }
+    //     {"courseCategory": 4, "jobEducation": "Bachelor's degree in Business Administration or a related field, providing a solid foundation in management principles."},
+    //     {"courseCategory": 3, "jobEducation": "Master's degree in Business Administration or a related field, focusing on advanced business strategies and leadership skills."}
     //   ],
     //   "jobTraining": [
-    //     {
-    //       "trainingId": 1
-    //     },
-    //     {
-    //       "trainingId": 2
-    //     }
+    //     {"training": 3, "jobTraining": "Certified Project Management Professional (PMP) training to enhance project management skills and knowledge."},
+    //     {"training": 2, "jobTraining": "Leadership development program designed to equip leaders with the skills necessary to drive team performance and business success."},
+    //     {"training": 1, "jobTraining": "Advanced Excel training for data analysis, financial modeling, and complex calculations, providing essential tools for business decisions."}
     //   ],
     //   "jobKnowledge": [
-    //     {
-    //       "knowledgeId": 201
-    //     },
-    //     {
-    //       "knowledgeId": 202
-    //     }
+    //     {"jobKnowledge": "In-depth knowledge of business processes, operations management, and strategic planning, with a focus on maximizing efficiency."},
+    //     {"jobKnowledge": "Strong understanding of financial management, including budgeting, forecasting, and financial analysis to support decision-making."},
+    //     {"jobKnowledge": "Comprehensive knowledge of human resources management, including recruitment, training, performance evaluation, and employee relations."}
     //   ],
-    //   "jobSkills": [
-    //     {
-    //       "skillId": 301
-    //     },
-    //     {
-    //       "skillId": 302
-    //     }
+    //   "jobSkill": [
+    //     {"skill": 3, "jobSkill": "Excellent communication and interpersonal skills, enabling effective collaboration and relationship-building with stakeholders at all levels."},
+    //     {"skill": 2, "jobSkill": "Proficient in data analysis and interpretation, with the ability to translate complex data into actionable insights."},
+    //     {"skill": 1, "jobSkill": "Strong leadership and team management abilities, with a proven track record of driving team performance and achieving targets."}
     //   ],
-    //   "jobWorkExperience": [
-    //     {
-    //       "duration": "2",
-    //       "responsibilities": "Developed web applications using React.js."
-    //     },
-    //     {
-    //       "duration": "3",
-    //       "responsibilities": "Led a team of developers in creating mobile apps."
-    //     }
+    //   "jobExperience": [
+    //     {"yearsOfExperience": "8", "jobExperience": "Extensive experience in operations management, with a proven ability to optimize processes and improve efficiency."},
+    //     {"yearsOfExperience": "15", "jobExperience": "Significant experience in strategic planning and business development, with a focus on driving growth and profitability."},
+    //     {"yearsOfExperience": "20", "jobExperience": "Comprehensive experience in leading cross-functional teams, fostering a collaborative environment, and achieving organizational objectives."}
     //   ]
     // }
-
+    
     include "connection.php";
     $conn->beginTransaction();
     $data = json_decode($json, true);
@@ -125,8 +101,8 @@ class Admin
     $jobEducation = $data['jobEducation'];
     $jobTraining = $data['jobTraining'];
     $jobKnowledge = $data['jobKnowledge'];
-    $jobSkills = $data['jobSkills'];
-    $jobWorkExperience = $data['jobWorkExperience'];
+    $jobSkills = $data['jobSkill'];
+    $jobWorkExperience = $data['jobExperience'];
 
     try {
       $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description) VALUES (:jobM_title, :jobM_description)";
@@ -141,39 +117,44 @@ class Admin
       foreach ($jobMasterDuties as $duty) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":duties_jobId", $jobMasterId);
-        $stmt->bindParam(":duties_text", $duty['dutiesText']);
+        $stmt->bindParam(":duties_text", $duty['duties']);
         $stmt->execute();
       }
 
-      $sql = "INSERT INTO tbljobseducation (jeduc_jobId, jeduc_categoryId) VALUES (:jeduc_jobId, :jeduc_categoryId)";
+      $sql = "INSERT INTO tbljobseducation (jeduc_jobId, jeduc_text, jeduc_categoryId) VALUES (:jeduc_jobId, :jeduc_text, :jeduc_categoryId)";
       foreach ($jobEducation as $education) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jeduc_jobId", $jobMasterId);
-        $stmt->bindParam(":jeduc_categoryId", $education['categoryId']);
+        $stmt->bindParam(":jeduc_text", $education['jobEducation']);
+        $stmt->bindParam(":jeduc_categoryId", $education['courseCategory']);
         $stmt->execute();
       }
 
-      $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_trainingId) VALUES (:jtrng_jobId, :jtrng_trainingId)";
+      $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_trainingId) VALUES (:jtrng_jobId, :jtrng_text, :jtrng_trainingId)";
       foreach ($jobTraining as $training) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jtrng_jobId", $jobMasterId);
-        $stmt->bindParam(":jtrng_trainingId", $training['trainingId']);
+        $stmt->bindParam(":jtrng_text", $training['jobTraining']);
+        $stmt->bindParam(":jtrng_trainingId", $training['training']);
         $stmt->execute();
       }
 
-      $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_knowledgeId) VALUES (:jknow_jobId, :jknow_knowledgeId)";
+      // $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_text, jknow_knowledgeId) VALUES (:jknow_jobId, :jknow_knowledgeId)";
+      $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_text) VALUES (:jknow_jobId, :jknow_text)";
       foreach ($jobKnowledge as $knowledge) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jknow_jobId", $jobMasterId);
-        $stmt->bindParam(":jknow_knowledgeId", $knowledge['knowledgeId']);
+        $stmt->bindParam(":jknow_text", $knowledge['jobKnowledge']);
+        // $stmt->bindParam(":jknow_knowledgeId", $knowledge['jobKnowledge']);
         $stmt->execute();
       }
 
-      $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_skillsId) VALUES (:jskills_jobId, :jskills_skillsId)";
+      $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_text, jskills_skillsId) VALUES (:jskills_jobId, :jskills_text, :jskills_skillsId)";
       foreach ($jobSkills as $skill) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jskills_jobId", $jobMasterId);
-        $stmt->bindParam(":jskills_skillsId", $skill['skillId']);
+        $stmt->bindParam(":jskills_text", $skill['jobSkill']);
+        $stmt->bindParam(":jskills_skillsId", $skill['skill']);
         $stmt->execute();
       }
 
@@ -181,8 +162,8 @@ class Admin
       foreach ($jobWorkExperience as $experience) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jwork_jobId", $jobMasterId);
-        $stmt->bindParam(":jwork_duration", $experience['duration']);
-        $stmt->bindParam(":jwork_responsibilities", $experience['responsibilities']);
+        $stmt->bindParam(":jwork_duration", $experience['yearsOfExperience']);
+        $stmt->bindParam(":jwork_responsibilities", $experience['jobExperience']);
         $stmt->execute();
       }
       $conn->commit();
@@ -200,10 +181,40 @@ class Admin
               FROM tbljobsmaster a  
               LEFT JOIN tblpositionapplied b 
               ON a.jobM_id = b.posA_jobMId  
-              GROUP BY a.	jobM_id ";
+              GROUP BY a.	jobM_id 
+              ORDER BY a.jobM_id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
+  }
+
+  function getDropDownForAddJobs()
+  {
+    try {
+      $data = [];
+      include "connection.php";
+      $conn->beginTransaction();
+      $sql = "SELECT * FROM tblcoursescategory";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['courseCategory'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+      $sql = "SELECT * FROM tblpersonaltraining";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['personalTraining'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+      $sql = "SELECT * FROM tblpersonalskills";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['personalSkills'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+      $conn->commit();
+      return json_encode($data);
+    } catch (PDOException $th) {
+      $conn->rollBack();
+      return 0;
+    }
   }
 } //admin
 
@@ -272,6 +283,9 @@ switch ($operation) {
     break;
   case "getAllJobs":
     echo $user->getAllJobs();
+    break;
+  case "getDropDownForAddJobs":
+    echo $user->getDropDownForAddJobs();
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
