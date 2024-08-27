@@ -205,6 +205,76 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
+
+  // function getAllDataForDropdownSignup()
+  // {
+  //   include "connection.php";
+  //   $conn->beginTransaction();
+  //   try {
+  //     $data = [];
+
+  //     $sql = "SELECT * FROM tblinstitution";
+  //     $stmt = $conn->prepare($sql);
+  //     $stmt->execute();
+  //     $data['institution'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  //     $sql = "SELECT * FROM tblcourses";
+  //     $stmt = $conn->prepare($sql);
+  //     $stmt->execute();
+  //     $data['courses'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  //     $sql = "SELECT * FROM tblcoursesgraduate";
+  //     $stmt = $conn->prepare($sql);
+  //     $stmt->execute();
+  //     $data['courseGraduate'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  //     $sql = "SELECT * FROM tblpersonalskills";
+  //     $stmt = $conn->prepare($sql);
+  //     $stmt->execute();
+  //     $data['skills'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  //     $sql = "SELECT * FROM tblpersonaltraining";
+  //     $stmt = $conn->prepare($sql);
+  //     $stmt->execute();
+  //     $data['training'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  //     $conn->commit();
+
+  //     return json_encode($data);
+  //   } catch (\Throwable $th) {
+  //     $conn->rollBack();
+  //     return 0;
+  //   }
+  // }
+
+  function getDropDownForAddJobs()
+  {
+    try {
+      $data = [];
+      include "connection.php";
+      $conn->beginTransaction();
+      $sql = "SELECT * FROM tblcoursescategory";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['courseCategory'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+      $sql = "SELECT * FROM tblpersonaltraining";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['personalTraining'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+      $sql = "SELECT * FROM tblpersonalskills";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['personalSkills'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+      $conn->commit();
+      return json_encode($data);
+    } catch (PDOException $th) {
+      $conn->rollBack();
+      return 0;
+    }
+  }
 } //admin
 
 function recordExists($value, $table, $column)
@@ -272,6 +342,9 @@ switch ($operation) {
     break;
   case "getAllJobs":
     echo $user->getAllJobs();
+    break;
+  case "getDropDownForAddJobs":
+    echo $user->getDropDownForAddJobs();
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
