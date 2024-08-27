@@ -91,7 +91,7 @@ class Admin
     //     {"yearsOfExperience": "20", "jobExperience": "Comprehensive experience in leading cross-functional teams, fostering a collaborative environment, and achieving organizational objectives."}
     //   ]
     // }
-    
+
     include "connection.php";
     $conn->beginTransaction();
     $data = json_decode($json, true);
@@ -216,6 +216,64 @@ class Admin
       return 0;
     }
   }
+
+  function getSelectedJobs($json)
+  {
+    include "connection.php";
+    $returnValue = [];
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tbljobsmaster WHERE jobM_id = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobMaster"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tbljobsmasterduties WHERE duties_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobDuties"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tbljobseducation WHERE jeduc_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobEducation"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tbljobstrainings WHERE jtrng_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobTrainings"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tbljobsknowledge WHERE jknow_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobKnowledge"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tbljobsskills WHERE jskills_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobSkills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tbljobsworkexperience WHERE jwork_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobExperience"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) as FullName, a.posA_totalpoints FROM tblpositionapplied a 
+            INNER JOIN tblcandidates b ON a.posA_candId = b.cand_id 
+            WHERE a.posA_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    return json_encode($returnValue);
+  }
 } //admin
 
 function recordExists($value, $table, $column)
@@ -286,6 +344,9 @@ switch ($operation) {
     break;
   case "getDropDownForAddJobs":
     echo $user->getDropDownForAddJobs();
+    break;
+  case "getSelectedJobs":
+    echo $user->getSelectedJobs($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
