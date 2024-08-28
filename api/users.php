@@ -274,7 +274,7 @@ class User
       $conn->commit();
 
       return json_encode($data);
-    } catch (\Throwable $th) {
+    } catch (PDOException $th) {
       $conn->rollBack();
       return 0;
     }
