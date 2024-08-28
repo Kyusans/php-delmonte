@@ -6,39 +6,8 @@ class Admin
   function addJobMaster($json)
   {
 
-    // {
-    //   "jobMaster": {"title": "Sample Job Title", "description": "A detailed job description that outlines the main duties, responsibilities, and qualifications required for this position."},
-    //   "jobMasterDuties": [
-    //     {"duties": "Oversee daily operations and ensure smooth workflow across all departments, with a focus on efficiency and quality."},
-    //     {"duties": "Develop and implement strategic plans to achieve organizational goals, enhancing productivity and profitability."},
-    //     {"duties": "Lead and mentor a team of professionals, fostering a collaborative environment and encouraging continuous learning."}
-    //   ],
-    //   "jobEducation": [
-    //     {"courseCategory": 4, "jobEducation": "Bachelor's degree in Business Administration or a related field, providing a solid foundation in management principles."},
-    //     {"courseCategory": 3, "jobEducation": "Master's degree in Business Administration or a related field, focusing on advanced business strategies and leadership skills."}
-    //   ],
-    //   "jobTraining": [
-    //     {"training": 3, "jobTraining": "Certified Project Management Professional (PMP) training to enhance project management skills and knowledge."},
-    //     {"training": 2, "jobTraining": "Leadership development program designed to equip leaders with the skills necessary to drive team performance and business success."},
-    //     {"training": 1, "jobTraining": "Advanced Excel training for data analysis, financial modeling, and complex calculations, providing essential tools for business decisions."}
-    //   ],
-    //   "jobKnowledge": [
-    //     {"jobKnowledge": "In-depth knowledge of business processes, operations management, and strategic planning, with a focus on maximizing efficiency."},
-    //     {"jobKnowledge": "Strong understanding of financial management, including budgeting, forecasting, and financial analysis to support decision-making."},
-    //     {"jobKnowledge": "Comprehensive knowledge of human resources management, including recruitment, training, performance evaluation, and employee relations."}
-    //   ],
-    //   "jobSkill": [
-    //     {"skill": 3, "jobSkill": "Excellent communication and interpersonal skills, enabling effective collaboration and relationship-building with stakeholders at all levels."},
-    //     {"skill": 2, "jobSkill": "Proficient in data analysis and interpretation, with the ability to translate complex data into actionable insights."},
-    //     {"skill": 1, "jobSkill": "Strong leadership and team management abilities, with a proven track record of driving team performance and achieving targets."}
-    //   ],
-    //   "jobExperience": [
-    //     {"yearsOfExperience": "8", "jobExperience": "Extensive experience in operations management, with a proven ability to optimize processes and improve efficiency."},
-    //     {"yearsOfExperience": "15", "jobExperience": "Significant experience in strategic planning and business development, with a focus on driving growth and profitability."},
-    //     {"yearsOfExperience": "20", "jobExperience": "Comprehensive experience in leading cross-functional teams, fostering a collaborative environment, and achieving organizational objectives."}
-    //   ]
-    // }
-
+    // {"jobMaster":{"title":"Kunwari Job title","description":"Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa."},"jobMasterDuties":[{"duties":"Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa."},{"duties":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo."},{"duties":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo."}],"jobEducation":[{"courseCategory":2,"jobEducation":"Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.","points":"5"},{"courseCategory":9,"jobEducation":"Etiam dapibus non ante quis fermentum. Aliquam nibh ipsum, tincidunt id nisl posuere, commodo viverra orci. Donec sagittis libero ultrices velit auctor faucibus. Nunc quis congue sapien. Sed iaculis augue vitae tortor dignissim tristique. Nunc vulputate, tortor a iaculis porta, velit augue egestas lacus, sed pellentesque neque tellus eu odio. Morbi vehicula sit amet urna tempus aliquam. Pellentesque id dui at augue lobortis congue quis vel lacus. Quisque ac erat turpis. Donec ligula est, faucibus sed purus sit amet, imperdiet volutpat augue. Proin eget sapien sed metus sodales lobortis quis ut mauris. Fusce rhoncus semper enim, nec venenatis nibh gravida et. Vestibulum tempus eros eu arcu sollicitudin rutrum.","points":"30"}],"jobTraining":[{"training":1,"jobTraining":"Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.","points":"5"},{"training":2,"jobTraining":"Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.","points":"10"}],"jobKnowledge":[{"knowledgeId":1,"jobKnowledge":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo.","points":"5"},{"knowledgeId":4,"jobKnowledge":"Curabitur dui nisi, aliquam a dui vel, aliquet laoreet nulla. Donec dictum erat lacus, eget interdum metus finibus eget. Nunc in nulla sollicitudin, rutrum tortor non, maximus lectus. Morbi suscipit nibh ac purus fermentum viverra. Morbi egestas, orci nec blandit semper, arcu ex laoreet magna, a venenatis tellus elit nec purus. Phasellus et dui luctus, venenatis velit aliquet, laoreet magna. Nulla maximus tincidunt nibh ac tristique. Nam feugiat ipsum sit amet suscipit vestibulum. Sed non euismod nunc.","points":"30"}],"jobSkill":[{"skill":2,"jobSkill":"Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.","points":"30"},{"skill":9,"jobSkill":"Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.","points":"30"}],"jobExperience":[{"yearsOfExperience":"2","jobExperience":"Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem."}]}
+    
     include "connection.php";
     $conn->beginTransaction();
     $data = json_decode($json, true);
@@ -68,40 +37,44 @@ class Admin
         $stmt->execute();
       }
 
-      $sql = "INSERT INTO tbljobseducation (jeduc_jobId, jeduc_text, jeduc_categoryId) VALUES (:jeduc_jobId, :jeduc_text, :jeduc_categoryId)";
+      $sql = "INSERT INTO tbljobseducation (jeduc_jobId, jeduc_text, jeduc_categoryId, jeduc_points) VALUES (:jeduc_jobId, :jeduc_text, :jeduc_categoryId, :points)";
       foreach ($jobEducation as $education) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jeduc_jobId", $jobMasterId);
         $stmt->bindParam(":jeduc_text", $education['jobEducation']);
         $stmt->bindParam(":jeduc_categoryId", $education['courseCategory']);
+        $stmt->bindParam(":points", $education['points']);
         $stmt->execute();
       }
 
-      $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_trainingId) VALUES (:jtrng_jobId, :jtrng_text, :jtrng_trainingId)";
+      $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_trainingId, jtrng_points) VALUES (:jtrng_jobId, :jtrng_text, :jtrng_trainingId, :points)";
       foreach ($jobTraining as $training) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jtrng_jobId", $jobMasterId);
         $stmt->bindParam(":jtrng_text", $training['jobTraining']);
         $stmt->bindParam(":jtrng_trainingId", $training['training']);
+        $stmt->bindParam(":points", $training['points']);
         $stmt->execute();
       }
 
-      // $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_text, jknow_knowledgeId) VALUES (:jknow_jobId, :jknow_knowledgeId)";
-      $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_text) VALUES (:jknow_jobId, :jknow_text)";
+      $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_text, jknow_knowledgeId, jknow_points) VALUES (:jknow_jobId, :jknow_text, :jknow_knowledgeId, :points)";
+      // $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_text) VALUES (:jknow_jobId, :jknow_text)";
       foreach ($jobKnowledge as $knowledge) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jknow_jobId", $jobMasterId);
         $stmt->bindParam(":jknow_text", $knowledge['jobKnowledge']);
-        // $stmt->bindParam(":jknow_knowledgeId", $knowledge['jobKnowledge']);
+        $stmt->bindParam(":jknow_knowledgeId", $knowledge['knowledgeId']);
+        $stmt->bindParam(":points", $knowledge['points']);
         $stmt->execute();
       }
 
-      $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_text, jskills_skillsId) VALUES (:jskills_jobId, :jskills_text, :jskills_skillsId)";
+      $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_text, jskills_skillsId, jskills_points) VALUES (:jskills_jobId, :jskills_text, :jskills_skillsId, :points)";
       foreach ($jobSkills as $skill) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jskills_jobId", $jobMasterId);
         $stmt->bindParam(":jskills_text", $skill['jobSkill']);
         $stmt->bindParam(":jskills_skillsId", $skill['skill']);
+        $stmt->bindParam(":points", $skill['points']);
         $stmt->execute();
       }
 
@@ -155,6 +128,11 @@ class Admin
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['personalSkills'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+      $sql = "SELECT * FROM tblknowledge";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['knowledge'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
       $conn->commit();
       return json_encode($data);
@@ -222,7 +200,8 @@ class Admin
     return json_encode($returnValue);
   }
 
-  function getLookUpTables(){
+  function getLookUpTables()
+  {
     include "connection.php";
     $returnValue = [];
     $sql = "SELECT * FROM tblcourses";

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 25, 2024 at 10:00 AM
+-- Generation Time: Aug 28, 2024 at 12:34 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -2741,15 +2741,16 @@ CREATE TABLE `tbljobseducation` (
   `jeduc_id` int(11) NOT NULL,
   `jeduc_jobId` int(11) NOT NULL,
   `jeduc_text` text NOT NULL,
-  `jeduc_categoryId` int(11) NOT NULL
+  `jeduc_categoryId` int(11) NOT NULL,
+  `jeduc_points` int(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbljobseducation`
 --
 
-INSERT INTO `tbljobseducation` (`jeduc_id`, `jeduc_jobId`, `jeduc_text`, `jeduc_categoryId`) VALUES
-(1, 1, 'While a high school diploma or its equivalent is common, some employers may prefer candidates with an associate’s or bachelor’s degree in animal science, agriculture, or a related field', 0);
+INSERT INTO `tbljobseducation` (`jeduc_id`, `jeduc_jobId`, `jeduc_text`, `jeduc_categoryId`, `jeduc_points`) VALUES
+(1, 1, 'While a high school diploma or its equivalent is common, some employers may prefer candidates with an associate’s or bachelor’s degree in animal science, agriculture, or a related field', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -2761,15 +2762,16 @@ CREATE TABLE `tbljobsknowledge` (
   `jknow_id` int(11) NOT NULL,
   `jknow_jobId` int(11) NOT NULL,
   `jknow_text` text NOT NULL,
-  `jknow_knowledgeId` int(11) NOT NULL
+  `jknow_knowledgeId` int(11) NOT NULL,
+  `jknow_points` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbljobsknowledge`
 --
 
-INSERT INTO `tbljobsknowledge` (`jknow_id`, `jknow_jobId`, `jknow_text`, `jknow_knowledgeId`) VALUES
-(1, 1, 'Proficiency in animal husbandry, including feeding, breeding, and healthcare of various types of livestock.', 0);
+INSERT INTO `tbljobsknowledge` (`jknow_id`, `jknow_jobId`, `jknow_text`, `jknow_knowledgeId`, `jknow_points`) VALUES
+(1, 1, 'Proficiency in animal husbandry, including feeding, breeding, and healthcare of various types of livestock.', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -2828,15 +2830,16 @@ CREATE TABLE `tbljobsskills` (
   `jskills_id` int(11) NOT NULL,
   `jskills_jobId` int(11) NOT NULL,
   `jskills_text` text NOT NULL,
-  `jskills_skillsId` int(11) NOT NULL
+  `jskills_skillsId` int(11) NOT NULL,
+  `jskills_points` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbljobsskills`
 --
 
-INSERT INTO `tbljobsskills` (`jskills_id`, `jskills_jobId`, `jskills_text`, `jskills_skillsId`) VALUES
-(1, 1, 'Ability to oversee daily operations, manage farm laborers, and implement animal husbandry protocols.', 0);
+INSERT INTO `tbljobsskills` (`jskills_id`, `jskills_jobId`, `jskills_text`, `jskills_skillsId`, `jskills_points`) VALUES
+(1, 1, 'Ability to oversee daily operations, manage farm laborers, and implement animal husbandry protocols.', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -2848,15 +2851,16 @@ CREATE TABLE `tbljobstrainings` (
   `jtrng_id` int(11) NOT NULL,
   `jtrng_jobId` int(11) NOT NULL,
   `jtrng_text` text NOT NULL,
-  `jtrng_trainingId` int(11) NOT NULL
+  `jtrng_trainingId` int(11) NOT NULL,
+  `jtrng_points` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbljobstrainings`
 --
 
-INSERT INTO `tbljobstrainings` (`jtrng_id`, `jtrng_jobId`, `jtrng_text`, `jtrng_trainingId`) VALUES
-(1, 1, 'A genuine interest in the farming industry and a commitment to animal welfare.\r\nRemember that specific job requirements may vary depending on the organization and the type of livestock being raised. ', 0);
+INSERT INTO `tbljobstrainings` (`jtrng_id`, `jtrng_jobId`, `jtrng_text`, `jtrng_trainingId`, `jtrng_points`) VALUES
+(1, 1, 'A genuine interest in the farming industry and a commitment to animal welfare.\r\nRemember that specific job requirements may vary depending on the organization and the type of livestock being raised. ', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -2868,15 +2872,37 @@ CREATE TABLE `tbljobsworkexperience` (
   `jwork_id` int(11) NOT NULL,
   `jwork_jobId` int(11) NOT NULL,
   `jwork_duration` text NOT NULL,
-  `jwork_responsibilities` text NOT NULL
+  `jwork_responsibilities` text NOT NULL,
+  `jwork_points` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbljobsworkexperience`
 --
 
-INSERT INTO `tbljobsworkexperience` (`jwork_id`, `jwork_jobId`, `jwork_duration`, `jwork_responsibilities`) VALUES
-(1, 1, '8 hours a day', 'A genuine interest in the farming industry and a commitment to animal welfare.\r\nRemember that specific job requirements may vary depending on the organization and the type of livestock being raised. ');
+INSERT INTO `tbljobsworkexperience` (`jwork_id`, `jwork_jobId`, `jwork_duration`, `jwork_responsibilities`, `jwork_points`) VALUES
+(1, 1, '8 hours a day', 'A genuine interest in the farming industry and a commitment to animal welfare.\r\nRemember that specific job requirements may vary depending on the organization and the type of livestock being raised. ', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblknowledge`
+--
+
+CREATE TABLE `tblknowledge` (
+  `knowledge_id` int(11) NOT NULL,
+  `knowledge_name` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblknowledge`
+--
+
+INSERT INTO `tblknowledge` (`knowledge_id`, `knowledge_name`) VALUES
+(1, 'Good Manufacturing Practices (GMP)'),
+(2, 'Quality Management Practices (QMP)'),
+(3, 'Hazard Analysis and Critical Control Points (HACCP)'),
+(4, 'Food Safety Management Systems (FSMS)');
 
 -- --------------------------------------------------------
 
@@ -3138,6 +3164,12 @@ ALTER TABLE `tbljobsworkexperience`
   ADD KEY `jwork_jobId` (`jwork_jobId`);
 
 --
+-- Indexes for table `tblknowledge`
+--
+ALTER TABLE `tblknowledge`
+  ADD PRIMARY KEY (`knowledge_id`);
+
+--
 -- Indexes for table `tblpassing`
 --
 ALTER TABLE `tblpassing`
@@ -3284,6 +3316,12 @@ ALTER TABLE `tbljobstrainings`
 --
 ALTER TABLE `tbljobsworkexperience`
   MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tblknowledge`
+--
+ALTER TABLE `tblknowledge`
+  MODIFY `knowledge_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tblpassing`
