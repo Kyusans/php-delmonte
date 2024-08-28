@@ -1,59 +1,6 @@
 <?php
 include "headers.php";
 
-// tbljobsmaster
-//  - jobM_id
-//  - jobM_title
-//  - jobM_description
-
-// tbljobsmasterduties
-//  - duties_id
-//  - duties_jobId
-//  - duties_text
-
-// QUALIFICATIONS - this is where we are going to match the appplicants' qualifications
-
-// tbljobseducation
-//  - jeduc_id
-//  - jeduc_jobId
-//  - jeduc_categoryId
-
-// tbljobstrainings
-//  - jtrng_id
-//  - jtrng_jobId
-//  - jtrng_trainingId
-
-// tbljobsknowledge
-//  - jknow_id
-//  - jknow_jobId
-//  - jknow_knowledgeId
-
-// tbljobsskills
-//  - jskills_id
-//  - jskills_jobId
-//  - jskills_skillsId
-
-// tbljobsworkexperience
-//  - jwork_id
-//  - jwork_jobId
-//  - jwork_duration
-//  - jwork_responsibilities
-
-
-
-// Knowledge and Compliance
-// - Good Manufacturing Practices (GMP)
-// - Quality Management Practices (QMP)
-// - Hazard Analysis and Critical Control Points (HACCP)
-// - Food Safety Management Systems (FSMS)
-
-// Technical Training
-//  - Manufacturing Operations
-//  - 5S (Workplace Organization Methodology)
-//  - MS Office (Microsoft Office Suite)
-//  - Statistical Process Control (SPC)
-//  - Occupational Safety and Health
-
 class Admin
 {
   function addJobMaster($json)
@@ -274,6 +221,37 @@ class Admin
 
     return json_encode($returnValue);
   }
+
+  function getLookUpTables(){
+    include "connection.php";
+    $returnValue = [];
+    $sql = "SELECT * FROM tblcourses";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $returnValue["courses"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tblcoursescategory";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $returnValue["courseCategory"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tblinstitution";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $returnValue["institution"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tblpersonalskills";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $returnValue["skills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tblpersonaltraining";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $returnValue["training"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    return json_encode($returnValue);
+  }
 } //admin
 
 function recordExists($value, $table, $column)
@@ -347,6 +325,9 @@ switch ($operation) {
     break;
   case "getSelectedJobs":
     echo $user->getSelectedJobs($json);
+    break;
+  case "getLookUpTables":
+    echo $user->getLookUpTables();
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
