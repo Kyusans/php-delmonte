@@ -156,6 +156,11 @@ class Admin
       $stmt->execute();
       $data['personalSkills'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
+      $sql = "SELECT * FROM tblknowledge";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['knowledge'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
       $conn->commit();
       return json_encode($data);
     } catch (PDOException $th) {
