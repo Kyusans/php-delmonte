@@ -18,10 +18,11 @@ class Admin
     $jobWorkExperience = $data['jobExperience'];
 
     try {
-      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description) VALUES (:jobM_title, :jobM_description)";
+      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status) VALUES (:jobM_title, :jobM_description, :jobM_status)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobM_title", $jobMaster['title']);
       $stmt->bindParam(":jobM_description", $jobMaster['description']);
+      $stmt->bindParam(":jobM_status", $jobMaster['isJobActive']);
       $stmt->execute();
 
       $jobMasterId = $conn->lastInsertId();
@@ -102,7 +103,7 @@ class Admin
     include "connection.php";
     $sql = "SELECT a.*, COUNT(b.posA_id ) as Total_Applied 
               FROM tbljobsmaster a  
-              LEFT JOIN tblpositionapplied b 
+              LEFT JOIN tblapplications b 
               ON a.jobM_id = b.posA_jobMId  
               GROUP BY a.	jobM_id 
               ORDER BY a.jobM_id DESC";
@@ -192,7 +193,7 @@ class Admin
     $stmt->execute();
     $returnValue["jobExperience"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) as FullName, a.posA_totalpoints FROM tblpositionapplied a 
+    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) as FullName, a.posA_totalpoints FROM tblapplications a 
             INNER JOIN tblcandidates b ON a.posA_candId = b.cand_id 
             WHERE a.posA_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
@@ -233,6 +234,18 @@ class Admin
     $returnValue["training"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
     return json_encode($returnValue);
+  }
+
+  function handleJobStatusSwitch($json){
+    // {"status": 1, "jobId": 10}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobsmaster SET jobM_status = :status WHERE jobM_id = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":status", $data['status']);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } //admin
 
@@ -310,6 +323,9 @@ switch ($operation) {
     break;
   case "getLookUpTables":
     echo $admin->getLookUpTables();
+    break;
+  case "handleJobStatusSwitch":
+    echo $admin->handleJobStatusSwitch($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 29, 2024 at 02:25 AM
+-- Generation Time: Sep 01, 2024 at 02:22 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,6 +41,35 @@ CREATE TABLE `tbladmin` (
 
 INSERT INTO `tbladmin` (`adm_id`, `adm_name`, `adm_email`, `adm_password`, `adm_user_level`) VALUES
 (1, 'Ralph Gallegos', 'ralph@gmail.com', 'ralph', 'admin');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblapplications`
+--
+
+CREATE TABLE `tblapplications` (
+  `posA_id` int(11) NOT NULL,
+  `posA_candId` int(11) DEFAULT NULL,
+  `posA_jobMId` int(20) NOT NULL,
+  `posA_datetime` datetime NOT NULL DEFAULT current_timestamp(),
+  `posA_totalpoints` int(20) NOT NULL,
+  `posA_updateDatetime` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblapplications`
+--
+
+INSERT INTO `tblapplications` (`posA_id`, `posA_candId`, `posA_jobMId`, `posA_datetime`, `posA_totalpoints`, `posA_updateDatetime`) VALUES
+(1, 6, 4, '2024-08-19 08:44:25', 0, '0000-00-00 00:00:00'),
+(2, 6, 3, '2024-08-19 08:44:42', 0, '0000-00-00 00:00:00'),
+(3, 6, 1, '2024-08-19 08:50:16', 0, '0000-00-00 00:00:00'),
+(5, 7, 6, '2024-08-21 16:16:10', 0, '0000-00-00 00:00:00'),
+(6, 7, 3, '2024-08-21 16:16:10', 0, '0000-00-00 00:00:00'),
+(8, 7, 4, '2024-08-30 12:14:55', 0, '0000-00-00 00:00:00'),
+(17, 6, 6, '2024-08-31 09:23:26', 0, '0000-00-00 00:00:00'),
+(18, 7, 1, '2024-08-31 10:57:48', 0, '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -2754,7 +2783,9 @@ INSERT INTO `tbljobseducation` (`jeduc_id`, `jeduc_jobId`, `jeduc_text`, `jeduc_
 (2, 8, 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', 2, 5),
 (3, 8, 'Etiam dapibus non ante quis fermentum. Aliquam nibh ipsum, tincidunt id nisl posuere, commodo viverra orci. Donec sagittis libero ultrices velit auctor faucibus. Nunc quis congue sapien. Sed iaculis augue vitae tortor dignissim tristique. Nunc vulputate, tortor a iaculis porta, velit augue egestas lacus, sed pellentesque neque tellus eu odio. Morbi vehicula sit amet urna tempus aliquam. Pellentesque id dui at augue lobortis congue quis vel lacus. Quisque ac erat turpis. Donec ligula est, faucibus sed purus sit amet, imperdiet volutpat augue. Proin eget sapien sed metus sodales lobortis quis ut mauris. Fusce rhoncus semper enim, nec venenatis nibh gravida et. Vestibulum tempus eros eu arcu sollicitudin rutrum.', 9, 30),
 (4, 9, 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', 2, 5),
-(5, 9, 'Etiam dapibus non ante quis fermentum. Aliquam nibh ipsum, tincidunt id nisl posuere, commodo viverra orci. Donec sagittis libero ultrices velit auctor faucibus. Nunc quis congue sapien. Sed iaculis augue vitae tortor dignissim tristique. Nunc vulputate, tortor a iaculis porta, velit augue egestas lacus, sed pellentesque neque tellus eu odio. Morbi vehicula sit amet urna tempus aliquam. Pellentesque id dui at augue lobortis congue quis vel lacus. Quisque ac erat turpis. Donec ligula est, faucibus sed purus sit amet, imperdiet volutpat augue. Proin eget sapien sed metus sodales lobortis quis ut mauris. Fusce rhoncus semper enim, nec venenatis nibh gravida et. Vestibulum tempus eros eu arcu sollicitudin rutrum.', 9, 30);
+(5, 9, 'Etiam dapibus non ante quis fermentum. Aliquam nibh ipsum, tincidunt id nisl posuere, commodo viverra orci. Donec sagittis libero ultrices velit auctor faucibus. Nunc quis congue sapien. Sed iaculis augue vitae tortor dignissim tristique. Nunc vulputate, tortor a iaculis porta, velit augue egestas lacus, sed pellentesque neque tellus eu odio. Morbi vehicula sit amet urna tempus aliquam. Pellentesque id dui at augue lobortis congue quis vel lacus. Quisque ac erat turpis. Donec ligula est, faucibus sed purus sit amet, imperdiet volutpat augue. Proin eget sapien sed metus sodales lobortis quis ut mauris. Fusce rhoncus semper enim, nec venenatis nibh gravida et. Vestibulum tempus eros eu arcu sollicitudin rutrum.', 9, 30),
+(6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 2, 10),
+(7, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 3, 5);
 
 -- --------------------------------------------------------
 
@@ -2775,11 +2806,7 @@ CREATE TABLE `tbljobsknowledge` (
 --
 
 INSERT INTO `tbljobsknowledge` (`jknow_id`, `jknow_jobId`, `jknow_text`, `jknow_knowledgeId`, `jknow_points`) VALUES
-(1, 1, 'Proficiency in animal husbandry, including feeding, breeding, and healthcare of various types of livestock.', 0, 0),
-(2, 8, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo.', 1, 5),
-(3, 8, 'Curabitur dui nisi, aliquam a dui vel, aliquet laoreet nulla. Donec dictum erat lacus, eget interdum metus finibus eget. Nunc in nulla sollicitudin, rutrum tortor non, maximus lectus. Morbi suscipit nibh ac purus fermentum viverra. Morbi egestas, orci nec blandit semper, arcu ex laoreet magna, a venenatis tellus elit nec purus. Phasellus et dui luctus, venenatis velit aliquet, laoreet magna. Nulla maximus tincidunt nibh ac tristique. Nam feugiat ipsum sit amet suscipit vestibulum. Sed non euismod nunc.', 4, 30),
-(4, 9, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo.', 1, 5),
-(5, 9, 'Curabitur dui nisi, aliquam a dui vel, aliquet laoreet nulla. Donec dictum erat lacus, eget interdum metus finibus eget. Nunc in nulla sollicitudin, rutrum tortor non, maximus lectus. Morbi suscipit nibh ac purus fermentum viverra. Morbi egestas, orci nec blandit semper, arcu ex laoreet magna, a venenatis tellus elit nec purus. Phasellus et dui luctus, venenatis velit aliquet, laoreet magna. Nulla maximus tincidunt nibh ac tristique. Nam feugiat ipsum sit amet suscipit vestibulum. Sed non euismod nunc.', 4, 30);
+(8, 1, 'Knowledge of modern technologies used in livestock farming, such as automated feeding systems, health monitoring devices, and genetic testing.', 3, 0);
 
 -- --------------------------------------------------------
 
@@ -2791,6 +2818,7 @@ CREATE TABLE `tbljobsmaster` (
   `jobM_id` int(20) NOT NULL,
   `jobM_title` varchar(250) NOT NULL,
   `jobM_description` text NOT NULL,
+  `jobM_createdAt` datetime DEFAULT NULL,
   `jobM_status` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -2798,16 +2826,17 @@ CREATE TABLE `tbljobsmaster` (
 -- Dumping data for table `tbljobsmaster`
 --
 
-INSERT INTO `tbljobsmaster` (`jobM_id`, `jobM_title`, `jobM_description`, `jobM_status`) VALUES
-(1, 'Livestock Production Supervisor', 'A Livestock Supervisor oversees daily operations on farms that raise animals for consumption or product use. They manage feeding, health care, and humane treatment of livestock, supervise farm workers, and prepare reports on production and management. Additionally, they coordinate breeding, monitor animal health, and ensure compliance with regulations. If you’re interested in related roles, Livestock Production Managers oversee farm operations for milk, meat, wool, and other products, focusing on safety and yield optimization. ', 1),
-(2, 'Production Supervisor', '', 0),
-(3, 'Marketing Intern', '', 1),
-(4, 'Commercial Capability Development Intern', '', 1),
-(5, 'Production Shift Supervisor (Tetra Line)', '', 0),
-(6, 'Quality Assurance Analyst', '', 1),
-(7, 'Human Resources Supervisor', '', 0),
-(8, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', 0),
-(9, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', 0);
+INSERT INTO `tbljobsmaster` (`jobM_id`, `jobM_title`, `jobM_description`, `jobM_createdAt`, `jobM_status`) VALUES
+(1, 'Livestock Production Supervisor', 'A Livestock Supervisor oversees daily operations on farms that raise animals for consumption or product use. They manage feeding, health care, and humane treatment of livestock, supervise farm workers, and prepare reports on production and management. Additionally, they coordinate breeding, monitor animal health, and ensure compliance with regulations. If you’re interested in related roles, Livestock Production Managers oversee farm operations for milk, meat, wool, and other products, focusing on safety and yield optimization. ', '2024-08-06 08:48:22', 1),
+(2, 'Production Supervisor', '', '2024-08-01 12:48:39', 0),
+(3, 'Marketing Intern', '', '2024-08-08 01:48:52', 1),
+(4, 'Commercial Capability Development Intern', '', '2024-08-12 18:49:03', 1),
+(5, 'Production Shift Supervisor (Tetra Line)', '', '2024-08-15 07:49:19', 0),
+(6, 'Quality Assurance Analyst', '', '2024-08-16 09:49:28', 1),
+(7, 'Human Resources Supervisor', '', '2024-08-10 16:49:40', 0),
+(8, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 08:49:55', 0),
+(9, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 10:50:05', 0),
+(10, 'Programmer', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', '2024-08-24 10:50:15', 0);
 
 -- --------------------------------------------------------
 
@@ -2834,7 +2863,9 @@ INSERT INTO `tbljobsmasterduties` (`duties_id`, `duties_jobId`, `duties_text`) V
 (6, 8, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo.'),
 (7, 9, 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.'),
 (8, 9, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo.'),
-(9, 9, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo.');
+(9, 9, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo.'),
+(10, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.'),
+(11, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.');
 
 -- --------------------------------------------------------
 
@@ -2859,7 +2890,8 @@ INSERT INTO `tbljobsskills` (`jskills_id`, `jskills_jobId`, `jskills_text`, `jsk
 (2, 8, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 30),
 (3, 8, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 9, 30),
 (4, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 30),
-(5, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 9, 30);
+(5, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 9, 30),
+(6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 2, 30);
 
 -- --------------------------------------------------------
 
@@ -2884,7 +2916,8 @@ INSERT INTO `tbljobstrainings` (`jtrng_id`, `jtrng_jobId`, `jtrng_text`, `jtrng_
 (2, 8, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 1, 5),
 (3, 8, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 10),
 (4, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 1, 5),
-(5, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 10);
+(5, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 10),
+(6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 3, 10);
 
 -- --------------------------------------------------------
 
@@ -2907,7 +2940,8 @@ CREATE TABLE `tbljobsworkexperience` (
 INSERT INTO `tbljobsworkexperience` (`jwork_id`, `jwork_jobId`, `jwork_duration`, `jwork_responsibilities`, `jwork_points`) VALUES
 (1, 1, '8 hours a day', 'A genuine interest in the farming industry and a commitment to animal welfare.\r\nRemember that specific job requirements may vary depending on the organization and the type of livestock being raised. ', 0),
 (2, 8, '2', 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 0),
-(3, 9, '2', 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 0);
+(3, 9, '2', 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 0),
+(4, 10, '10', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 0);
 
 -- --------------------------------------------------------
 
@@ -2925,9 +2959,9 @@ CREATE TABLE `tblknowledge` (
 --
 
 INSERT INTO `tblknowledge` (`knowledge_id`, `knowledge_name`) VALUES
-(1, 'Good Manufacturing Practices (GMP)'),
-(2, 'Quality Management Practices (QMP)'),
-(3, 'Hazard Analysis and Critical Control Points (HACCP)'),
+(1, 'Quality Management Practices (QMP)\r\n'),
+(2, 'Hazard Analysis and Critical Control Points (HACCP)\r\n'),
+(3, 'Good Manufacturing Practices (GMP)\r\n'),
 (4, 'Food Safety Management Systems (FSMS)');
 
 -- --------------------------------------------------------
@@ -2941,6 +2975,13 @@ CREATE TABLE `tblpassing` (
   `passing_jobId` int(11) NOT NULL,
   `passing_points` int(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblpassing`
+--
+
+INSERT INTO `tblpassing` (`passing_id`, `passing_jobId`, `passing_points`) VALUES
+(1, 10, 50);
 
 -- --------------------------------------------------------
 
@@ -2999,34 +3040,6 @@ INSERT INTO `tblpersonaltraining` (`perT_id`, `perT_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tblpositionapplied`
---
-
-CREATE TABLE `tblpositionapplied` (
-  `posA_id` int(11) NOT NULL,
-  `posA_candId` int(11) DEFAULT NULL,
-  `posA_jobMId` int(20) NOT NULL,
-  `posA_datetime` datetime NOT NULL DEFAULT current_timestamp(),
-  `posA_totalpoints` int(20) NOT NULL,
-  `posA_updateDatetime` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tblpositionapplied`
---
-
-INSERT INTO `tblpositionapplied` (`posA_id`, `posA_candId`, `posA_jobMId`, `posA_datetime`, `posA_totalpoints`, `posA_updateDatetime`) VALUES
-(1, 6, 4, '2024-08-19 08:44:25', 0, '0000-00-00 00:00:00'),
-(2, 6, 3, '2024-08-19 08:44:42', 0, '0000-00-00 00:00:00'),
-(3, 6, 1, '2024-08-19 08:50:16', 0, '0000-00-00 00:00:00'),
-(4, 6, 1, '2024-08-19 08:50:18', 0, '0000-00-00 00:00:00'),
-(5, 7, 6, '2024-08-21 16:16:10', 0, '0000-00-00 00:00:00'),
-(6, 7, 3, '2024-08-21 16:16:10', 0, '0000-00-00 00:00:00'),
-(7, 7, 1, '2024-08-23 16:10:04', 0, '2024-08-23 10:09:49');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `tblskills`
 --
 
@@ -3079,6 +3092,14 @@ CREATE TABLE `tbltraining` (
 --
 ALTER TABLE `tbladmin`
   ADD PRIMARY KEY (`adm_id`);
+
+--
+-- Indexes for table `tblapplications`
+--
+ALTER TABLE `tblapplications`
+  ADD PRIMARY KEY (`posA_id`),
+  ADD KEY `personal_info_id` (`posA_candId`),
+  ADD KEY `apply_position_id` (`posA_jobMId`);
 
 --
 -- Indexes for table `tblcandidates`
@@ -3154,7 +3175,8 @@ ALTER TABLE `tbljobseducation`
 --
 ALTER TABLE `tbljobsknowledge`
   ADD PRIMARY KEY (`jknow_id`),
-  ADD KEY `jknow_jobId` (`jknow_jobId`);
+  ADD KEY `jknow_jobId` (`jknow_jobId`),
+  ADD KEY `jknow_knowledgeId` (`jknow_knowledgeId`);
 
 --
 -- Indexes for table `tbljobsmaster`
@@ -3215,14 +3237,6 @@ ALTER TABLE `tblpersonaltraining`
   ADD PRIMARY KEY (`perT_id`);
 
 --
--- Indexes for table `tblpositionapplied`
---
-ALTER TABLE `tblpositionapplied`
-  ADD PRIMARY KEY (`posA_id`),
-  ADD KEY `personal_info_id` (`posA_candId`),
-  ADD KEY `apply_position_id` (`posA_jobMId`);
-
---
 -- Indexes for table `tblskills`
 --
 ALTER TABLE `tblskills`
@@ -3253,6 +3267,12 @@ ALTER TABLE `tbltraining`
 --
 ALTER TABLE `tbladmin`
   MODIFY `adm_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tblapplications`
+--
+ALTER TABLE `tblapplications`
+  MODIFY `posA_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `tblcandidates`
@@ -3306,43 +3326,43 @@ ALTER TABLE `tblforgotpassword`
 -- AUTO_INCREMENT for table `tbljobseducation`
 --
 ALTER TABLE `tbljobseducation`
-  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tbljobsknowledge`
 --
 ALTER TABLE `tbljobsknowledge`
-  MODIFY `jknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `jknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `tbljobsmaster`
 --
 ALTER TABLE `tbljobsmaster`
-  MODIFY `jobM_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `jobM_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tbljobsmasterduties`
 --
 ALTER TABLE `tbljobsmasterduties`
-  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tbljobsskills`
 --
 ALTER TABLE `tbljobsskills`
-  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tbljobstrainings`
 --
 ALTER TABLE `tbljobstrainings`
-  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tbljobsworkexperience`
 --
 ALTER TABLE `tbljobsworkexperience`
-  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tblknowledge`
@@ -3354,7 +3374,7 @@ ALTER TABLE `tblknowledge`
 -- AUTO_INCREMENT for table `tblpassing`
 --
 ALTER TABLE `tblpassing`
-  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblpersonalskills`
@@ -3367,12 +3387,6 @@ ALTER TABLE `tblpersonalskills`
 --
 ALTER TABLE `tblpersonaltraining`
   MODIFY `perT_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `tblpositionapplied`
---
-ALTER TABLE `tblpositionapplied`
-  MODIFY `posA_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tblskills`
@@ -3395,6 +3409,13 @@ ALTER TABLE `tbltraining`
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `tblapplications`
+--
+ALTER TABLE `tblapplications`
+  ADD CONSTRAINT `tblapplications_ibfk_1` FOREIGN KEY (`posA_candId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tblapplications_ibfk_2` FOREIGN KEY (`posA_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
 
 --
 -- Constraints for table `tblconsent`
@@ -3439,7 +3460,8 @@ ALTER TABLE `tbljobseducation`
 -- Constraints for table `tbljobsknowledge`
 --
 ALTER TABLE `tbljobsknowledge`
-  ADD CONSTRAINT `tbljobsknowledge_ibfk_1` FOREIGN KEY (`jknow_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
+  ADD CONSTRAINT `tbljobsknowledge_ibfk_1` FOREIGN KEY (`jknow_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
+  ADD CONSTRAINT `tbljobsknowledge_ibfk_2` FOREIGN KEY (`jknow_knowledgeId`) REFERENCES `tblknowledge` (`knowledge_id`);
 
 --
 -- Constraints for table `tbljobsmasterduties`
@@ -3464,13 +3486,6 @@ ALTER TABLE `tbljobstrainings`
 --
 ALTER TABLE `tbljobsworkexperience`
   ADD CONSTRAINT `tbljobsworkexperience_ibfk_1` FOREIGN KEY (`jwork_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
-
---
--- Constraints for table `tblpositionapplied`
---
-ALTER TABLE `tblpositionapplied`
-  ADD CONSTRAINT `tblpositionapplied_ibfk_1` FOREIGN KEY (`posA_candId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `tblpositionapplied_ibfk_2` FOREIGN KEY (`posA_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
 
 --
 -- Constraints for table `tblskills`
