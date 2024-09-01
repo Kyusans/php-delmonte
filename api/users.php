@@ -519,6 +519,18 @@ class User
     $stmt->bindParam(':cand_id', $cand_id);
     $stmt->execute();
     $returnValue["employmentHistory"] = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tblskills WHERE skills_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["skills"] = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tbltraining WHERE training_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["training"] = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
     
     return json_encode($returnValue);
   }
