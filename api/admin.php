@@ -16,18 +16,20 @@ class Admin
     $jobKnowledge = $data['jobKnowledge'];
     $jobSkills = $data['jobSkill'];
     $jobWorkExperience = $data['jobExperience'];
+    $todayDate = getCurrentDate();
 
     try {
-      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status) VALUES (:jobM_title, :jobM_description, :jobM_status)";
+      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status, jobM_createdAt) VALUES (:jobM_title, :jobM_description, :jobM_status, jobM_createdAt)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobM_title", $jobMaster['title']);
       $stmt->bindParam(":jobM_description", $jobMaster['description']);
       $stmt->bindParam(":jobM_status", $jobMaster['isJobActive']);
+      $stmt->bindParam(":jobM_createdAt", $todayDate);
       $stmt->execute();
 
       $jobMasterId = $conn->lastInsertId();
 
-      $sql = "INSERT INTO tblpassing (passing_jobId, passing_points) VALUES (:passing_jobId, :passing_points)";
+      $sql = "INSERT INTO tbljobpassing (passing_jobId, passing_points) VALUES (:passing_jobId, :passing_points)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":passing_jobId", $jobMasterId);
       $stmt->bindParam(":passing_points", $jobMaster['passingPercentage']);
