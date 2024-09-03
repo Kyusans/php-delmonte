@@ -78,10 +78,6 @@ class User
     return json_encode(null);
   }
 
-
-
-
-
   function signup($json)
   {
     // example data
@@ -134,7 +130,7 @@ class User
       $newId = $conn->lastInsertId();
       if ($stmt->rowCount() > 0) {
         $sql = "INSERT INTO tbleducbackground (
-              educ_personalId, educ_coursesId, educ_course_graduated, educ_coursegradId,
+              educ_personalId, educ_coursesId, educ_courseGraduated, educ_coursegradId,
               educ_institutionId, educ_dategraduate, 	educ_prcCert, educ_prcLicenseNo)
               VALUES (:personal_info_id, :courses_id, :course_date_graduated, :course_graduate_id,
               :institution_id, :date_of_graduation, :prc_license, :prc_license_number)";
@@ -184,25 +180,8 @@ class User
                 $stmt->execute();
               }
               if ($stmt->rowCount() > 0) {
-                $sql = "INSERT INTO tblapplications(posA_candId, posA_jobMId, posA_datetime)
-                      VALUES (:personal_info_id, :apply_position_id, :created_datetime)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bindParam(':personal_info_id', $newId);
-                $stmt->bindParam(':apply_position_id', $json['positionId']);
-                $stmt->bindParam(':created_datetime', $createdDateTime);
-                $stmt->execute();
-                if ($stmt->rowCount() > 0) {
-                  $sql = "INSERT INTO tblconsent(cons_candId , cons_subscribetoemailupdates)
-                    VALUES (:personal_info_id, :subscribe_to_email_updates)";
-                  $stmt = $conn->prepare($sql);
-                  $stmt->bindParam(':personal_info_id', $newId);
-                  $stmt->bindParam(':subscribe_to_email_updates', $json['isSubscribeToEmail']);
-                  $stmt->execute();
-                  if ($stmt->rowCount() > 0) {
-                    $conn->commit();
-                    return 1;
-                  }
-                }
+                $conn->commit();
+                return 1;
               }
             }
           }
@@ -248,7 +227,7 @@ class User
     include "send_email.php";
 
     $data = json_decode($json, true);
-    if (recordExists($data['email'], "tblcandidates", "email")) return -1;
+    if (recordExists($data['email'], "tblcandidates", "cand_email")) return -1;
 
     $firstLetter = strtoupper(substr($data['email'], 0, 1));
     $thirdLetter = strtoupper(substr($data['email'], 2, 1));
@@ -283,7 +262,7 @@ class User
     // {"email": "qkyusans@gmail"}
     include "connection.php";
     $data = json_decode($json, true);
-    if (recordExists($data['email'], "tblcandidates", "email")) {
+    if (recordExists($data['email'], "tblcandidates", "cand_email ")) {
       return -1;
     } else {
       return 1;
@@ -321,6 +300,11 @@ class User
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['training'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tblknowledge";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['knowledge'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       $conn->commit();
 
@@ -531,9 +515,10 @@ class User
     $stmt->bindParam(':cand_id', $cand_id);
     $stmt->execute();
     $returnValue["training"] = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
-    
+
     return json_encode($returnValue);
   }
+
 } //user
 
 function recordExists($value, $table, $column)
@@ -590,13 +575,16 @@ function getCurrentDate()
   return $today->format('Y-m-d h:i:s A');
 }
 
-$input = json_decode(file_get_contents('php://input'), true);
-// $operation = isset($input["operation"]) ? $input["operation"] : "0";
-$operation = isset($_POST["operation"]) ? $_POST["operation"] : (isset($input["operation"]) ? $input["operation"] : "0");
+$json = isset($_POST["json"]) ? $_POST["json"] : "0";
+$operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
 
-// $json = isset($input["json"]) ? $input["json"] : "0";
+// $input = json_decode(file_get_contents('php://input'), true);
+// // $operation = isset($input["operation"]) ? $input["operation"] : "0";
+// $operation = isset($_POST["operation"]) ? $_POST["operation"] : (isset($input["operation"]) ? $input["operation"] : "0");
 
-$json = isset($_POST["json"]) ? $_POST["json"] : (isset($input["json"]) ? $input["json"] : "0");
+// // $json = isset($input["json"]) ? $input["json"] : "0";
+
+// $json = isset($_POST["json"]) ? $_POST["json"] : (isset($input["json"]) ? $input["json"] : "0");
 
 
 $user = new User();
