@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 01, 2024 at 02:22 AM
+-- Generation Time: Sep 03, 2024 at 11:01 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -49,27 +49,91 @@ INSERT INTO `tbladmin` (`adm_id`, `adm_name`, `adm_email`, `adm_password`, `adm_
 --
 
 CREATE TABLE `tblapplications` (
-  `posA_id` int(11) NOT NULL,
-  `posA_candId` int(11) DEFAULT NULL,
-  `posA_jobMId` int(20) NOT NULL,
-  `posA_datetime` datetime NOT NULL DEFAULT current_timestamp(),
-  `posA_totalpoints` int(20) NOT NULL,
-  `posA_updateDatetime` datetime NOT NULL
+  `app_id` int(11) NOT NULL,
+  `app_candId` int(11) DEFAULT NULL,
+  `app_jobMId` int(20) NOT NULL,
+  `app_datetime` datetime NOT NULL DEFAULT current_timestamp(),
+  `app_totalpoints` int(20) NOT NULL,
+  `app_updateDatetime` datetime NOT NULL,
+  `app_appSId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblapplications`
 --
 
-INSERT INTO `tblapplications` (`posA_id`, `posA_candId`, `posA_jobMId`, `posA_datetime`, `posA_totalpoints`, `posA_updateDatetime`) VALUES
-(1, 6, 4, '2024-08-19 08:44:25', 0, '0000-00-00 00:00:00'),
-(2, 6, 3, '2024-08-19 08:44:42', 0, '0000-00-00 00:00:00'),
-(3, 6, 1, '2024-08-19 08:50:16', 0, '0000-00-00 00:00:00'),
-(5, 7, 6, '2024-08-21 16:16:10', 0, '0000-00-00 00:00:00'),
-(6, 7, 3, '2024-08-21 16:16:10', 0, '0000-00-00 00:00:00'),
-(8, 7, 4, '2024-08-30 12:14:55', 0, '0000-00-00 00:00:00'),
-(17, 6, 6, '2024-08-31 09:23:26', 0, '0000-00-00 00:00:00'),
-(18, 7, 1, '2024-08-31 10:57:48', 0, '0000-00-00 00:00:00');
+INSERT INTO `tblapplications` (`app_id`, `app_candId`, `app_jobMId`, `app_datetime`, `app_totalpoints`, `app_updateDatetime`, `app_appSId`) VALUES
+(1, 7, 1, '2024-09-02 12:54:03', 0, '0000-00-00 00:00:00', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblapplicationstatus`
+--
+
+CREATE TABLE `tblapplicationstatus` (
+  `appS_id` int(11) NOT NULL,
+  `appS_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblapplicationstatus`
+--
+
+INSERT INTO `tblapplicationstatus` (`appS_id`, `appS_name`) VALUES
+(1, 'Pending'),
+(2, 'Process'),
+(3, 'Accept'),
+(4, 'Decline');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcandconsent`
+--
+
+CREATE TABLE `tblcandconsent` (
+  `cons_id` int(11) NOT NULL,
+  `cons_candId` int(11) DEFAULT NULL,
+  `cons_subscribetoemailupdates` tinyint(1) DEFAULT NULL,
+  `cons_dataprivacyconsent` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcandeducbackground`
+--
+
+CREATE TABLE `tblcandeducbackground` (
+  `educ_back_id` int(11) NOT NULL,
+  `educ_canId` int(11) DEFAULT NULL,
+  `educ_coursesId` int(20) NOT NULL,
+  `educ_institutionId` int(20) NOT NULL,
+  `educ_dategraduate` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcandemploymenthistory`
+--
+
+CREATE TABLE `tblcandemploymenthistory` (
+  `empH_id` int(20) NOT NULL,
+  `empH_candId` int(11) NOT NULL,
+  `empH_positionName` varchar(250) NOT NULL,
+  `empH_companyName` varchar(250) NOT NULL,
+  `empH_startdate` date NOT NULL,
+  `empH_enddate` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcandemploymenthistory`
+--
+
+INSERT INTO `tblcandemploymenthistory` (`empH_id`, `empH_candId`, `empH_positionName`, `empH_companyName`, `empH_startdate`, `empH_enddate`) VALUES
+(1, 7, 'Coordinator', 'La kreativ', '2022-08-10', '2024-08-14');
 
 -- --------------------------------------------------------
 
@@ -112,14 +176,50 @@ INSERT INTO `tblcandidates` (`cand_id`, `cand_lastname`, `cand_firstname`, `cand
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tblconsent`
+-- Table structure for table `tblcandknowledge`
 --
 
-CREATE TABLE `tblconsent` (
-  `cons_id` int(11) NOT NULL,
-  `cons_candId` int(11) DEFAULT NULL,
-  `cons_subscribetoemailupdates` tinyint(1) DEFAULT NULL,
-  `cons_dataprivacyconsent` tinyint(1) DEFAULT NULL
+CREATE TABLE `tblcandknowledge` (
+  `canknow_id` int(11) NOT NULL,
+  `canknow_canId` int(11) NOT NULL,
+  `canknow_knowledgeId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcandlicense`
+--
+
+CREATE TABLE `tblcandlicense` (
+  `license_id` int(11) NOT NULL,
+  `license_number` int(50) NOT NULL,
+  `license_canId` int(11) NOT NULL,
+  `license_masterId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcandskills`
+--
+
+CREATE TABLE `tblcandskills` (
+  `skills_id` int(20) NOT NULL,
+  `skills_candId` int(11) NOT NULL,
+  `skills_perSId` int(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcandtraining`
+--
+
+CREATE TABLE `tblcandtraining` (
+  `training_id` int(20) NOT NULL,
+  `training_candId` int(20) NOT NULL,
+  `training_perTId` int(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -131,80 +231,81 @@ CREATE TABLE `tblconsent` (
 CREATE TABLE `tblcourses` (
   `courses_id` int(20) NOT NULL,
   `courses_name` varchar(250) NOT NULL,
-  `courses_coursecategoryId` int(20) NOT NULL
+  `courses_coursecategoryId` int(20) NOT NULL,
+  `courses_courseTypeId` int(11) NOT NULL DEFAULT 2
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblcourses`
 --
 
-INSERT INTO `tblcourses` (`courses_id`, `courses_name`, `courses_coursecategoryId`) VALUES
-(23, 'Bachelor of Arts (AB) in English', 5),
-(24, 'Bachelor of Arts (AB) in Filipino', 5),
-(25, 'Bachelor of Arts (AB) in History', 5),
-(26, 'Bachelor of Arts (AB) in Philosophy', 5),
-(27, 'Bachelor of Arts (AB) in Political Science', 5),
-(28, 'Bachelor of Arts (AB) in Psychology', 5),
-(29, 'Bachelor of Fine Arts (BFA) in Painting', 5),
-(30, 'Bachelor of Fine Arts (BFA) in Sculpture', 5),
-(31, 'Bachelor of Fine Arts (BFA) in Graphic Design', 5),
-(32, 'Bachelor of Fine Arts (BFA) in Photography', 5),
-(33, 'Bachelor of Music (BM) in Performance', 5),
-(34, 'Bachelor of Music (BM) in Music Education', 5),
-(35, 'Bachelor of Music (BM) in Music Therapy', 5),
-(36, 'Bachelor of Science in Business Administration (BSBA) in Accounting', 1),
-(37, 'Bachelor of Science in Business Administration (BSBA) in Business Management', 1),
-(38, 'Bachelor of Science in Business Administration (BSBA) in Entrepreneurship', 1),
-(39, 'Bachelor of Science in Business Administration (BSBA) in Finance', 1),
-(40, 'Bachelor of Science in Business Administration (BSBA) in Human Resource Management', 1),
-(41, 'Bachelor of Science in Business Administration (BSBA) in Marketing', 1),
-(42, 'Bachelor of Science in Business Administration (BSBA) in Operations Management', 1),
-(43, 'Bachelor of Science in Entrepreneurship (BSE)', 1),
-(44, 'Bachelor of Science in Management (BSM)', 1),
-(45, 'Bachelor of Science in Computer Science (BSCS)', 18),
-(46, 'Bachelor of Science in Information Technology (BSIT)', 18),
-(47, 'Bachelor of Science in Information Systems (BSIS)', 18),
-(48, 'Bachelor of Elementary Education (BEEd)', 4),
-(49, 'Bachelor of Secondary Education (BSEd) in English', 4),
-(50, 'Bachelor of Secondary Education (BSEd) in Filipino', 4),
-(51, 'Bachelor of Secondary Education (BSEd) in Mathematics', 4),
-(52, 'Bachelor of Secondary Education (BSEd) in Science', 4),
-(53, 'Bachelor of Secondary Education (BSEd) in Social Studies', 4),
-(54, 'Bachelor of Physical Education (BPE)', 4),
-(55, 'Bachelor of Special Needs Education (BSNEd)', 4),
-(56, 'Bachelor of Science in Civil Engineering (BSCE)', 2),
-(57, 'Bachelor of Science in Computer Engineering (BSCoE)', 2),
-(58, 'Bachelor of Science in Electrical Engineering (BSEE)', 2),
-(59, 'Bachelor of Science in Electronics Engineering (BSECE)', 2),
-(60, 'Bachelor of Science in Mechanical Engineering (BSME)', 2),
-(61, 'Bachelor of Science in Industrial Engineering (BSIE)', 2),
-(83, 'Bachelor of Science in Nursing (BSN)', 3),
-(84, 'Bachelor of Science in Medical Technology (BSMT)', 3),
-(85, 'Bachelor of Science in Pharmacy (BSPharm)', 3),
-(86, 'Bachelor of Science in Physical Therapy (BSPT)', 3),
-(87, 'Bachelor of Science in Occupational Therapy (BSOT)', 3),
-(91, 'Bachelor of Science in Hospitality Management (BSHM)', 9),
-(92, 'Bachelor of Science in Tourism Management (BSTM)', 9),
-(93, 'Bachelor of Science in Biology (BSBio)', 19),
-(94, 'Bachelor of Science in Chemistry (BSChem)', 19),
-(95, 'Bachelor of Science in Mathematics (BSMath)', 19),
-(96, 'Bachelor of Science in Physics (BSPhy)', 19),
-(97, 'Bachelor of Science in Statistics (BSStat)', 19),
-(98, 'Bachelor of Science in Economics (BSEcon)', 11),
-(99, 'Bachelor of Science in Psychology (BSPsy)', 11),
-(100, 'Bachelor of Science in Sociology (BSSoc)', 11),
-(101, 'Bachelor of Science in Anthropology (BSAnthro)', 11),
-(102, 'Bachelor of Science in Criminology (BSCrim)', 20),
-(103, 'Bachelor of Science in Environmental Science (BSES)', 20),
-(104, 'Bachelor of Science in Forestry (BSFor)', 20),
-(105, 'Bachelor of Science in Geology (BSGeo)', 20),
-(106, 'Bachelor of Science in Marine Biology (BSMB)', 20),
-(107, 'Bachelor of Science in Agriculture (BSA)', 21),
-(108, 'Bachelor of Science in Agricultural Business (BSAB)', 21),
-(109, 'Bachelor of Science in Agricultural Economics (BSAE)', 21),
-(110, 'Bachelor of Science in Agronomy (BSAgr)', 21),
-(111, 'Bachelor of Science in Animal Science (BSAS)', 21),
-(112, 'Bachelor of Science in Entomology (BSEnt)', 21);
+INSERT INTO `tblcourses` (`courses_id`, `courses_name`, `courses_coursecategoryId`, `courses_courseTypeId`) VALUES
+(23, 'Bachelor of Arts (AB) in English', 5, 2),
+(24, 'Bachelor of Arts (AB) in Filipino', 5, 2),
+(25, 'Bachelor of Arts (AB) in History', 5, 2),
+(26, 'Bachelor of Arts (AB) in Philosophy', 5, 2),
+(27, 'Bachelor of Arts (AB) in Political Science', 5, 2),
+(28, 'Bachelor of Arts (AB) in Psychology', 5, 2),
+(29, 'Bachelor of Fine Arts (BFA) in Painting', 5, 2),
+(30, 'Bachelor of Fine Arts (BFA) in Sculpture', 5, 2),
+(31, 'Bachelor of Fine Arts (BFA) in Graphic Design', 5, 2),
+(32, 'Bachelor of Fine Arts (BFA) in Photography', 5, 2),
+(33, 'Bachelor of Music (BM) in Performance', 5, 2),
+(34, 'Bachelor of Music (BM) in Music Education', 5, 2),
+(35, 'Bachelor of Music (BM) in Music Therapy', 5, 2),
+(36, 'Bachelor of Science in Business Administration (BSBA) in Accounting', 1, 2),
+(37, 'Bachelor of Science in Business Administration (BSBA) in Business Management', 1, 2),
+(38, 'Bachelor of Science in Business Administration (BSBA) in Entrepreneurship', 1, 2),
+(39, 'Bachelor of Science in Business Administration (BSBA) in Finance', 1, 2),
+(40, 'Bachelor of Science in Business Administration (BSBA) in Human Resource Management', 1, 2),
+(41, 'Bachelor of Science in Business Administration (BSBA) in Marketing', 1, 2),
+(42, 'Bachelor of Science in Business Administration (BSBA) in Operations Management', 1, 2),
+(43, 'Bachelor of Science in Entrepreneurship (BSE)', 1, 2),
+(44, 'Bachelor of Science in Management (BSM)', 1, 2),
+(45, 'Bachelor of Science in Computer Science (BSCS)', 18, 2),
+(46, 'Bachelor of Science in Information Technology (BSIT)', 18, 2),
+(47, 'Bachelor of Science in Information Systems (BSIS)', 18, 2),
+(48, 'Bachelor of Elementary Education (BEEd)', 4, 2),
+(49, 'Bachelor of Secondary Education (BSEd) in English', 4, 2),
+(50, 'Bachelor of Secondary Education (BSEd) in Filipino', 4, 2),
+(51, 'Bachelor of Secondary Education (BSEd) in Mathematics', 4, 2),
+(52, 'Bachelor of Secondary Education (BSEd) in Science', 4, 2),
+(53, 'Bachelor of Secondary Education (BSEd) in Social Studies', 4, 2),
+(54, 'Bachelor of Physical Education (BPE)', 4, 2),
+(55, 'Bachelor of Special Needs Education (BSNEd)', 4, 2),
+(56, 'Bachelor of Science in Civil Engineering (BSCE)', 2, 2),
+(57, 'Bachelor of Science in Computer Engineering (BSCoE)', 2, 2),
+(58, 'Bachelor of Science in Electrical Engineering (BSEE)', 2, 2),
+(59, 'Bachelor of Science in Electronics Engineering (BSECE)', 2, 2),
+(60, 'Bachelor of Science in Mechanical Engineering (BSME)', 2, 2),
+(61, 'Bachelor of Science in Industrial Engineering (BSIE)', 2, 2),
+(83, 'Bachelor of Science in Nursing (BSN)', 3, 2),
+(84, 'Bachelor of Science in Medical Technology (BSMT)', 3, 2),
+(85, 'Bachelor of Science in Pharmacy (BSPharm)', 3, 2),
+(86, 'Bachelor of Science in Physical Therapy (BSPT)', 3, 2),
+(87, 'Bachelor of Science in Occupational Therapy (BSOT)', 3, 2),
+(91, 'Bachelor of Science in Hospitality Management (BSHM)', 9, 2),
+(92, 'Bachelor of Science in Tourism Management (BSTM)', 9, 2),
+(93, 'Bachelor of Science in Biology (BSBio)', 19, 2),
+(94, 'Bachelor of Science in Chemistry (BSChem)', 19, 2),
+(95, 'Bachelor of Science in Mathematics (BSMath)', 19, 2),
+(96, 'Bachelor of Science in Physics (BSPhy)', 19, 2),
+(97, 'Bachelor of Science in Statistics (BSStat)', 19, 2),
+(98, 'Bachelor of Science in Economics (BSEcon)', 11, 2),
+(99, 'Bachelor of Science in Psychology (BSPsy)', 11, 2),
+(100, 'Bachelor of Science in Sociology (BSSoc)', 11, 2),
+(101, 'Bachelor of Science in Anthropology (BSAnthro)', 11, 2),
+(102, 'Bachelor of Science in Criminology (BSCrim)', 20, 2),
+(103, 'Bachelor of Science in Environmental Science (BSES)', 20, 2),
+(104, 'Bachelor of Science in Forestry (BSFor)', 20, 2),
+(105, 'Bachelor of Science in Geology (BSGeo)', 20, 2),
+(106, 'Bachelor of Science in Marine Biology (BSMB)', 20, 2),
+(107, 'Bachelor of Science in Agriculture (BSA)', 21, 2),
+(108, 'Bachelor of Science in Agricultural Business (BSAB)', 21, 2),
+(109, 'Bachelor of Science in Agricultural Economics (BSAE)', 21, 2),
+(110, 'Bachelor of Science in Agronomy (BSAgr)', 21, 2),
+(111, 'Bachelor of Science in Animal Science (BSAS)', 21, 2),
+(112, 'Bachelor of Science in Entomology (BSEnt)', 21, 2);
 
 -- --------------------------------------------------------
 
@@ -247,61 +348,22 @@ INSERT INTO `tblcoursescategory` (`course_categoryId`, `course_categoryName`) VA
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tblcoursesgraduate`
+-- Table structure for table `tblcoursetype`
 --
 
-CREATE TABLE `tblcoursesgraduate` (
-  `course_graduateId` int(11) NOT NULL,
-  `course_graduateName` varchar(100) NOT NULL
+CREATE TABLE `tblcoursetype` (
+  `crs_type_id` int(11) NOT NULL,
+  `crs_type_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `tblcoursesgraduate`
+-- Dumping data for table `tblcoursetype`
 --
 
-INSERT INTO `tblcoursesgraduate` (`course_graduateId`, `course_graduateName`) VALUES
+INSERT INTO `tblcoursetype` (`crs_type_id`, `crs_type_name`) VALUES
 (1, 'Secondary Education'),
 (2, 'Tertiary Education'),
 (3, 'Graduate Education');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbleducbackground`
---
-
-CREATE TABLE `tbleducbackground` (
-  `educ_back_id` int(11) NOT NULL,
-  `educ_personalId` int(11) DEFAULT NULL,
-  `educ_coursesId` int(20) NOT NULL,
-  `educ_coursegradId` int(50) NOT NULL,
-  `educ_institutionId` int(20) NOT NULL,
-  `educ_dategraduate` date NOT NULL,
-  `educ_prcCert` varchar(250) NOT NULL,
-  `educ_prcLicenseNo` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tblemploymenthistory`
---
-
-CREATE TABLE `tblemploymenthistory` (
-  `empH_id` int(20) NOT NULL,
-  `empH_candId` int(11) NOT NULL,
-  `empH_positionName` varchar(250) NOT NULL,
-  `empH_companyName` varchar(250) NOT NULL,
-  `empH_startdate` date NOT NULL,
-  `empH_enddate` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tblemploymenthistory`
---
-
-INSERT INTO `tblemploymenthistory` (`empH_id`, `empH_candId`, `empH_positionName`, `empH_companyName`, `empH_startdate`, `empH_enddate`) VALUES
-(1, 7, 'Coordinator', 'La kreativ', '2022-08-10', '2024-08-14');
 
 -- --------------------------------------------------------
 
@@ -2763,6 +2825,25 @@ INSERT INTO `tblinstitution` (`institution_id`, `institution_name`, `institution
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tbljobpassing`
+--
+
+CREATE TABLE `tbljobpassing` (
+  `passing_id` int(20) NOT NULL,
+  `passing_jobId` int(11) NOT NULL,
+  `passing_points` int(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbljobpassing`
+--
+
+INSERT INTO `tbljobpassing` (`passing_id`, `passing_jobId`, `passing_points`) VALUES
+(1, 10, 50);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tbljobseducation`
 --
 
@@ -2946,42 +3027,34 @@ INSERT INTO `tbljobsworkexperience` (`jwork_id`, `jwork_jobId`, `jwork_duration`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tblknowledge`
+-- Table structure for table `tbllicensemaster`
 --
 
-CREATE TABLE `tblknowledge` (
+CREATE TABLE `tbllicensemaster` (
+  `license_master_id` int(11) NOT NULL,
+  `license_master_name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblpersonalknowledge`
+--
+
+CREATE TABLE `tblpersonalknowledge` (
   `knowledge_id` int(11) NOT NULL,
   `knowledge_name` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `tblknowledge`
+-- Dumping data for table `tblpersonalknowledge`
 --
 
-INSERT INTO `tblknowledge` (`knowledge_id`, `knowledge_name`) VALUES
+INSERT INTO `tblpersonalknowledge` (`knowledge_id`, `knowledge_name`) VALUES
 (1, 'Quality Management Practices (QMP)\r\n'),
 (2, 'Hazard Analysis and Critical Control Points (HACCP)\r\n'),
 (3, 'Good Manufacturing Practices (GMP)\r\n'),
 (4, 'Food Safety Management Systems (FSMS)');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tblpassing`
---
-
-CREATE TABLE `tblpassing` (
-  `passing_id` int(20) NOT NULL,
-  `passing_jobId` int(11) NOT NULL,
-  `passing_points` int(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tblpassing`
---
-
-INSERT INTO `tblpassing` (`passing_id`, `passing_jobId`, `passing_points`) VALUES
-(1, 10, 50);
 
 -- --------------------------------------------------------
 
@@ -3040,19 +3113,6 @@ INSERT INTO `tblpersonaltraining` (`perT_id`, `perT_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tblskills`
---
-
-CREATE TABLE `tblskills` (
-  `skills_id` int(20) NOT NULL,
-  `skills_candId` int(11) NOT NULL,
-  `skills_perSId` int(20) NOT NULL,
-  `skills_points` int(11) NOT NULL DEFAULT 5
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `tblsupervisor`
 --
 
@@ -3071,18 +3131,6 @@ CREATE TABLE `tblsupervisor` (
 INSERT INTO `tblsupervisor` (`sup_id`, `sup_name`, `sup_email`, `sup_password`, `sup_user_level`) VALUES
 (1, 'jake', 'jake@gmail.com', 'jake', 'supervisor');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tbltraining`
---
-
-CREATE TABLE `tbltraining` (
-  `training_id` int(20) NOT NULL,
-  `training_candId` int(20) NOT NULL,
-  `training_perTId` int(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
 --
 -- Indexes for dumped tables
 --
@@ -3097,9 +3145,39 @@ ALTER TABLE `tbladmin`
 -- Indexes for table `tblapplications`
 --
 ALTER TABLE `tblapplications`
-  ADD PRIMARY KEY (`posA_id`),
-  ADD KEY `personal_info_id` (`posA_candId`),
-  ADD KEY `apply_position_id` (`posA_jobMId`);
+  ADD PRIMARY KEY (`app_id`),
+  ADD KEY `personal_info_id` (`app_candId`),
+  ADD KEY `apply_position_id` (`app_jobMId`),
+  ADD KEY `fk_app_status` (`app_appSId`);
+
+--
+-- Indexes for table `tblapplicationstatus`
+--
+ALTER TABLE `tblapplicationstatus`
+  ADD PRIMARY KEY (`appS_id`);
+
+--
+-- Indexes for table `tblcandconsent`
+--
+ALTER TABLE `tblcandconsent`
+  ADD PRIMARY KEY (`cons_id`),
+  ADD KEY `personal_info_id` (`cons_candId`);
+
+--
+-- Indexes for table `tblcandeducbackground`
+--
+ALTER TABLE `tblcandeducbackground`
+  ADD PRIMARY KEY (`educ_back_id`),
+  ADD KEY `personal_info_id` (`educ_canId`),
+  ADD KEY `courses_id` (`educ_coursesId`),
+  ADD KEY `institution_id` (`educ_institutionId`);
+
+--
+-- Indexes for table `tblcandemploymenthistory`
+--
+ALTER TABLE `tblcandemploymenthistory`
+  ADD PRIMARY KEY (`empH_id`),
+  ADD KEY `personal_info_id` (`empH_candId`);
 
 --
 -- Indexes for table `tblcandidates`
@@ -3108,18 +3186,42 @@ ALTER TABLE `tblcandidates`
   ADD PRIMARY KEY (`cand_id`);
 
 --
--- Indexes for table `tblconsent`
+-- Indexes for table `tblcandknowledge`
 --
-ALTER TABLE `tblconsent`
-  ADD PRIMARY KEY (`cons_id`),
-  ADD KEY `personal_info_id` (`cons_candId`);
+ALTER TABLE `tblcandknowledge`
+  ADD KEY `canknow_canId` (`canknow_canId`);
+
+--
+-- Indexes for table `tblcandlicense`
+--
+ALTER TABLE `tblcandlicense`
+  ADD PRIMARY KEY (`license_id`),
+  ADD KEY `license_canId` (`license_canId`),
+  ADD KEY `license_masterId` (`license_masterId`);
+
+--
+-- Indexes for table `tblcandskills`
+--
+ALTER TABLE `tblcandskills`
+  ADD PRIMARY KEY (`skills_id`),
+  ADD KEY `personal_info_id` (`skills_candId`),
+  ADD KEY `personal_skills_id` (`skills_perSId`);
+
+--
+-- Indexes for table `tblcandtraining`
+--
+ALTER TABLE `tblcandtraining`
+  ADD PRIMARY KEY (`training_id`),
+  ADD KEY `personal_info_id` (`training_candId`),
+  ADD KEY `personal_training_id` (`training_perTId`);
 
 --
 -- Indexes for table `tblcourses`
 --
 ALTER TABLE `tblcourses`
   ADD PRIMARY KEY (`courses_id`),
-  ADD KEY `course_category_id` (`courses_coursecategoryId`);
+  ADD KEY `course_category_id` (`courses_coursecategoryId`),
+  ADD KEY `tblcourses_ibfk_1` (`courses_courseTypeId`);
 
 --
 -- Indexes for table `tblcoursescategory`
@@ -3128,27 +3230,10 @@ ALTER TABLE `tblcoursescategory`
   ADD PRIMARY KEY (`course_categoryId`);
 
 --
--- Indexes for table `tblcoursesgraduate`
+-- Indexes for table `tblcoursetype`
 --
-ALTER TABLE `tblcoursesgraduate`
-  ADD PRIMARY KEY (`course_graduateId`);
-
---
--- Indexes for table `tbleducbackground`
---
-ALTER TABLE `tbleducbackground`
-  ADD PRIMARY KEY (`educ_back_id`),
-  ADD KEY `personal_info_id` (`educ_personalId`),
-  ADD KEY `courses_id` (`educ_coursesId`),
-  ADD KEY `course_graduate_id` (`educ_coursegradId`),
-  ADD KEY `institution_id` (`educ_institutionId`);
-
---
--- Indexes for table `tblemploymenthistory`
---
-ALTER TABLE `tblemploymenthistory`
-  ADD PRIMARY KEY (`empH_id`),
-  ADD KEY `personal_info_id` (`empH_candId`);
+ALTER TABLE `tblcoursetype`
+  ADD PRIMARY KEY (`crs_type_id`);
 
 --
 -- Indexes for table `tblforgotpassword`
@@ -3162,6 +3247,12 @@ ALTER TABLE `tblforgotpassword`
 --
 ALTER TABLE `tblinstitution`
   ADD PRIMARY KEY (`institution_id`);
+
+--
+-- Indexes for table `tbljobpassing`
+--
+ALTER TABLE `tbljobpassing`
+  ADD PRIMARY KEY (`passing_id`);
 
 --
 -- Indexes for table `tbljobseducation`
@@ -3213,16 +3304,16 @@ ALTER TABLE `tbljobsworkexperience`
   ADD KEY `jwork_jobId` (`jwork_jobId`);
 
 --
--- Indexes for table `tblknowledge`
+-- Indexes for table `tbllicensemaster`
 --
-ALTER TABLE `tblknowledge`
-  ADD PRIMARY KEY (`knowledge_id`);
+ALTER TABLE `tbllicensemaster`
+  ADD PRIMARY KEY (`license_master_id`);
 
 --
--- Indexes for table `tblpassing`
+-- Indexes for table `tblpersonalknowledge`
 --
-ALTER TABLE `tblpassing`
-  ADD PRIMARY KEY (`passing_id`);
+ALTER TABLE `tblpersonalknowledge`
+  ADD PRIMARY KEY (`knowledge_id`);
 
 --
 -- Indexes for table `tblpersonalskills`
@@ -3237,26 +3328,10 @@ ALTER TABLE `tblpersonaltraining`
   ADD PRIMARY KEY (`perT_id`);
 
 --
--- Indexes for table `tblskills`
---
-ALTER TABLE `tblskills`
-  ADD PRIMARY KEY (`skills_id`),
-  ADD KEY `personal_info_id` (`skills_candId`),
-  ADD KEY `personal_skills_id` (`skills_perSId`);
-
---
 -- Indexes for table `tblsupervisor`
 --
 ALTER TABLE `tblsupervisor`
   ADD PRIMARY KEY (`sup_id`);
-
---
--- Indexes for table `tbltraining`
---
-ALTER TABLE `tbltraining`
-  ADD PRIMARY KEY (`training_id`),
-  ADD KEY `personal_info_id` (`training_candId`),
-  ADD KEY `personal_training_id` (`training_perTId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -3272,7 +3347,31 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblapplications`
 --
 ALTER TABLE `tblapplications`
-  MODIFY `posA_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `app_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tblapplicationstatus`
+--
+ALTER TABLE `tblapplicationstatus`
+  MODIFY `appS_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `tblcandconsent`
+--
+ALTER TABLE `tblcandconsent`
+  MODIFY `cons_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tblcandeducbackground`
+--
+ALTER TABLE `tblcandeducbackground`
+  MODIFY `educ_back_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tblcandemploymenthistory`
+--
+ALTER TABLE `tblcandemploymenthistory`
+  MODIFY `empH_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblcandidates`
@@ -3281,10 +3380,22 @@ ALTER TABLE `tblcandidates`
   MODIFY `cand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- AUTO_INCREMENT for table `tblconsent`
+-- AUTO_INCREMENT for table `tblcandlicense`
 --
-ALTER TABLE `tblconsent`
-  MODIFY `cons_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `tblcandlicense`
+  MODIFY `license_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tblcandskills`
+--
+ALTER TABLE `tblcandskills`
+  MODIFY `skills_id` int(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tblcandtraining`
+--
+ALTER TABLE `tblcandtraining`
+  MODIFY `training_id` int(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tblcourses`
@@ -3299,28 +3410,22 @@ ALTER TABLE `tblcoursescategory`
   MODIFY `course_categoryId` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
--- AUTO_INCREMENT for table `tblcoursesgraduate`
+-- AUTO_INCREMENT for table `tblcoursetype`
 --
-ALTER TABLE `tblcoursesgraduate`
-  MODIFY `course_graduateId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `tbleducbackground`
---
-ALTER TABLE `tbleducbackground`
-  MODIFY `educ_back_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `tblemploymenthistory`
---
-ALTER TABLE `tblemploymenthistory`
-  MODIFY `empH_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `tblcoursetype`
+  MODIFY `crs_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblforgotpassword`
 --
 ALTER TABLE `tblforgotpassword`
   MODIFY `forgotpass_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbljobpassing`
+--
+ALTER TABLE `tbljobpassing`
+  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tbljobseducation`
@@ -3365,16 +3470,16 @@ ALTER TABLE `tbljobsworkexperience`
   MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `tblknowledge`
+-- AUTO_INCREMENT for table `tbllicensemaster`
 --
-ALTER TABLE `tblknowledge`
-  MODIFY `knowledge_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+ALTER TABLE `tbllicensemaster`
+  MODIFY `license_master_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `tblpassing`
+-- AUTO_INCREMENT for table `tblpersonalknowledge`
 --
-ALTER TABLE `tblpassing`
-  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `tblpersonalknowledge`
+  MODIFY `knowledge_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tblpersonalskills`
@@ -3389,22 +3494,10 @@ ALTER TABLE `tblpersonaltraining`
   MODIFY `perT_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- AUTO_INCREMENT for table `tblskills`
---
-ALTER TABLE `tblskills`
-  MODIFY `skills_id` int(20) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `tblsupervisor`
 --
 ALTER TABLE `tblsupervisor`
   MODIFY `sup_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `tbltraining`
---
-ALTER TABLE `tbltraining`
-  MODIFY `training_id` int(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -3414,35 +3507,62 @@ ALTER TABLE `tbltraining`
 -- Constraints for table `tblapplications`
 --
 ALTER TABLE `tblapplications`
-  ADD CONSTRAINT `tblapplications_ibfk_1` FOREIGN KEY (`posA_candId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `tblapplications_ibfk_2` FOREIGN KEY (`posA_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
+  ADD CONSTRAINT `fk_app_status` FOREIGN KEY (`app_appSId`) REFERENCES `tblapplicationstatus` (`appS_id`),
+  ADD CONSTRAINT `tblapplications_ibfk_1` FOREIGN KEY (`app_candId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tblapplications_ibfk_2` FOREIGN KEY (`app_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
 
 --
--- Constraints for table `tblconsent`
+-- Constraints for table `tblcandconsent`
 --
-ALTER TABLE `tblconsent`
-  ADD CONSTRAINT `tblconsent_ibfk_1` FOREIGN KEY (`cons_candId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE;
+ALTER TABLE `tblcandconsent`
+  ADD CONSTRAINT `tblcandconsent_ibfk_1` FOREIGN KEY (`cons_candId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `tblcandeducbackground`
+--
+ALTER TABLE `tblcandeducbackground`
+  ADD CONSTRAINT `tblcandeducbackground_ibfk_1` FOREIGN KEY (`educ_canId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tblcandeducbackground_ibfk_2` FOREIGN KEY (`educ_coursesId`) REFERENCES `tblcourses` (`courses_id`),
+  ADD CONSTRAINT `tblcandeducbackground_ibfk_5` FOREIGN KEY (`educ_institutionId`) REFERENCES `tblinstitution` (`institution_id`);
+
+--
+-- Constraints for table `tblcandemploymenthistory`
+--
+ALTER TABLE `tblcandemploymenthistory`
+  ADD CONSTRAINT `tblcandemploymenthistory_ibfk_1` FOREIGN KEY (`empH_candId`) REFERENCES `tblcandidates` (`cand_id`);
+
+--
+-- Constraints for table `tblcandknowledge`
+--
+ALTER TABLE `tblcandknowledge`
+  ADD CONSTRAINT `tblcandknowledge_ibfk_1` FOREIGN KEY (`canknow_canId`) REFERENCES `tblcandidates` (`cand_id`);
+
+--
+-- Constraints for table `tblcandlicense`
+--
+ALTER TABLE `tblcandlicense`
+  ADD CONSTRAINT `tblcandlicense_ibfk_1` FOREIGN KEY (`license_canId`) REFERENCES `tblcandidates` (`cand_id`),
+  ADD CONSTRAINT `tblcandlicense_ibfk_2` FOREIGN KEY (`license_masterId`) REFERENCES `tbllicensemaster` (`license_master_id`);
+
+--
+-- Constraints for table `tblcandskills`
+--
+ALTER TABLE `tblcandskills`
+  ADD CONSTRAINT `tblcandskills_ibfk_1` FOREIGN KEY (`skills_candId`) REFERENCES `tblcandidates` (`cand_id`),
+  ADD CONSTRAINT `tblcandskills_ibfk_2` FOREIGN KEY (`skills_perSId`) REFERENCES `tblpersonalskills` (`perS_id`);
+
+--
+-- Constraints for table `tblcandtraining`
+--
+ALTER TABLE `tblcandtraining`
+  ADD CONSTRAINT `tblcandtraining_ibfk_1` FOREIGN KEY (`training_candId`) REFERENCES `tblcandidates` (`cand_id`),
+  ADD CONSTRAINT `tblcandtraining_ibfk_2` FOREIGN KEY (`training_perTId`) REFERENCES `tblpersonaltraining` (`perT_id`);
 
 --
 -- Constraints for table `tblcourses`
 --
 ALTER TABLE `tblcourses`
-  ADD CONSTRAINT `tblcourses_ibfk_1` FOREIGN KEY (`courses_coursecategoryId`) REFERENCES `tblcoursescategory` (`course_categoryId`);
-
---
--- Constraints for table `tbleducbackground`
---
-ALTER TABLE `tbleducbackground`
-  ADD CONSTRAINT `tbleducbackground_ibfk_1` FOREIGN KEY (`educ_personalId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `tbleducbackground_ibfk_2` FOREIGN KEY (`educ_coursesId`) REFERENCES `tblcourses` (`courses_id`),
-  ADD CONSTRAINT `tbleducbackground_ibfk_4` FOREIGN KEY (`educ_coursegradId`) REFERENCES `tblcoursesgraduate` (`course_graduateId`),
-  ADD CONSTRAINT `tbleducbackground_ibfk_5` FOREIGN KEY (`educ_institutionId`) REFERENCES `tblinstitution` (`institution_id`);
-
---
--- Constraints for table `tblemploymenthistory`
---
-ALTER TABLE `tblemploymenthistory`
-  ADD CONSTRAINT `tblemploymenthistory_ibfk_1` FOREIGN KEY (`empH_candId`) REFERENCES `tblcandidates` (`cand_id`);
+  ADD CONSTRAINT `tblcourses_ibfk_1` FOREIGN KEY (`courses_courseTypeId`) REFERENCES `tblcoursetype` (`crs_type_id`);
 
 --
 -- Constraints for table `tblforgotpassword`
@@ -3461,7 +3581,7 @@ ALTER TABLE `tbljobseducation`
 --
 ALTER TABLE `tbljobsknowledge`
   ADD CONSTRAINT `tbljobsknowledge_ibfk_1` FOREIGN KEY (`jknow_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljobsknowledge_ibfk_2` FOREIGN KEY (`jknow_knowledgeId`) REFERENCES `tblknowledge` (`knowledge_id`);
+  ADD CONSTRAINT `tbljobsknowledge_ibfk_2` FOREIGN KEY (`jknow_knowledgeId`) REFERENCES `tblpersonalknowledge` (`knowledge_id`);
 
 --
 -- Constraints for table `tbljobsmasterduties`
@@ -3486,20 +3606,6 @@ ALTER TABLE `tbljobstrainings`
 --
 ALTER TABLE `tbljobsworkexperience`
   ADD CONSTRAINT `tbljobsworkexperience_ibfk_1` FOREIGN KEY (`jwork_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
-
---
--- Constraints for table `tblskills`
---
-ALTER TABLE `tblskills`
-  ADD CONSTRAINT `tblskills_ibfk_1` FOREIGN KEY (`skills_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblskills_ibfk_2` FOREIGN KEY (`skills_perSId`) REFERENCES `tblpersonalskills` (`perS_id`);
-
---
--- Constraints for table `tbltraining`
---
-ALTER TABLE `tbltraining`
-  ADD CONSTRAINT `tbltraining_ibfk_1` FOREIGN KEY (`training_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tbltraining_ibfk_2` FOREIGN KEY (`training_perTId`) REFERENCES `tblpersonaltraining` (`perT_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
