@@ -151,11 +151,12 @@ class Admin
 
   function getSelectedJobs($json)
   {
-    // {"jobId": 10}
+    // {"jobId": 11}
     include "connection.php";
     $returnValue = [];
     $data = json_decode($json, true);
     $sql = "SELECT * FROM tbljobsmaster WHERE jobM_id = :jobId";
+    $jobId = $data['jobId'];
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
@@ -197,14 +198,16 @@ class Admin
     $stmt->execute();
     $returnValue["jobExperience"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) as FullName, a.app_totalpoints FROM tblapplications a 
+    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) as FullName FROM tblapplications a 
             INNER JOIN tblcandidates b ON a.app_candId = b.cand_id 
             WHERE a.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-
+    foreach ($returnValue["candidates"] as &$candidate) {
+      $candidate['points'] = calculateCandidatePoints($candidate['cand_id'], $jobId);
+    }
     return json_encode($returnValue);
   }
 
@@ -240,7 +243,8 @@ class Admin
     return json_encode($returnValue);
   }
 
-  function handleJobStatusSwitch($json){
+  function handleJobStatusSwitch($json)
+  {
     // {"status": 1, "jobId": 10}
     include "connection.php";
     $data = json_decode($json, true);
@@ -252,6 +256,93 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } //admin
+
+function calculateCandidatePoints($candId, $jobId)
+{
+  include "connection.php";
+  $totalPoints = 0;
+  $maxPoints = 0;
+
+  $sql = "SELECT SUM(jeduc_points) as educ_points, (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
+            FROM tbljobseducation j 
+            INNER JOIN tblcandeducbackground c 
+            ON j.jeduc_categoryId = c.educ_coursesId 
+            WHERE c.educ_canId = :candId AND j.jeduc_jobId = :jobId";
+  $stmt = $conn->prepare($sql);
+  $stmt->bindParam(":candId", $candId);
+  $stmt->bindParam(":jobId", $jobId);
+  $stmt->execute();
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  $educationPoints = $result['educ_points'] ?? 0;
+  $maxEducationPoints = $result['max_educ_points'] ?? 0;
+  $totalPoints += $educationPoints;
+  $maxPoints += $maxEducationPoints;
+
+  $sql = "SELECT SUM(jwork_points) as exp_points, (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) as max_exp_points
+            FROM tbljobsworkexperience j 
+            INNER JOIN tblcandemploymenthistory c 
+            ON j.jwork_duration = c.empH_startDate 
+            WHERE c.empH_candId = :candId AND j.jwork_jobId = :jobId";
+  $stmt = $conn->prepare($sql);
+  $stmt->bindParam(":candId", $candId);
+  $stmt->bindParam(":jobId", $jobId);
+  $stmt->execute();
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  $experiencePoints = $result['exp_points'] ?? 0;
+  $maxExperiencePoints = $result['max_exp_points'] ?? 0;
+  $totalPoints += $experiencePoints;
+  $maxPoints += $maxExperiencePoints;
+
+  $sql = "SELECT SUM(jskills_points) as skills_points, (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :jobId) as max_skills_points
+            FROM tbljobsskills j 
+            INNER JOIN tblcandskills c 
+            ON j.jskills_skillsId = c.skills_perSId 
+            WHERE c.skills_candId = :candId AND j.jskills_jobId = :jobId";
+  $stmt = $conn->prepare($sql);
+  $stmt->bindParam(":candId", $candId);
+  $stmt->bindParam(":jobId", $jobId);
+  $stmt->execute();
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  $skillsPoints = $result['skills_points'] ?? 0;
+  $maxSkillsPoints = $result['max_skills_points'] ?? 0;
+  $totalPoints += $skillsPoints;
+  $maxPoints += $maxSkillsPoints;
+
+  $sql = "SELECT SUM(jtrng_points) as training_points, (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :jobId) as max_training_points
+            FROM tbljobstrainings j 
+            INNER JOIN tblcandtraining c 
+            ON j.jtrng_trainingId = c.training_perTId 
+            WHERE c.training_candId = :candId AND j.jtrng_jobId = :jobId";
+  $stmt = $conn->prepare($sql);
+  $stmt->bindParam(":candId", $candId);
+  $stmt->bindParam(":jobId", $jobId);
+  $stmt->execute();
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  $trainingPoints = $result['training_points'] ?? 0;
+  $maxTrainingPoints = $result['max_training_points'] ?? 0;
+  $totalPoints += $trainingPoints;
+  $maxPoints += $maxTrainingPoints;
+
+  $sql = "SELECT SUM(jknow_points) as knowledge_points, (SELECT SUM(jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :jobId) as max_knowledge_points
+            FROM tbljobsknowledge j 
+            INNER JOIN tblcandknowledge c 
+            ON j.jknow_knowledgeId = c.canknow_knowledgeId 
+            WHERE c.canknow_canId = :candId AND j.jknow_jobId = :jobId";
+  $stmt = $conn->prepare($sql);
+  $stmt->bindParam(":candId", $candId);
+  $stmt->bindParam(":jobId", $jobId);
+  $stmt->execute();
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  $knowledgePoints = $result['knowledge_points'] ?? 0;
+  $maxKnowledgePoints = $result['max_knowledge_points'] ?? 0;
+  $totalPoints += $knowledgePoints;
+  $maxPoints += $maxKnowledgePoints;
+
+  $percentage = ($maxPoints > 0) ? round(($totalPoints / $maxPoints) * 100, 2) : 0;
+
+  return $percentage;
+}
+
 
 function recordExists($value, $table, $column)
 {
