@@ -268,11 +268,12 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints = 0;
   $maxPoints = 0;
 
-  $sql = "SELECT SUM(jeduc_points) as educ_points, (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
-            FROM tbljobseducation j 
-            INNER JOIN tblcandeducbackground c 
-            ON j.jeduc_categoryId = c.educ_coursesId 
-            WHERE c.educ_canId = :candId AND j.jeduc_jobId = :jobId";
+  $sql = "SELECT SUM(c.jeduc_points) as educ_points, (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
+          FROM tblcourses a
+          INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
+          INNER JOIN tbljobseducation c ON c.jeduc_categoryId = b.course_categoryId
+          INNER JOIN tblcandeducbackground d ON d.educ_coursesId = a.courses_id
+          WHERE d.educ_canId = :candId AND c.jeduc_jobId = :jobId";
   $stmt = $conn->prepare($sql);
   $stmt->bindParam(":candId", $candId);
   $stmt->bindParam(":jobId", $jobId);
