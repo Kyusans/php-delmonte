@@ -90,8 +90,11 @@ class User
       $skills = $json['skills'] ?? [];
       $trainings = $json['trainings'] ?? [];
       $knowledge = $json['knowledge'] ?? [];
+      $licenses = $json['licenses'] ?? [];
       $createdDateTime = getCurrentDate();
-
+      $isSubscribeToEmail = $json['isSubscribeToEmail'] ?? 0;
+      // return json_encode($json);
+      // die();
       $sql = "INSERT INTO tblcandidates(cand_lastname, cand_firstname, cand_middlename, cand_contactNo,
                 cand_alternateContactNo, cand_email, cand_alternateEmail, cand_presentAddress,
                 cand_permanentAddress, cand_dateofBirth, cand_sex, cand_sssNo, cand_tinNo,
@@ -124,27 +127,21 @@ class User
 
       if ($stmt->rowCount() > 0) {
         if (!empty($educationalBackground)) {
-          $sql = "INSERT INTO tbleducbackground (
-                        educ_personalId, educ_coursesId, educ_courseGraduated, educ_coursegradId,
-                        educ_institutionId, educ_dategraduate, educ_prcCert, educ_prcLicenseNo)
-                        VALUES (:personal_info_id, :courses_id, :course_date_graduated, :course_graduate_id,
-                        :institution_id, :date_of_graduation, :prc_license, :prc_license_number)";
+          $sql = "INSERT INTO tblcandeducbackground (educ_canId, educ_coursesId, educ_institutionId, educ_dateGraduate) 
+          VALUES (:personal_info_id, :educational_courses_id, :educational_institution_id, :educational_date_graduate)";
+
           foreach ($educationalBackground as $item) {
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':personal_info_id', $newId);
-            $stmt->bindParam(':courses_id', $item['course']);
-            $stmt->bindParam(':course_date_graduated', $item['courseDateGraduated']);
-            $stmt->bindParam(':course_graduate_id', $item['graduateCourse']);
-            $stmt->bindParam(':institution_id', $item['institution']);
-            $stmt->bindParam(':date_of_graduation', $item['graduateCourseDate']);
-            $stmt->bindParam(':prc_license', $item['prcLicense']);
-            $stmt->bindParam(':prc_license_number', $item['prcLicenseNumber']);
+            $stmt->bindParam(':educational_courses_id', $item['course']);
+            $stmt->bindParam(':educational_institution_id', $item['institution']);
+            $stmt->bindParam(':educational_date_graduate', $item['courseDateGraduated']);
             $stmt->execute();
           }
         }
 
         if ($stmt->rowCount() > 0 && !empty($employmentHistory)) {
-          $sql = "INSERT INTO tblemploymenthistory(empH_candId , empH_positionName, empH_companyName,
+          $sql = "INSERT INTO tblcandemploymenthistory(empH_candId , empH_positionName, empH_companyName,
                         empH_startDate, empH_endDate) VALUES (:personal_info_id, :employment_position_name,
                         :employment_company_name, :employment_start_date, :employment_end_date)";
           foreach ($employmentHistory as $item) {
@@ -159,7 +156,7 @@ class User
         }
 
         if ($stmt->rowCount() > 0 && !empty($trainings)) {
-          $sql = "INSERT INTO tbltraining (training_candId , training_perTId )
+          $sql = "INSERT INTO tblcandtraining (training_candId , training_perTId )
                         VALUES (:personal_info_id, :personal_training_id)";
           foreach ($trainings as $item) {
             $stmt = $conn->prepare($sql);
@@ -170,7 +167,7 @@ class User
         }
 
         if ($stmt->rowCount() > 0 && !empty($skills)) {
-          $sql = "INSERT INTO tblskills(skills_candId , skills_perSId)
+          $sql = "INSERT INTO tblcandskills(skills_candId , skills_perSId)
                         VALUES (:personal_info_id, :personal_skill_id)";
           foreach ($skills as $item) {
             $stmt = $conn->prepare($sql);
@@ -181,7 +178,7 @@ class User
         }
 
         if ($stmt->rowCount() > 0 && !empty($knowledge)) {
-          $sql = "INSERT INTO tblcandidateknowledge(canknow_canId , canknow_knowledgeId)
+          $sql = "INSERT INTO tblcandknowledge(canknow_canId , canknow_knowledgeId)
                         VALUES (:personal_info_id, :personal_knowledge_id)";
           foreach ($knowledge as $item) {
             $stmt = $conn->prepare($sql);
@@ -189,6 +186,27 @@ class User
             $stmt->bindParam(':personal_knowledge_id', $item['knowledge']);
             $stmt->execute();
           }
+        }
+
+        if ($stmt->rowCount() > 0 && !empty($licenses)) {
+          $sql = "INSERT INTO tblcandlicense(license_number, license_canId, license_masterId) 
+                  VALUES (:license_number, :license_canId, :license_masterId)";
+          foreach ($licenses as $item) {
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':license_number', $item['licenseNumber']);
+            $stmt->bindParam(':license_canId', $newId);
+            $stmt->bindParam(':license_masterId', $item['license']);
+            $stmt->execute();
+          }
+        }
+
+        if ($stmt->rowCount() > 0 && !empty($isSubscribeToEmail)) {
+          $sql = "INSERT INTO tblcandconsent(cons_candId , cons_subscribetoemailupdates) 
+          VALUES (:personal_info_id, :personal_subscribe_to_email)";
+          $stmt = $conn->prepare($sql);
+          $stmt->bindParam(':personal_info_id', $newId);
+          $stmt->bindParam(':personal_subscribe_to_email', $isSubscribeToEmail);
+          $stmt->execute();
         }
 
         if ($stmt->rowCount() > 0) {
@@ -320,6 +338,11 @@ class User
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['license'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tbllicensetype";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['licenseType'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       $conn->commit();
 
@@ -489,7 +512,7 @@ class User
 
   function getCandidateProfile($json)
   {
-    // {"cand_id": 6}
+    // {"cand_id": 10}
 
     try {
       include "connection.php";
@@ -587,52 +610,6 @@ function getCurrentDate()
   return $today->format('Y-m-d h:i:s A');
 }
 
-// function calculateCandidatePoints($json)
-// {
-//   // {"candId": 6, "jobId": 15}
-//   include "connection.php";
-//   $conn->beginTransaction();
-//   $qualificationPoints = [];
-//   $data = json_decode($json, true);
-//   $candId = $data['candId'];
-//   $jobId = $data['jobId'];
-//   try {
-//     // ---- get qualification points
-//     $sql = "SELECT jknow_points, jknow_knowledgeId FROM tbljobsknowledge 
-//     WHERE jknow_jobId = :jobId";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(":jobId", $jobId);
-//     $stmt->execute();
-//     $qualificationPoints["jobKnowledge"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-
-//     $sql = "SELECT jskills_points , jskills_skillsId FROM tbljobsskills  
-//     WHERE jskills_jobId = :jobId";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(":jobId", $jobId);
-//     $stmt->execute();
-//     $qualificationPoints["jobSkills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-
-//     $sql = "SELECT jtrng_points, jtrng_trainingId  FROM tbljobstrainings   
-//     WHERE jtrng_jobId = :jobId";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(":jobId", $jobId);
-//     $stmt->execute();
-//     $qualificationPoints["jobTrainings"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-
-//     $sql = "SELECT jwork_points, jwork_duration FROM tbljobsworkexperience   
-//     WHERE jwork_jobId = :jobId";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(":jobId", $jobId);
-//     $stmt->execute();
-//     $qualificationPoints["jobWorkExperience"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-//     // ---- get qualification points
-
-//     return json_encode($qualificationPoints);
-//   } catch (PDOException $th) {
-//     $conn->rollBack();
-//     return 0;
-//   }
-// }
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
 $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";

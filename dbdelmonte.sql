@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 03, 2024 at 11:01 AM
+-- Generation Time: Sep 04, 2024 at 06:05 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -3032,7 +3032,19 @@ INSERT INTO `tbljobsworkexperience` (`jwork_id`, `jwork_jobId`, `jwork_duration`
 
 CREATE TABLE `tbllicensemaster` (
   `license_master_id` int(11) NOT NULL,
-  `license_master_name` varchar(100) NOT NULL
+  `license_master_name` varchar(100) NOT NULL,
+  `license_master_typeId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbllicensetype`
+--
+
+CREATE TABLE `tbllicensetype` (
+  `license_type_id` int(11) NOT NULL,
+  `license_type_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -3307,7 +3319,14 @@ ALTER TABLE `tbljobsworkexperience`
 -- Indexes for table `tbllicensemaster`
 --
 ALTER TABLE `tbllicensemaster`
-  ADD PRIMARY KEY (`license_master_id`);
+  ADD PRIMARY KEY (`license_master_id`),
+  ADD KEY `license_master_typeId` (`license_master_typeId`);
+
+--
+-- Indexes for table `tbllicensetype`
+--
+ALTER TABLE `tbllicensetype`
+  ADD PRIMARY KEY (`license_type_id`);
 
 --
 -- Indexes for table `tblpersonalknowledge`
@@ -3476,6 +3495,12 @@ ALTER TABLE `tbllicensemaster`
   MODIFY `license_master_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `tbllicensetype`
+--
+ALTER TABLE `tbllicensetype`
+  MODIFY `license_type_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `tblpersonalknowledge`
 --
 ALTER TABLE `tblpersonalknowledge`
@@ -3606,6 +3631,12 @@ ALTER TABLE `tbljobstrainings`
 --
 ALTER TABLE `tbljobsworkexperience`
   ADD CONSTRAINT `tbljobsworkexperience_ibfk_1` FOREIGN KEY (`jwork_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
+
+--
+-- Constraints for table `tbllicensemaster`
+--
+ALTER TABLE `tbllicensemaster`
+  ADD CONSTRAINT `tbllicensemaster_ibfk_1` FOREIGN KEY (`license_master_typeId`) REFERENCES `tbllicensetype` (`license_type_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
