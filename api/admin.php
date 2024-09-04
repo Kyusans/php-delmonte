@@ -284,6 +284,7 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints += $educationPoints;
   $maxPoints += $maxEducationPoints;
 
+  // wala pa ni, 
   $sql = "SELECT SUM(jwork_points) as exp_points, (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) as max_exp_points
             FROM tbljobsworkexperience j 
             INNER JOIN tblcandemploymenthistory c 
@@ -347,6 +348,7 @@ function calculateCandidatePoints($candId, $jobId)
   $percentage = ($maxPoints > 0) ? round(($totalPoints / $maxPoints) * 100, 2) : 0;
 
   return [
+    'maxPoints' => $maxPoints,
     'totalPoints' => $totalPoints,
     'percentage' => $percentage,
   ];
