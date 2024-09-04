@@ -19,7 +19,7 @@ class Admin
     $todayDate = getCurrentDate();
 
     try {
-      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status, jobM_createdAt) VALUES (:jobM_title, :jobM_description, :jobM_status, jobM_createdAt)";
+      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status, jobM_createdAt) VALUES (:jobM_title, :jobM_description, :jobM_status, :jobM_createdAt)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobM_title", $jobMaster['title']);
       $stmt->bindParam(":jobM_description", $jobMaster['description']);
@@ -84,12 +84,13 @@ class Admin
         $stmt->execute();
       }
 
-      $sql = "INSERT INTO tbljobsworkexperience (jwork_jobId, jwork_duration, jwork_responsibilities) VALUES (:jwork_jobId, :jwork_duration, :jwork_responsibilities)";
+      $sql = "INSERT INTO tbljobsworkexperience (jwork_jobId, jwork_duration, jwork_responsibilities, jwork_points) VALUES (:jwork_jobId, :jwork_duration, :jwork_responsibilities, :points)";
       foreach ($jobWorkExperience as $experience) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jwork_jobId", $jobMasterId);
         $stmt->bindParam(":jwork_duration", $experience['yearsOfExperience']);
         $stmt->bindParam(":jwork_responsibilities", $experience['jobExperience']);
+        $stmt->bindParam(":points", $experience['points']);
         $stmt->execute();
       }
       $conn->commit();
@@ -135,7 +136,7 @@ class Admin
       $stmt->execute();
       $data['personalSkills'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
-      $sql = "SELECT * FROM tblknowledge";
+      $sql = "SELECT * FROM tblpersonalknowledge";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['knowledge'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
