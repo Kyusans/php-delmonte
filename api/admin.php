@@ -156,7 +156,6 @@ class Admin
     $returnValue = [];
     $data = json_decode($json, true);
     $sql = "SELECT * FROM tbljobsmaster WHERE jobM_id = :jobId";
-    $jobId = $data['jobId'];
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
@@ -198,6 +197,12 @@ class Admin
     $stmt->execute();
     $returnValue["jobExperience"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
+    $sql = "SELECT passing_points as passing_percentage FROM tbljobpassing WHERE passing_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobPassing"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
     $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) as FullName FROM tblapplications a 
             INNER JOIN tblcandidates b ON a.app_candId = b.cand_id 
             WHERE a.app_jobMId = :jobId";
@@ -206,7 +211,7 @@ class Admin
     $stmt->execute();
     $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
     foreach ($returnValue["candidates"] as &$candidate) {
-      $candidate['points'] = calculateCandidatePoints($candidate['cand_id'], $jobId);
+      $candidate['points'] = calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
     }
     return json_encode($returnValue);
   }
@@ -338,7 +343,7 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints += $knowledgePoints;
   $maxPoints += $maxKnowledgePoints;
 
-  $percentage = ($maxPoints > 0) ? ($totalPoints / $maxPoints) * 100 : 0;
+  $percentage = ($maxPoints > 0) ? round(($totalPoints / $maxPoints) * 100, 2) : 0;
 
   return [
     'totalPoints' => $totalPoints,
