@@ -321,6 +321,11 @@ class User
       $stmt->execute();
       $data['license'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+      $sql = "SELECT * FROM tbllicensetype";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['licenseType'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
       $conn->commit();
 
       return json_encode($data);
@@ -489,7 +494,7 @@ class User
 
   function getCandidateProfile($json)
   {
-    // {"cand_id": 6}
+    // {"cand_id": 10}
 
     try {
       include "connection.php";
@@ -587,52 +592,6 @@ function getCurrentDate()
   return $today->format('Y-m-d h:i:s A');
 }
 
-// function calculateCandidatePoints($json)
-// {
-//   // {"candId": 6, "jobId": 15}
-//   include "connection.php";
-//   $conn->beginTransaction();
-//   $qualificationPoints = [];
-//   $data = json_decode($json, true);
-//   $candId = $data['candId'];
-//   $jobId = $data['jobId'];
-//   try {
-//     // ---- get qualification points
-//     $sql = "SELECT jknow_points, jknow_knowledgeId FROM tbljobsknowledge 
-//     WHERE jknow_jobId = :jobId";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(":jobId", $jobId);
-//     $stmt->execute();
-//     $qualificationPoints["jobKnowledge"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-
-//     $sql = "SELECT jskills_points , jskills_skillsId FROM tbljobsskills  
-//     WHERE jskills_jobId = :jobId";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(":jobId", $jobId);
-//     $stmt->execute();
-//     $qualificationPoints["jobSkills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-
-//     $sql = "SELECT jtrng_points, jtrng_trainingId  FROM tbljobstrainings   
-//     WHERE jtrng_jobId = :jobId";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(":jobId", $jobId);
-//     $stmt->execute();
-//     $qualificationPoints["jobTrainings"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-
-//     $sql = "SELECT jwork_points, jwork_duration FROM tbljobsworkexperience   
-//     WHERE jwork_jobId = :jobId";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(":jobId", $jobId);
-//     $stmt->execute();
-//     $qualificationPoints["jobWorkExperience"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-//     // ---- get qualification points
-
-//     return json_encode($qualificationPoints);
-//   } catch (PDOException $th) {
-//     $conn->rollBack();
-//     return 0;
-//   }
-// }
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
 $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
