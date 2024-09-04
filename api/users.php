@@ -491,41 +491,45 @@ class User
   {
     // {"cand_id": 6}
 
-    include "connection.php";
-    $returnValue = [];
-    $data = json_decode($json, true);
-    $cand_id = $data['cand_id'];
-    $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':cand_id', $cand_id);
-    $stmt->execute();
-    $returnValue["candidateInformation"] = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
+    try {
+      include "connection.php";
+      $returnValue = [];
+      $data = json_decode($json, true);
+      $cand_id = $data['cand_id'];
+      $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':cand_id', $cand_id);
+      $stmt->execute();
+      $returnValue["candidateInformation"] = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT * FROM tblcandeducbackground WHERE educ_canId = :cand_id";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':cand_id', $cand_id);
-    $stmt->execute();
-    $returnValue["educationalBackground"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+      $sql = "SELECT * FROM tblcandeducbackground WHERE educ_canId = :cand_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':cand_id', $cand_id);
+      $stmt->execute();
+      $returnValue["educationalBackground"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId = :cand_id";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':cand_id', $cand_id);
-    $stmt->execute();
-    $returnValue["employmentHistory"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+      $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId = :cand_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':cand_id', $cand_id);
+      $stmt->execute();
+      $returnValue["employmentHistory"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT * FROM tblcandskills WHERE skills_candId = :cand_id";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':cand_id', $cand_id);
-    $stmt->execute();
-    $returnValue["skills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+      $sql = "SELECT * FROM tblcandskills WHERE skills_candId = :cand_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':cand_id', $cand_id);
+      $stmt->execute();
+      $returnValue["skills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT * FROM tblcandtraining WHERE training_candId = :cand_id";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':cand_id', $cand_id);
-    $stmt->execute();
-    $returnValue["training"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+      $sql = "SELECT * FROM tblcandtraining WHERE training_candId = :cand_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':cand_id', $cand_id);
+      $stmt->execute();
+      $returnValue["training"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    return json_encode($returnValue);
+      return json_encode($returnValue);
+    } catch (PDOException $th) {
+      return 0;
+    }
   }
 } //user
 
@@ -687,9 +691,9 @@ switch ($operation) {
   case "getCandidateProfile":
     echo $user->getCandidateProfile($json);
     break;
-  // case "calculateCandidatePoints":
-  //   echo calculateCandidatePoints($json);
-  //   break;
+    // case "calculateCandidatePoints":
+    //   echo calculateCandidatePoints($json);
+    //   break;
   default:
     echo json_encode("WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO");
     http_response_code(400); // Bad Request
