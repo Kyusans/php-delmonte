@@ -338,10 +338,14 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints += $knowledgePoints;
   $maxPoints += $maxKnowledgePoints;
 
-  $percentage = ($maxPoints > 0) ? round(($totalPoints / $maxPoints) * 100, 2) : 0;
+  $percentage = ($maxPoints > 0) ? ($totalPoints / $maxPoints) * 100 : 0;
 
-  return $percentage;
+  return [
+    'totalPoints' => $totalPoints,
+    'percentage' => $percentage,
+  ];
 }
+
 
 
 function recordExists($value, $table, $column)
