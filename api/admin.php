@@ -284,12 +284,14 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints += $educationPoints;
   $maxPoints += $maxEducationPoints;
 
-  // wala pa ni, 
-  $sql = "SELECT SUM(jwork_points) as exp_points, (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) as max_exp_points
-            FROM tbljobsworkexperience j 
-            INNER JOIN tblcandemploymenthistory c 
-            ON j.jwork_duration = c.empH_startDate 
-            WHERE c.empH_candId = :candId AND j.jwork_jobId = :jobId";
+  $sql = "SELECT SUM(a.jwork_points) AS exp_points, 
+          (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) AS max_exp_points
+          FROM tbljobsworkexperience a
+          INNER JOIN tblapplications b ON b.app_jobMId = a.jwork_jobId
+          INNER JOIN tblcandemploymenthistory c ON c.empH_candId = b.app_candId
+          WHERE INSTR(a.jwork_responsibilities, c.empH_positionName) > 0
+          AND c.empH_candId = :candId AND a.jwork_jobId = :jobId
+          AND TIMESTAMPDIFF(YEAR, c.empH_startDate, c.empH_endDate) >= a.jwork_duration";
   $stmt = $conn->prepare($sql);
   $stmt->bindParam(":candId", $candId);
   $stmt->bindParam(":jobId", $jobId);
