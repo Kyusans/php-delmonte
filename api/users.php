@@ -566,50 +566,75 @@ class User
       echo json_encode(["error" => $e->getMessage()]);
     }
   }
-
   function getCandidateProfile($json)
   {
-    // {"cand_id": 10}
+    // {"cand_id": 21}
+    include "connection.php";
+    $returnValue = [];
+    $data = json_decode($json, true);
 
-    try {
-      include "connection.php";
-      $returnValue = [];
-      $data = json_decode($json, true);
-      $cand_id = $data['cand_id'];
-      $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["candidateInformation"] = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
+    $cand_id = $data['cand_id'];
 
-      $sql = "SELECT * FROM tblcandeducbackground WHERE educ_canId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["educationalBackground"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["candidateInformation"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-      $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["employmentHistory"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    $sql = "SELECT b.courses_name, c.institution_name, a.educ_dategraduate, d.course_categoryName, e.crs_type_name, a.educ_back_id, b.courses_id, c.institution_id FROM tblcandeducbackground a
+     INNER JOIN tblcourses b ON a.educ_coursesId = b.courses_id
+     INNER JOIN tblinstitution c ON a.educ_institutionId = c.institution_id
+     INNER JOIN tblcoursescategory d ON b.courses_coursecategoryId = d.course_categoryId
+     INNER JOIN tblcoursetype e ON b.courses_courseTypeId = e.crs_type_id
+     WHERE educ_canId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["educationalBackground"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-      $sql = "SELECT * FROM tblcandskills WHERE skills_candId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["skills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    $sql = "SELECT * FROM tblcandemploymenthistory
+     WHERE empH_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["employmentHistory"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-      $sql = "SELECT * FROM tblcandtraining WHERE training_candId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["training"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    $sql = "SELECT b.perS_name, b.perS_id, a.skills_id, a.skills_perSId FROM tblcandskills a
+     INNER JOIN tblpersonalskills b ON a.skills_perSId = b.perS_id
+     WHERE skills_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["skills"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-      return json_encode($returnValue);
-    } catch (PDOException $th) {
-      return 0;
-    }
+    $sql = "SELECT b.perT_name, a.training_id, b.perT_id, a.training_perTId FROM tblcandtraining a
+     INNER JOIN tblpersonaltraining b ON a.training_perTId = b.perT_id
+     WHERE training_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["training"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    $sql = "SELECT b.knowledge_name, a.canknow_id, a.canknow_knowledgeId FROM tblcandknowledge a
+     INNER JOIN tblpersonalknowledge b ON a.canknow_knowledgeId = b.knowledge_id
+     WHERE canknow_canId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["knowledge"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    $sql = "SELECT b.license_master_name, a.license_number, c.license_type_name, a.license_id, a.license_masterId FROM tblcandlicense a
+    INNER JOIN tbllicensemaster b ON a.license_masterId = b.license_master_id
+    INNER JOIN tbllicensetype c ON b.license_master_typeId = c.license_type_id
+    WHERE license_canId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["license"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    error_log("Return Value: " . print_r($returnValue, true));
+
+    return json_encode($returnValue);
   }
 } //user
 
