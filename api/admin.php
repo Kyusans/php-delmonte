@@ -261,6 +261,18 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+  function addDuties($json){
+    // {"duties": "duties", "dutyId": 3}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbljobsmasterduties (duties_jobId, duties_text) VALUES (:dutyId, :duties)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":duties", $data['duties']);
+    $stmt->bindParam(":dutyId", $data['dutyId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
   function updateDuties($json){
     // {"duties": "duties", "dutyId": 3}
     include "connection.php";
@@ -272,6 +284,7 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -445,6 +458,9 @@ switch ($operation) {
     break;
   case "handleJobStatusSwitch":
     echo $admin->handleJobStatusSwitch($json);
+    break;
+  case "addDuties":
+    echo $admin->addDuties($json);
     break;
   case "updateDuties":
     echo $admin->updateDuties($json);
