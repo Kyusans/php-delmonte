@@ -261,6 +261,42 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+  function getAllDataForDropdownUpdate()
+  {
+    include "connection.php";
+    $conn->beginTransaction();
+    try {
+      $data = [];
+
+      $sql = "SELECT * FROM tblcoursescategory";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['courseCategory'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tblpersonalskills";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['skills'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tblpersonaltraining";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['training'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tblpersonalknowledge";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['knowledge'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $conn->commit();
+
+      return json_encode($data);
+    } catch (\Throwable $th) {
+      $conn->rollBack();
+      return 0;
+    }
+  }
+
   function getDuties($json)
   {
     // {"jobId": 10}
@@ -311,7 +347,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function getJobEducation($json){
+  function getJobEducation($json)
+  {
     // {"jobId": 10}
     include "connection.php";
     $data = json_decode($json, true);
@@ -322,40 +359,19 @@ class Admin
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
 
-  function getAllDataForDropdownUpdate()
+  function addJobEducation($json)
   {
+    // {"points": 10, "courseCategory": 3, "jobEducation": "jobEducation", "jobId": 11}
     include "connection.php";
-    $conn->beginTransaction();
-    try {
-      $data = [];
-
-      $sql = "SELECT * FROM tblcoursescategory";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['courseCategory'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-      $sql = "SELECT * FROM tblpersonalskills";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['skills'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-      $sql = "SELECT * FROM tblpersonaltraining";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['training'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-      $sql = "SELECT * FROM tblpersonalknowledge";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['knowledge'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-      $conn->commit();
-
-      return json_encode($data);
-    } catch (\Throwable $th) {
-      $conn->rollBack();
-      return 0;
-    }
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbljobseducation (jeduc_points, jeduc_categoryId, jeduc_jobId, jeduc_text) VALUES (:points, :courseCategory, :jobId, :jobEducation)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":courseCategory", $data['courseCategory']);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->bindParam(":jobEducation", $data['jobEducation']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } //admin
 
@@ -531,6 +547,9 @@ switch ($operation) {
   case "handleJobStatusSwitch":
     echo $admin->handleJobStatusSwitch($json);
     break;
+  case "getAllDataForDropdownUpdate":
+    echo $admin->getAllDataForDropdownUpdate();
+    break;
   case "getDuties":
     echo $admin->getDuties($json);
     break;
@@ -546,8 +565,8 @@ switch ($operation) {
   case "getJobEducation":
     echo $admin->getJobEducation($json);
     break;
-  case "getAllDataForDropdownUpdate":
-    echo $admin->getAllDataForDropdownUpdate();
+  case "addJobEducation":
+    echo $admin->addJobEducation($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
