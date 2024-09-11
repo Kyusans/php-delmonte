@@ -261,7 +261,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function getDuties($json){
+  function getDuties($json)
+  {
     // {"jobId": 10}
     include "connection.php";
     $data = json_decode($json, true);
@@ -272,7 +273,8 @@ class Admin
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
 
-  function addDuties($json){
+  function addDuties($json)
+  {
     // {"duties": "duties", "jobId": 3}
     include "connection.php";
     $data = json_decode($json, true);
@@ -284,7 +286,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function updateDuties($json){
+  function updateDuties($json)
+  {
     // {"duties": "duties", "dutyId": 3}
     include "connection.php";
     $data = json_decode($json, true);
@@ -296,7 +299,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function deleteDuties($json){
+  function deleteDuties($json)
+  {
     // {"dutyId": 3}
     include "connection.php";
     $data = json_decode($json, true);
@@ -307,6 +311,41 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+  function getAllDataForDropdownUpdate()
+  {
+    include "connection.php";
+    $conn->beginTransaction();
+    try {
+      $data = [];
+
+      $sql = "SELECT * FROM tblcoursescategory";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['courseCategory'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tblpersonalskills";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['skills'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tblpersonaltraining";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['training'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT * FROM tblpersonalknowledge";
+      $stmt = $conn->prepare($sql);
+      $stmt->execute();
+      $data['knowledge'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $conn->commit();
+
+      return json_encode($data);
+    } catch (\Throwable $th) {
+      $conn->rollBack();
+      return 0;
+    }
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -492,6 +531,9 @@ switch ($operation) {
     break;
   case "deleteDuties":
     echo $admin->deleteDuties($json);
+    break;
+  case "getAllDataForDropdownUpdate":
+    echo $admin->getAllDataForDropdownUpdate();
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
