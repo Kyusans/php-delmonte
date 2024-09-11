@@ -311,6 +311,17 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+  function getJobEducation($json){
+    // {"jobId": 10}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tbljobseducation WHERE jeduc_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
+  }
+
   function getAllDataForDropdownUpdate()
   {
     include "connection.php";
@@ -531,6 +542,9 @@ switch ($operation) {
     break;
   case "deleteDuties":
     echo $admin->deleteDuties($json);
+    break;
+  case "getJobEducation":
+    echo $admin->getJobEducation($json);
     break;
   case "getAllDataForDropdownUpdate":
     echo $admin->getAllDataForDropdownUpdate();
