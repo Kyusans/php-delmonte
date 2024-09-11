@@ -261,14 +261,25 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function addDuties($json){
-    // {"duties": "duties", "dutyId": 3}
+  function getDuties($json){
+    // {"jobId": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobsmasterduties (duties_jobId, duties_text) VALUES (:dutyId, :duties)";
+    $sql = "SELECT * FROM tbljobsmasterduties WHERE duties_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
+  }
+
+  function addDuties($json){
+    // {"duties": "duties", "jobId": 3}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbljobsmasterduties (duties_jobId, duties_text) VALUES (:jobId, :duties)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":duties", $data['duties']);
-    $stmt->bindParam(":dutyId", $data['dutyId']);
+    $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -458,6 +469,9 @@ switch ($operation) {
     break;
   case "handleJobStatusSwitch":
     echo $admin->handleJobStatusSwitch($json);
+    break;
+  case "getDuties":
+    echo $admin->getDuties($json);
     break;
   case "addDuties":
     echo $admin->addDuties($json);
