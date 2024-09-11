@@ -373,6 +373,20 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function updateJobEducation($json){
+    // {"points": 10, "courseCategory": 3, "educationText": "jobEducation", "jobId": 11, "id": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobseducation SET jeduc_points = :points, jeduc_categoryId = :courseCategory, jeduc_text = :educationText WHERE jeduc_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":courseCategory", $data['courseCategory']);
+    $stmt->bindParam(":educationText", $data['educationText']);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -567,6 +581,9 @@ switch ($operation) {
     break;
   case "addJobEducation":
     echo $admin->addJobEducation($json);
+    break;
+  case "updateJobEducation":
+    echo $admin->updateJobEducation($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
