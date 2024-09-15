@@ -466,6 +466,21 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
+
+  function addJobTraining($json) {
+    // {"jobId": 11, "trainingText": "training", "trainingId": 3, "points": 10}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_trainingId, jtrng_points) 
+            VALUES (:jobId, :trainingText, :trainingId, :points)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->bindParam(":trainingText", $data['trainingText']);
+    $stmt->bindParam(":trainingId", $data['trainingId']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -681,6 +696,9 @@ switch ($operation) {
     break;
   case "getJobTraining":
     echo $admin->getJobTraining($json);
+    break;
+  case "addJobTraining":
+    echo $admin->addJobTraining($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
