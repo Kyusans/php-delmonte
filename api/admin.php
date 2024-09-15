@@ -409,6 +409,20 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
+
+  function updateJobSkills($json){
+    // {"id": 3, "skillText": "skills", "skillId": 3, "points": 10}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobsskills SET jskills_text = :skillText, jskills_skillsId = :skillId, jskills_points = :points WHERE jskills_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":skillText", $data['skillText']);
+    $stmt->bindParam(":skillId", $data['skillId']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -612,6 +626,9 @@ switch ($operation) {
     break;
   case "getJobSkills":
     echo $admin->getJobSkills($json);
+    break;
+  case "updateJobSkills":
+    echo $admin->updateJobSkills($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
