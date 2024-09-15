@@ -481,6 +481,20 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function updateJobTraining($json){
+    // {"id": 10, "trainingText": "trainingsssssss", "trainingId": 3, "points": 10}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobstrainings SET jtrng_text = :trainingText, jtrng_trainingId = :trainingId, jtrng_points = :points WHERE jtrng_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":trainingText", $data['trainingText']);
+    $stmt->bindParam(":trainingId", $data['trainingId']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -699,6 +713,9 @@ switch ($operation) {
     break;
   case "addJobTraining":
     echo $admin->addJobTraining($json);
+    break;
+  case "updateJobTraining":
+    echo $admin->updateJobTraining($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
