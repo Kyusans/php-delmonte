@@ -443,6 +443,17 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function deleteJobSkills($json){
+    // {"id": 3}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "DELETE FROM tbljobsskills WHERE jskills_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -652,6 +663,9 @@ switch ($operation) {
     break;
   case "addJobSkills":
     echo $admin->addJobSkills($json);
+    break;
+  case "deleteJobSkills":
+    echo $admin->deleteJobSkills($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
