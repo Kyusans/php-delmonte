@@ -456,7 +456,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function getJobTraining($json) {
+  function getJobTraining($json)
+  {
     // {"jobId": 11}
     include "connection.php";
     $data = json_decode($json, true);
@@ -467,7 +468,8 @@ class Admin
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
 
-  function addJobTraining($json) {
+  function addJobTraining($json)
+  {
     // {"jobId": 11, "trainingText": "training", "trainingId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
@@ -482,7 +484,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function updateJobTraining($json){
+  function updateJobTraining($json)
+  {
     // {"id": 10, "trainingText": "trainingsssssss", "trainingId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
@@ -491,6 +494,18 @@ class Admin
     $stmt->bindParam(":trainingText", $data['trainingText']);
     $stmt->bindParam(":trainingId", $data['trainingId']);
     $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function deleteJobTraining($json)
+  {
+    // {"id": 3}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "DELETE FROM tbljobstrainings WHERE jtrng_id = :id";
+    $stmt = $conn->prepare($sql);
     $stmt->bindParam(":id", $data['id']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
@@ -716,6 +731,9 @@ switch ($operation) {
     break;
   case "updateJobTraining":
     echo $admin->updateJobTraining($json);
+    break;
+  case "deleteJobTraining":
+    echo $admin->deleteJobTraining($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
