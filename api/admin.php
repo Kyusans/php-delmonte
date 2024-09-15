@@ -444,11 +444,67 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function deleteJobSkills($json){
+  function deleteJobSkills($json)
+  {
     // {"id": 3}
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "DELETE FROM tbljobsskills WHERE jskills_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function getJobTraining($json)
+  {
+    // {"jobId": 11}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tbljobstrainings WHERE jtrng_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
+  }
+
+  function addJobTraining($json)
+  {
+    // {"jobId": 11, "trainingText": "training", "trainingId": 3, "points": 10}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_trainingId, jtrng_points) 
+            VALUES (:jobId, :trainingText, :trainingId, :points)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->bindParam(":trainingText", $data['trainingText']);
+    $stmt->bindParam(":trainingId", $data['trainingId']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function updateJobTraining($json)
+  {
+    // {"id": 10, "trainingText": "trainingsssssss", "trainingId": 3, "points": 10}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobstrainings SET jtrng_text = :trainingText, jtrng_trainingId = :trainingId, jtrng_points = :points WHERE jtrng_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":trainingText", $data['trainingText']);
+    $stmt->bindParam(":trainingId", $data['trainingId']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function deleteJobTraining($json)
+  {
+    // {"id": 3}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "DELETE FROM tbljobstrainings WHERE jtrng_id = :id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":id", $data['id']);
     $stmt->execute();
@@ -462,7 +518,8 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints = 0;
   $maxPoints = 0;
 
-  $sql = "SELECT SUM(c.jeduc_points) as educ_points, (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
+  $sql = "SELECT SUM(DISTINCT c.jeduc_points) as educ_points, 
+                 (SELECT SUM(DISTINCT jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
           FROM tblcourses a
           INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
           INNER JOIN tbljobseducation c ON c.jeduc_categoryId = b.course_categoryId
@@ -478,8 +535,8 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints += $educationPoints;
   $maxPoints += $maxEducationPoints;
 
-  $sql = "SELECT SUM(a.jwork_points) AS exp_points, 
-          (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) AS max_exp_points
+  $sql = "SELECT SUM(DISTINCT a.jwork_points) AS exp_points, 
+                 (SELECT SUM(DISTINCT jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) AS max_exp_points
           FROM tbljobsworkexperience a
           INNER JOIN tblapplications b ON b.app_jobMId = a.jwork_jobId
           INNER JOIN tblcandemploymenthistory c ON c.empH_candId = b.app_candId
@@ -496,11 +553,11 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints += $experiencePoints;
   $maxPoints += $maxExperiencePoints;
 
-  $sql = "SELECT SUM(jskills_points) as skills_points, (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :jobId) as max_skills_points
-            FROM tbljobsskills j 
-            INNER JOIN tblcandskills c 
-            ON j.jskills_skillsId = c.skills_perSId 
-            WHERE c.skills_candId = :candId AND j.jskills_jobId = :jobId";
+  $sql = "SELECT SUM(DISTINCT j.jskills_points) as skills_points, 
+                 (SELECT SUM(DISTINCT jskills_points) FROM tbljobsskills WHERE jskills_jobId = :jobId) as max_skills_points
+          FROM tbljobsskills j 
+          INNER JOIN tblcandskills c ON j.jskills_skillsId = c.skills_perSId 
+          WHERE c.skills_candId = :candId AND j.jskills_jobId = :jobId";
   $stmt = $conn->prepare($sql);
   $stmt->bindParam(":candId", $candId);
   $stmt->bindParam(":jobId", $jobId);
@@ -511,11 +568,11 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints += $skillsPoints;
   $maxPoints += $maxSkillsPoints;
 
-  $sql = "SELECT SUM(jtrng_points) as training_points, (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :jobId) as max_training_points
-            FROM tbljobstrainings j 
-            INNER JOIN tblcandtraining c 
-            ON j.jtrng_trainingId = c.training_perTId 
-            WHERE c.training_candId = :candId AND j.jtrng_jobId = :jobId";
+  $sql = "SELECT SUM(DISTINCT j.jtrng_points) as training_points, 
+                 (SELECT SUM(DISTINCT jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :jobId) as max_training_points
+          FROM tbljobstrainings j 
+          INNER JOIN tblcandtraining c ON j.jtrng_trainingId = c.training_perTId 
+          WHERE c.training_candId = :candId AND j.jtrng_jobId = :jobId";
   $stmt = $conn->prepare($sql);
   $stmt->bindParam(":candId", $candId);
   $stmt->bindParam(":jobId", $jobId);
@@ -526,11 +583,11 @@ function calculateCandidatePoints($candId, $jobId)
   $totalPoints += $trainingPoints;
   $maxPoints += $maxTrainingPoints;
 
-  $sql = "SELECT SUM(jknow_points) as knowledge_points, (SELECT SUM(jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :jobId) as max_knowledge_points
-            FROM tbljobsknowledge j 
-            INNER JOIN tblcandknowledge c 
-            ON j.jknow_knowledgeId = c.canknow_knowledgeId 
-            WHERE c.canknow_canId = :candId AND j.jknow_jobId = :jobId";
+  $sql = "SELECT SUM(DISTINCT j.jknow_points) as knowledge_points, 
+                 (SELECT SUM(DISTINCT jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :jobId) as max_knowledge_points
+          FROM tbljobsknowledge j 
+          INNER JOIN tblcandknowledge c ON j.jknow_knowledgeId = c.canknow_knowledgeId 
+          WHERE c.canknow_canId = :candId AND j.jknow_jobId = :jobId";
   $stmt = $conn->prepare($sql);
   $stmt->bindParam(":candId", $candId);
   $stmt->bindParam(":jobId", $jobId);
@@ -549,6 +606,7 @@ function calculateCandidatePoints($candId, $jobId)
     'percentage' => $percentage,
   ];
 }
+
 
 function recordExists($value, $table, $column)
 {
@@ -666,6 +724,18 @@ switch ($operation) {
     break;
   case "deleteJobSkills":
     echo $admin->deleteJobSkills($json);
+    break;
+  case "getJobTraining":
+    echo $admin->getJobTraining($json);
+    break;
+  case "addJobTraining":
+    echo $admin->addJobTraining($json);
+    break;
+  case "updateJobTraining":
+    echo $admin->updateJobTraining($json);
+    break;
+  case "deleteJobTraining":
+    echo $admin->deleteJobTraining($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
