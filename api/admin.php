@@ -444,7 +444,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function deleteJobSkills($json){
+  function deleteJobSkills($json)
+  {
     // {"id": 3}
     include "connection.php";
     $data = json_decode($json, true);
@@ -453,6 +454,17 @@ class Admin
     $stmt->bindParam(":id", $data['id']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function getJobTraining($json) {
+    // {"jobId": 11}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tbljobstrainings WHERE jtrng_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
 } //admin
 
@@ -666,6 +678,9 @@ switch ($operation) {
     break;
   case "deleteJobSkills":
     echo $admin->deleteJobSkills($json);
+    break;
+  case "getJobTraining":
+    echo $admin->getJobTraining($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
