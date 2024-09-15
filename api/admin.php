@@ -374,7 +374,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function updateJobEducation($json){
+  function updateJobEducation($json)
+  {
     // {"points": 10, "courseCategory": 3, "educationText": "jobEducation", "jobId": 11, "id": 1}
     include "connection.php";
     $data = json_decode($json, true);
@@ -388,7 +389,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function deleteJobEducation($json){
+  function deleteJobEducation($json)
+  {
     // {"id": 1}
     include "connection.php";
     $data = json_decode($json, true);
@@ -399,7 +401,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function getJobSkills($json){
+  function getJobSkills($json)
+  {
     // {"jobId": 10}
     include "connection.php";
     $data = json_decode($json, true);
@@ -410,7 +413,8 @@ class Admin
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
 
-  function updateJobSkills($json){
+  function updateJobSkills($json)
+  {
     // {"id": 3, "skillText": "skills", "skillId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
@@ -420,6 +424,22 @@ class Admin
     $stmt->bindParam(":skillId", $data['skillId']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function addJobSkills($json)
+  {
+    // {"jobId": 11, "skillText": "skills", "skillId": 3, "points": 10}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_text, jskills_skillsId, jskills_points) 
+            VALUES (:jobId, :skillText, :skillId, :points)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->bindParam(":skillText", $data['skillText']);
+    $stmt->bindParam(":skillId", $data['skillId']);
+    $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -629,6 +649,9 @@ switch ($operation) {
     break;
   case "updateJobSkills":
     echo $admin->updateJobSkills($json);
+    break;
+  case "addJobSkills":
+    echo $admin->addJobSkills($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
