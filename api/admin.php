@@ -586,6 +586,20 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function updateJobKnowledge($json){
+    // {"id": 11, "knowledgeText": "knowledge NATIN TO", "points": 10, "knowledgeId": 2}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobsknowledge SET jknow_text = :knowledgeText, jknow_points = :points, jknow_knowledgeId = :knowledgeId WHERE jknow_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":knowledgeText", $data['knowledgeText']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":knowledgeId", $data['knowledgeId']);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -830,6 +844,9 @@ switch ($operation) {
     break;
   case "addJobKnowledge":
     echo $admin->addJobKnowledge($json);
+    break;
+  case "updateJobKnowledge":
+    echo $admin->updateJobKnowledge($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
