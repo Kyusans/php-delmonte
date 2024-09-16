@@ -550,6 +550,17 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function deleteJobExperience($json){
+    // {"id": 7}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "DELETE FROM tbljobsworkexperience WHERE jwork_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -785,6 +796,9 @@ switch ($operation) {
     break;
   case "updateJobExperience":
     echo $admin->updateJobExperience($json);
+    break;
+  case "deleteJobExperience":
+    echo $admin->deleteJobExperience($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
