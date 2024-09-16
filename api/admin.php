@@ -536,6 +536,20 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function updateJobExperience($json){
+    // {"id": 7, "experienceText": "experiencsadqweasdwqee", "yearsOfExperience": 2, "points": 10}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobsworkexperience SET jwork_responsibilities = :experienceText, jwork_duration = :yearsOfExperience, jwork_points = :points WHERE jwork_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":experienceText", $data['experienceText']);
+    $stmt->bindParam(":yearsOfExperience", $data['yearsOfExperience']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -768,6 +782,9 @@ switch ($operation) {
     break;
   case "addJobExperience":
     echo $admin->addJobExperience($json);
+    break;
+  case "updateJobExperience":
+    echo $admin->updateJobExperience($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
