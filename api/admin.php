@@ -600,6 +600,17 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function deleteJobKnowledge($json){
+    // {"id": 11}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "DELETE FROM tbljobsknowledge WHERE jknow_id = :id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":id", $data['id']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -847,6 +858,9 @@ switch ($operation) {
     break;
   case "updateJobKnowledge":
     echo $admin->updateJobKnowledge($json);
+    break;
+  case "deleteJobKnowledge":
+    echo $admin->deleteJobKnowledge($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
