@@ -690,13 +690,17 @@ class Admin
     $criteria = [];
 
     // Education: Check if the candidate's education meets the job criteria
-    $sql = "SELECT c.course_categoryName, 
-                     (CASE WHEN b.educ_coursesId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
-              FROM tbljobseducation je
-              INNER JOIN tblcoursescategory c ON je.jeduc_categoryId = c.course_categoryId
-              LEFT JOIN tblcandeducbackground b ON b.educ_coursesId = je.jeduc_categoryId
-                  AND b.educ_canId = :cand_id
-              WHERE je.jeduc_jobId = :job_id";
+    $sql = "SELECT c.course_categoryName, (CASE WHEN b.educ_coursesId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+            FROM tbljobseducation je
+            INNER JOIN tblcoursescategory c ON je.jeduc_categoryId = c.course_categoryId
+            LEFT JOIN tblcandeducbackground b ON b.educ_coursesId IN (
+                SELECT courses_id
+                FROM tblcourses
+                WHERE courses_coursecategoryId = c.course_categoryId
+            )
+            AND b.educ_canId = :cand_id
+            WHERE je.jeduc_jobId = :job_id;
+            ";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
     $stmt->bindParam(':job_id', $job_id);
