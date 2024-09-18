@@ -699,8 +699,8 @@ class Admin
                 WHERE courses_coursecategoryId = c.course_categoryId
             )
             AND b.educ_canId = :cand_id
-            WHERE je.jeduc_jobId = :job_id;
-            ";
+            WHERE je.jeduc_jobId = :job_id
+            GROUP BY c.course_categoryName";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
     $stmt->bindParam(':job_id', $job_id);
