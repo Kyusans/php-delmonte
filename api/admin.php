@@ -622,152 +622,149 @@ class Admin
 
   function getCandidateProfile($json)
   {
-      include "connection.php";
-      $returnValue = [];
-      $data = json_decode($json, true);
-  
-      $cand_id = $data['cand_id'];
-      $job_id = $data['job_id'];
-  
-      // Fetch candidate's basic information
-      $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["candidateInformation"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-  
-      // Education
-      $sql = "SELECT b.courses_name, c.institution_name, a.educ_dategraduate, d.course_categoryName, e.crs_type_name, a.educ_back_id, b.courses_id, c.institution_id 
-              FROM tblcandeducbackground a
-              INNER JOIN tblcourses b ON a.educ_coursesId = b.courses_id
-              INNER JOIN tblinstitution c ON a.educ_institutionId = c.institution_id
-              INNER JOIN tblcoursescategory d ON b.courses_coursecategoryId = d.course_categoryId
-              INNER JOIN tblcoursetype e ON b.courses_courseTypeId = e.crs_type_id
-              WHERE educ_canId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["educationalBackground"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Employment history
-      $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["employmentHistory"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Skills
-      $sql = "SELECT b.perS_name, b.perS_id, a.skills_id, a.skills_perSId 
-              FROM tblcandskills a
-              INNER JOIN tblpersonalskills b ON a.skills_perSId = b.perS_id
-              WHERE skills_candId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["skills"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Training
-      $sql = "SELECT b.perT_name, a.training_id, b.perT_id, a.training_perTId 
-              FROM tblcandtraining a
-              INNER JOIN tblpersonaltraining b ON a.training_perTId = b.perT_id
-              WHERE training_candId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["training"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Knowledge
-      $sql = "SELECT b.knowledge_name, a.canknow_id, a.canknow_knowledgeId 
-              FROM tblcandknowledge a
-              INNER JOIN tblpersonalknowledge b ON a.canknow_knowledgeId = b.knowledge_id
-              WHERE canknow_canId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["knowledge"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // License
-      $sql = "SELECT b.license_master_name, a.license_number, c.license_type_name, a.license_id, a.license_masterId 
-              FROM tblcandlicense a
-              INNER JOIN tbllicensemaster b ON a.license_masterId = b.license_master_id
-              INNER JOIN tbllicensetype c ON b.license_master_typeId = c.license_type_id
-              WHERE license_canId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->execute();
-      $returnValue["license"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Criteria
-      $criteria = [];
-  
-      // Education Criteria: Check each course against job requirements
-      $sql = "SELECT b.courses_name, IF(je.jeduc_categoryId IS NOT NULL, 1, 0) AS meets_criteria
-              FROM tblcandeducbackground ceb
-              INNER JOIN tblcourses b ON ceb.educ_coursesId = b.courses_id
-              LEFT JOIN tbljobseducation je ON je.jeduc_categoryId = b.courses_coursecategoryId AND je.jeduc_jobId = :job_id
-              WHERE ceb.educ_canId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->bindParam(':job_id', $job_id);
-      $stmt->execute();
-      $criteria["education"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Experience Criteria: Check each employment history entry against job requirements
-      $sql = "SELECT ceh.empH_positionName, IF(jwe.jwork_jobId IS NOT NULL, 1, 0) AS meets_criteria
-              FROM tblcandemploymenthistory ceh
-              LEFT JOIN tbljobsworkexperience jwe ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
-              AND jwe.jwork_jobId = :job_id
-              WHERE ceh.empH_candId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->bindParam(':job_id', $job_id);
-      $stmt->execute();
-      $criteria["experience"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Skills Criteria: Check each skill against job requirements
-      $sql = "SELECT b.perS_name, IF(js.jskills_skillsId IS NOT NULL, 1, 0) AS meets_criteria
-              FROM tblpersonalskills b
-              LEFT JOIN tbljobsskills js ON js.jskills_skillsId = b.perS_id AND js.jskills_jobId = :job_id
-              INNER JOIN tblcandskills cs ON cs.skills_perSId = b.perS_id
-              WHERE cs.skills_candId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->bindParam(':job_id', $job_id);
-      $stmt->execute();
-      $criteria["skills"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Training Criteria: Check each training against job requirements
-      $sql = "SELECT b.perT_name, IF(jt.jtrng_trainingId IS NOT NULL, 1, 0) AS meets_criteria
-              FROM tblpersonaltraining b
-              LEFT JOIN tbljobstrainings jt ON jt.jtrng_trainingId = b.perT_id AND jt.jtrng_jobId = :job_id
-              INNER JOIN tblcandtraining ct ON ct.training_perTId = b.perT_id
-              WHERE ct.training_candId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->bindParam(':job_id', $job_id);
-      $stmt->execute();
-      $criteria["training"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Knowledge Criteria: Check each knowledge item against job requirements
-      $sql = "SELECT b.knowledge_name, IF(jk.jknow_knowledgeId IS NOT NULL, 1, 0) AS meets_criteria
-              FROM tblpersonalknowledge b
-              LEFT JOIN tbljobsknowledge jk ON jk.jknow_knowledgeId = b.knowledge_id AND jk.jknow_jobId = :job_id
-              INNER JOIN tblcandknowledge ck ON ck.canknow_knowledgeId = b.knowledge_id
-              WHERE ck.canknow_canId = :cand_id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':cand_id', $cand_id);
-      $stmt->bindParam(':job_id', $job_id);
-      $stmt->execute();
-      $criteria["knowledge"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
-  
-      // Add criteria to returnValue
-      $returnValue["criteria"] = $criteria;
-  
-      // Return results with criteria checks
-      error_log("Return Value: " . print_r($returnValue, true));
-      return json_encode($returnValue);
+    include "connection.php";
+    $returnValue = [];
+    $data = json_decode($json, true);
+
+    $cand_id = $data['cand_id'];
+    $job_id = $data['job_id'];
+
+    // Fetch candidate's basic information
+    $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["candidateInformation"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+    // Education
+    $sql = "SELECT b.courses_name, c.institution_name, a.educ_dategraduate, d.course_categoryName, e.crs_type_name, a.educ_back_id, b.courses_id, c.institution_id 
+    FROM tblcandeducbackground a
+    INNER JOIN tblcourses b ON a.educ_coursesId = b.courses_id
+    INNER JOIN tblinstitution c ON a.educ_institutionId = c.institution_id
+    INNER JOIN tblcoursescategory d ON b.courses_coursecategoryId = d.course_categoryId
+    INNER JOIN tblcoursetype e ON b.courses_courseTypeId = e.crs_type_id
+    WHERE educ_canId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["educationalBackground"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Employment history
+    $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["employmentHistory"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Skills
+    $sql = "SELECT b.perS_name, b.perS_id, a.skills_id, a.skills_perSId 
+    FROM tblcandskills a
+    INNER JOIN tblpersonalskills b ON a.skills_perSId = b.perS_id
+    WHERE a.skills_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["skills"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Training
+    $sql = "SELECT b.perT_name, a.training_id, b.perT_id, a.training_perTId 
+    FROM tblcandtraining a
+    INNER JOIN tblpersonaltraining b ON a.training_perTId = b.perT_id
+    WHERE a.training_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["training"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Knowledge
+    $sql = "SELECT b.knowledge_name, a.canknow_id, a.canknow_knowledgeId 
+    FROM tblcandknowledge a
+    INNER JOIN tblpersonalknowledge b ON a.canknow_knowledgeId = b.knowledge_id
+    WHERE a.canknow_canId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["knowledge"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Job Criteria and Candidate Matching
+    $criteria = [];
+
+    // Education: Check if the candidate's education meets the job criteria
+    $sql = "SELECT c.course_categoryName, 
+                     (CASE WHEN b.educ_coursesId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+              FROM tbljobseducation je
+              INNER JOIN tblcoursescategory c ON je.jeduc_categoryId = c.course_categoryId
+              LEFT JOIN tblcandeducbackground b ON b.educ_coursesId = je.jeduc_categoryId
+                  AND b.educ_canId = :cand_id
+              WHERE je.jeduc_jobId = :job_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
+    $stmt->execute();
+    $criteria["education"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Experience: Check if the candidate's experience meets the job criteria
+    $sql = "SELECT jwe.jwork_responsibilities, 
+                     (CASE WHEN ceh.empH_positionName IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+              FROM tbljobsworkexperience jwe
+              LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
+                  AND ceh.empH_candId = :cand_id
+              WHERE jwe.jwork_jobId = :job_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
+    $stmt->execute();
+    $criteria["experience"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Skills: Check if the candidate's skills meet the job criteria
+    $sql = "SELECT ps.perS_name, 
+                     (CASE WHEN cs.skills_perSId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+              FROM tbljobsskills js
+              INNER JOIN tblpersonalskills ps ON js.jskills_skillsId = ps.perS_id
+              LEFT JOIN tblcandskills cs ON cs.skills_perSId = ps.perS_id
+                  AND cs.skills_candId = :cand_id
+              WHERE js.jskills_jobId = :job_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
+    $stmt->execute();
+    $criteria["skills"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Training: Check if the candidate's training meets the job criteria
+    $sql = "SELECT pt.perT_name, 
+                     (CASE WHEN ct.training_perTId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+              FROM tbljobstrainings jt
+              INNER JOIN tblpersonaltraining pt ON jt.jtrng_trainingId = pt.perT_id
+              LEFT JOIN tblcandtraining ct ON ct.training_perTId = pt.perT_id
+                  AND ct.training_candId = :cand_id
+              WHERE jt.jtrng_jobId = :job_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
+    $stmt->execute();
+    $criteria["training"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Knowledge: Check if the candidate's knowledge meets the job criteria
+    $sql = "SELECT pk.knowledge_name, 
+                     (CASE WHEN ck.canknow_knowledgeId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+              FROM tbljobsknowledge jk
+              INNER JOIN tblpersonalknowledge pk ON jk.jknow_knowledgeId = pk.knowledge_id
+              LEFT JOIN tblcandknowledge ck ON ck.canknow_knowledgeId = pk.knowledge_id
+                  AND ck.canknow_canId = :cand_id
+              WHERE jk.jknow_jobId = :job_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
+    $stmt->execute();
+    $criteria["knowledge"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+    // Add job criteria to returnValue
+    $returnValue["criteria"] = $criteria;
+
+    // Return results
+    error_log("Return Value: " . print_r($returnValue, true));
+    return json_encode($returnValue);
   }
-  
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
