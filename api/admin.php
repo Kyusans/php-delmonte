@@ -620,6 +620,71 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+  function fetchEducationalBackground($cand_id)
+  {
+    include "connection.php";
+    $sql = "SELECT b.courses_name, c.institution_name, a.educ_dategraduate, d.course_categoryName, e.crs_type_name, a.educ_back_id, b.courses_id, c.institution_id 
+    FROM tblcandeducbackground a
+    INNER JOIN tblcourses b ON a.educ_coursesId = b.courses_id
+    INNER JOIN tblinstitution c ON a.educ_institutionId = c.institution_id
+    INNER JOIN tblcoursescategory d ON b.courses_coursecategoryId = d.course_categoryId
+    INNER JOIN tblcoursetype e ON b.courses_courseTypeId = e.crs_type_id
+    WHERE educ_canId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+  }
+
+  function fetchEmploymentHistory($cand_id)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+  }
+
+  function fetchSkills($cand_id)
+  {
+    include "connection.php";
+    $sql = "SELECT b.perS_name, b.perS_id, a.skills_id, a.skills_perSId 
+    FROM tblcandskills a
+    INNER JOIN tblpersonalskills b ON a.skills_perSId = b.perS_id
+    WHERE a.skills_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+  }
+
+  function fetchTraining($cand_id)
+  {
+    include "connection.php";
+    $sql = "SELECT b.perT_name, a.training_id, b.perT_id, a.training_perTId 
+    FROM tblcandtraining a
+    INNER JOIN tblpersonaltraining b ON a.training_perTId = b.perT_id
+    WHERE a.training_candId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+  }
+
+  function fetchKnowledge($cand_id)
+  {
+    include "connection.php";
+    $sql = "SELECT b.knowledge_name, a.canknow_id, a.canknow_knowledgeId 
+    FROM tblcandknowledge a
+    INNER JOIN tblpersonalknowledge b ON a.canknow_knowledgeId = b.knowledge_id
+    WHERE a.canknow_canId = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+  }
+
   function getCandidateProfile($json)
   {
     include "connection.php";
@@ -636,55 +701,89 @@ class Admin
     $stmt->execute();
     $returnValue["candidateInformation"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    // Education
-    $sql = "SELECT b.courses_name, c.institution_name, a.educ_dategraduate, d.course_categoryName, e.crs_type_name, a.educ_back_id, b.courses_id, c.institution_id 
-    FROM tblcandeducbackground a
-    INNER JOIN tblcourses b ON a.educ_coursesId = b.courses_id
-    INNER JOIN tblinstitution c ON a.educ_institutionId = c.institution_id
-    INNER JOIN tblcoursescategory d ON b.courses_coursecategoryId = d.course_categoryId
-    INNER JOIN tblcoursetype e ON b.courses_courseTypeId = e.crs_type_id
-    WHERE educ_canId = :cand_id";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':cand_id', $cand_id);
-    $stmt->execute();
-    $returnValue["educationalBackground"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    // Initialize points by category
+    $pointsByCategory = [
+      'education' => ['points' => 0, 'maxPoints' => 0],
+      'experience' => ['points' => 0, 'maxPoints' => 0],
+      'skills' => ['points' => 0, 'maxPoints' => 0],
+      'training' => ['points' => 0, 'maxPoints' => 0],
+      'knowledge' => ['points' => 0, 'maxPoints' => 0],
+    ];
 
-    // Employment history
-    $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId = :cand_id";
+    // Education Points
+    $sql = "SELECT SUM(DISTINCT je.jeduc_points) AS educ_points, 
+            (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :job_id) AS max_educ_points
+            FROM tbljobseducation je
+            LEFT JOIN tblcandeducbackground eb ON je.jeduc_categoryId = (
+                SELECT b.courses_coursecategoryId FROM tblcourses b WHERE b.courses_id = eb.educ_coursesId
+            )
+            WHERE eb.educ_canId = :cand_id AND je.jeduc_jobId = :job_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
     $stmt->execute();
-    $returnValue["employmentHistory"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $pointsByCategory['education']['points'] = $result['educ_points'] ?? 0;
+    $pointsByCategory['education']['maxPoints'] = $result['max_educ_points'] ?? 0;
 
-    // Skills
-    $sql = "SELECT b.perS_name, b.perS_id, a.skills_id, a.skills_perSId 
-    FROM tblcandskills a
-    INNER JOIN tblpersonalskills b ON a.skills_perSId = b.perS_id
-    WHERE a.skills_candId = :cand_id";
+    // Experience Points
+    $sql = "SELECT SUM(DISTINCT jwe.jwork_points) AS exp_points, 
+            (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :job_id) AS max_exp_points
+            FROM tbljobsworkexperience jwe
+            LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
+            WHERE ceh.empH_candId = :cand_id AND jwe.jwork_jobId = :job_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
     $stmt->execute();
-    $returnValue["skills"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $pointsByCategory['experience']['points'] = $result['exp_points'] ?? 0;
+    $pointsByCategory['experience']['maxPoints'] = $result['max_exp_points'] ?? 0;
 
-    // Training
-    $sql = "SELECT b.perT_name, a.training_id, b.perT_id, a.training_perTId 
-    FROM tblcandtraining a
-    INNER JOIN tblpersonaltraining b ON a.training_perTId = b.perT_id
-    WHERE a.training_candId = :cand_id";
+    // Skills Points
+    $sql = "SELECT SUM(DISTINCT js.jskills_points) AS skills_points, 
+            (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :job_id) AS max_skills_points
+            FROM tbljobsskills js
+            LEFT JOIN tblcandskills cs ON js.jskills_skillsId = cs.skills_perSId
+            WHERE cs.skills_candId = :cand_id AND js.jskills_jobId = :job_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
     $stmt->execute();
-    $returnValue["training"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $pointsByCategory['skills']['points'] = $result['skills_points'] ?? 0;
+    $pointsByCategory['skills']['maxPoints'] = $result['max_skills_points'] ?? 0;
 
-    // Knowledge
-    $sql = "SELECT b.knowledge_name, a.canknow_id, a.canknow_knowledgeId 
-    FROM tblcandknowledge a
-    INNER JOIN tblpersonalknowledge b ON a.canknow_knowledgeId = b.knowledge_id
-    WHERE a.canknow_canId = :cand_id";
+    // Training Points
+    $sql = "SELECT SUM(DISTINCT jt.jtrng_points) AS training_points, 
+            (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :job_id) AS max_training_points
+            FROM tbljobstrainings jt
+            LEFT JOIN tblcandtraining ct ON jt.jtrng_trainingId = ct.training_perTId
+            WHERE ct.training_candId = :cand_id AND jt.jtrng_jobId = :job_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
     $stmt->execute();
-    $returnValue["knowledge"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $pointsByCategory['training']['points'] = $result['training_points'] ?? 0;
+    $pointsByCategory['training']['maxPoints'] = $result['max_training_points'] ?? 0;
+
+    // Knowledge Points
+    $sql = "SELECT SUM(DISTINCT jk.jknow_points) AS knowledge_points, 
+            (SELECT SUM(jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :job_id) AS max_knowledge_points
+            FROM tbljobsknowledge jk
+            LEFT JOIN tblcandknowledge ck ON jk.jknow_knowledgeId = ck.canknow_knowledgeId
+            WHERE ck.canknow_canId = :cand_id AND jk.jknow_jobId = :job_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $pointsByCategory['knowledge']['points'] = $result['knowledge_points'] ?? 0;
+    $pointsByCategory['knowledge']['maxPoints'] = $result['max_knowledge_points'] ?? 0;
+
+    // Add points by category to returnValue
+    $returnValue["pointsByCategory"] = $pointsByCategory;
 
     // Job Criteria and Candidate Matching
     $criteria = [];
@@ -709,7 +808,7 @@ class Admin
 
     // Experience: Check if the candidate's experience meets the job criteria
     $sql = "SELECT jwe.jwork_responsibilities, 
-                     (CASE WHEN ceh.empH_positionName IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+              (CASE WHEN ceh.empH_positionName IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobsworkexperience jwe
               LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
                   AND ceh.empH_candId = :cand_id
@@ -736,7 +835,7 @@ class Admin
 
     // Training: Check if the candidate's training meets the job criteria
     $sql = "SELECT pt.perT_name, 
-                     (CASE WHEN ct.training_perTId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+              (CASE WHEN ct.training_perTId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobstrainings jt
               INNER JOIN tblpersonaltraining pt ON jt.jtrng_trainingId = pt.perT_id
               LEFT JOIN tblcandtraining ct ON ct.training_perTId = pt.perT_id
@@ -750,7 +849,7 @@ class Admin
 
     // Knowledge: Check if the candidate's knowledge meets the job criteria
     $sql = "SELECT pk.knowledge_name, 
-                     (CASE WHEN ck.canknow_knowledgeId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+              (CASE WHEN ck.canknow_knowledgeId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobsknowledge jk
               INNER JOIN tblpersonalknowledge pk ON jk.jknow_knowledgeId = pk.knowledge_id
               LEFT JOIN tblcandknowledge ck ON ck.canknow_knowledgeId = pk.knowledge_id
@@ -765,8 +864,14 @@ class Admin
     // Add job criteria to returnValue
     $returnValue["criteria"] = $criteria;
 
+    // Add education, employment, skills, training, and knowledge info
+    $returnValue["educationalBackground"] = $this->fetchEducationalBackground($cand_id);
+    $returnValue["employmentHistory"] = $this->fetchEmploymentHistory($cand_id);
+    $returnValue["skills"] = $this->fetchSkills($cand_id);
+    $returnValue["training"] = $this->fetchTraining($cand_id);
+    $returnValue["knowledge"] = $this->fetchKnowledge($cand_id);
+
     // Return results
-    error_log("Return Value: " . print_r($returnValue, true));
     return json_encode($returnValue);
   }
 } //admin
