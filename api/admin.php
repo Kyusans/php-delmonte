@@ -203,8 +203,12 @@ class Admin
     $stmt->execute();
     $returnValue["jobPassing"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) as FullName FROM tblapplications a 
-            INNER JOIN tblcandidates b ON a.app_candId = b.cand_id 
+    $sql = "SELECT b.cand_id, 
+            CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, e.status_name 
+            FROM tblapplications a
+            INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
+            INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
+            INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
             WHERE a.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -755,7 +759,7 @@ class Admin
     $pointsByCategory['skills']['maxPoints'] = $result['max_skills_points'] ?? 0;
 
     // Training Points
-    $sql = "SELECT SUM(jt.jtrng_points) AS training_points, 
+    $sql = "SELECT SUM(DISTINCT jt.jtrng_points) AS training_points, 
             (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :job_id) AS max_training_points
             FROM tbljobstrainings jt
             LEFT JOIN tblcandtraining ct ON jt.jtrng_trainingId = ct.training_perTId
@@ -821,7 +825,7 @@ class Admin
 
     // Skills: Check if the candidate's skills meet the job criteria
     $sql = "SELECT ps.perS_name, 
-                     (CASE WHEN cs.skills_perSId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+              (CASE WHEN cs.skills_perSId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobsskills js
               INNER JOIN tblpersonalskills ps ON js.jskills_skillsId = ps.perS_id
               LEFT JOIN tblcandskills cs ON cs.skills_perSId = ps.perS_id
@@ -834,7 +838,7 @@ class Admin
     $criteria["skills"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     // Training: Check if the candidate's training meets the job criteria
-    $sql = "SELECT pt.perT_name, 
+    $sql = "SELECT DISTINCT pt.perT_name, 
               (CASE WHEN ct.training_perTId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobstrainings jt
               INNER JOIN tblpersonaltraining pt ON jt.jtrng_trainingId = pt.perT_id

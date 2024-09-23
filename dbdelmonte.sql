@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 04, 2024 at 06:05 AM
+-- Generation Time: Sep 23, 2024 at 08:24 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -52,18 +52,16 @@ CREATE TABLE `tblapplications` (
   `app_id` int(11) NOT NULL,
   `app_candId` int(11) DEFAULT NULL,
   `app_jobMId` int(20) NOT NULL,
-  `app_datetime` datetime NOT NULL DEFAULT current_timestamp(),
-  `app_totalpoints` int(20) NOT NULL,
-  `app_updateDatetime` datetime NOT NULL,
-  `app_appSId` int(11) NOT NULL
+  `app_datetime` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblapplications`
 --
 
-INSERT INTO `tblapplications` (`app_id`, `app_candId`, `app_jobMId`, `app_datetime`, `app_totalpoints`, `app_updateDatetime`, `app_appSId`) VALUES
-(1, 7, 1, '2024-09-02 12:54:03', 0, '0000-00-00 00:00:00', 1);
+INSERT INTO `tblapplications` (`app_id`, `app_candId`, `app_jobMId`, `app_datetime`) VALUES
+(11, 7, 1, '2024-09-19 12:07:39'),
+(12, 7, 11, '2024-09-21 11:10:27');
 
 -- --------------------------------------------------------
 
@@ -72,19 +70,19 @@ INSERT INTO `tblapplications` (`app_id`, `app_candId`, `app_jobMId`, `app_dateti
 --
 
 CREATE TABLE `tblapplicationstatus` (
-  `appS_id` int(11) NOT NULL,
-  `appS_name` varchar(50) NOT NULL
+  `appS_id` int(50) NOT NULL,
+  `appS_appId` int(50) NOT NULL,
+  `appS_statusId` int(50) NOT NULL,
+  `appS_date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblapplicationstatus`
 --
 
-INSERT INTO `tblapplicationstatus` (`appS_id`, `appS_name`) VALUES
-(1, 'Pending'),
-(2, 'Process'),
-(3, 'Accept'),
-(4, 'Decline');
+INSERT INTO `tblapplicationstatus` (`appS_id`, `appS_appId`, `appS_statusId`, `appS_date`) VALUES
+(5, 11, 2, '2024-09-19 12:07:39'),
+(6, 12, 1, '2024-09-21 11:10:27');
 
 -- --------------------------------------------------------
 
@@ -99,6 +97,14 @@ CREATE TABLE `tblcandconsent` (
   `cons_dataprivacyconsent` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblcandconsent`
+--
+
+INSERT INTO `tblcandconsent` (`cons_id`, `cons_candId`, `cons_subscribetoemailupdates`, `cons_dataprivacyconsent`) VALUES
+(1, 8, 1, NULL),
+(2, 9, 1, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -112,6 +118,19 @@ CREATE TABLE `tblcandeducbackground` (
   `educ_institutionId` int(20) NOT NULL,
   `educ_dategraduate` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcandeducbackground`
+--
+
+INSERT INTO `tblcandeducbackground` (`educ_back_id`, `educ_canId`, `educ_coursesId`, `educ_institutionId`, `educ_dategraduate`) VALUES
+(1, 8, 23, 1, '2024-09-02'),
+(2, 7, 46, 1474, '2024-08-09'),
+(22, 7, 57, 1515, '2024-08-10'),
+(23, 7, 47, 1516, '2024-07-10'),
+(24, 9, 46, 1474, '2024-08-08'),
+(25, 10, 23, 1, '2024-09-04'),
+(26, 6, 39, 1474, '2024-08-21');
 
 -- --------------------------------------------------------
 
@@ -133,7 +152,10 @@ CREATE TABLE `tblcandemploymenthistory` (
 --
 
 INSERT INTO `tblcandemploymenthistory` (`empH_id`, `empH_candId`, `empH_positionName`, `empH_companyName`, `empH_startdate`, `empH_enddate`) VALUES
-(1, 7, 'Coordinator', 'La kreativ', '2022-08-10', '2024-08-14');
+(17, 7, 'Project Manager', 'Phinma - Cagayan de Oro College', '2023-10-08', '2024-03-05'),
+(18, 9, 'Coordinator', 'La Kreativ', '2021-09-08', '2024-09-08'),
+(19, 10, 'Janitor', 'Nasa', '2024-08-01', '2024-09-06'),
+(23, 6, 'Programmer', 'GSD', '2022-08-17', '2023-03-15');
 
 -- --------------------------------------------------------
 
@@ -171,7 +193,10 @@ CREATE TABLE `tblcandidates` (
 
 INSERT INTO `tblcandidates` (`cand_id`, `cand_lastname`, `cand_firstname`, `cand_middlename`, `cand_contactNo`, `cand_alternatecontactNo`, `cand_email`, `cand_alternateEmail`, `cand_presentAddress`, `cand_permanentAddress`, `cand_dateofBirth`, `cand_sex`, `cand_sssNo`, `cand_tinNo`, `cand_philhealthNo`, `cand_pagibigNo`, `cand_password`, `cand_createdDatetime`, `cand_updatedDatetime`, `cand_pinCode`, `cand_activeStatus`) VALUES
 (6, 'macario', 'mel', 'sabido', '096768745321', '096498231232', 'mel@gmail.com', 'mel@gmail.com', 'balay', 'balay', '2024-08-08', 'Male', '031245', '123123', '123123', '123123', 'mel', NULL, NULL, '', 0),
-(7, 'Gallegos', 'Ralph Jan\r\n', 'Pelino', '09056548089', '09261853553', 'ralp.pelino11@gmail.com', 'ralp.pelino11@gmail.com', 'Iponan', 'Iponan', '2014-08-08', 'Male', '565656565', '5656565', '56566', '565656', 'rap', NULL, NULL, '', 0);
+(7, 'Gallegos', 'Ralph Jan', 'Pelino', '09056548089', '09261853553', 'ralphjangallegos@gmail.com', 'ralp.pelino11@gmail.com', 'Iponan', 'Iponan', '2014-08-08', 'Male', '565656565', '5656565', '56566', '565656', 'ralphjan12', NULL, NULL, '', 0),
+(8, 'macario', 'kobid', 'joe', '0945635345345', '09456353434545', 'kobid1212@gmail.com', 'kobid12@gmail.com', 'balay', 'dog house', '2024-09-02', 'Male', '123', '123', '123', '123', 'macario123', '2024-09-05 11:32:10', NULL, '', 0),
+(9, 'Gallegos', 'Ralph Jan', 'Jan P.', '09056548089', '09056548089', 'rape.gallegos.coc@phinmaed.com', 'rape.gallegos.coc@phinmaed.com', 'Ficoville, Iponan', 'Ficoville, Iponan', '2001-11-08', 'Male', '8998', '7878', '8998', '7878', 'gwapo', '2024-09-11 11:24:50', NULL, '', 0),
+(10, 'Roaya', 'Jake', 'Lumaktod', '09675868967857', '09675868967812', 'jake@gmail.com', 'jake12@gmail.com', 'Ficoville, Iponan', 'Ficoville, Iponan', '2002-10-20', 'Other', '8998', '7878', '8998', '7878', 'jake123', '2024-09-12 09:34:22', NULL, '', 0);
 
 -- --------------------------------------------------------
 
@@ -184,6 +209,20 @@ CREATE TABLE `tblcandknowledge` (
   `canknow_canId` int(11) NOT NULL,
   `canknow_knowledgeId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcandknowledge`
+--
+
+INSERT INTO `tblcandknowledge` (`canknow_id`, `canknow_canId`, `canknow_knowledgeId`) VALUES
+(1, 8, 1),
+(2, 7, 1),
+(3, 7, 3),
+(4, 7, 4),
+(7, 9, 1),
+(8, 10, 1),
+(9, 6, 3),
+(10, 7, 2);
 
 -- --------------------------------------------------------
 
@@ -198,6 +237,35 @@ CREATE TABLE `tblcandlicense` (
   `license_masterId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblcandlicense`
+--
+
+INSERT INTO `tblcandlicense` (`license_id`, `license_number`, `license_canId`, `license_masterId`) VALUES
+(1, 5666264, 7, 9),
+(4, 89989, 9, 9),
+(5, 89989, 10, 1),
+(6, 747546, 7, 6);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblcandresume`
+--
+
+CREATE TABLE `tblcandresume` (
+  `canres_id` int(11) NOT NULL,
+  `canres_candId` int(11) NOT NULL,
+  `canres_image` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcandresume`
+--
+
+INSERT INTO `tblcandresume` (`canres_id`, `canres_candId`, `canres_image`) VALUES
+(16, 7, 'expected6.png');
+
 -- --------------------------------------------------------
 
 --
@@ -210,6 +278,17 @@ CREATE TABLE `tblcandskills` (
   `skills_perSId` int(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblcandskills`
+--
+
+INSERT INTO `tblcandskills` (`skills_id`, `skills_candId`, `skills_perSId`) VALUES
+(1, 8, 1),
+(16, 9, 1),
+(17, 10, 1),
+(18, 10, 2),
+(25, 7, 7);
+
 -- --------------------------------------------------------
 
 --
@@ -219,8 +298,27 @@ CREATE TABLE `tblcandskills` (
 CREATE TABLE `tblcandtraining` (
   `training_id` int(20) NOT NULL,
   `training_candId` int(20) NOT NULL,
-  `training_perTId` int(20) NOT NULL
+  `training_perTId` int(20) NOT NULL,
+  `training_image` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcandtraining`
+--
+
+INSERT INTO `tblcandtraining` (`training_id`, `training_candId`, `training_perTId`, `training_image`) VALUES
+(6, 7, 2, 'event.png'),
+(8, 7, 3, 'manager.png'),
+(12, 9, 2, 'event.png'),
+(14, 10, 3, 'manager.png'),
+(16, 10, 2, 'fckk.png'),
+(17, 7, 2, 'event.png'),
+(18, 7, 2, 'assist.png'),
+(20, 6, 3, 'manager.png'),
+(23, 7, 2, 'event.png'),
+(25, 7, 3, 'manager.png'),
+(26, 7, 2, 'assist.png'),
+(27, 7, 3, 'samples.png');
 
 -- --------------------------------------------------------
 
@@ -2839,7 +2937,17 @@ CREATE TABLE `tbljobpassing` (
 --
 
 INSERT INTO `tbljobpassing` (`passing_id`, `passing_jobId`, `passing_points`) VALUES
-(1, 10, 50);
+(1, 1, 50),
+(2, 2, 30),
+(3, 3, 50),
+(4, 4, 70),
+(5, 5, 69),
+(6, 6, 90),
+(7, 7, 30),
+(8, 8, 0),
+(9, 9, 0),
+(10, 10, 0),
+(11, 11, 100);
 
 -- --------------------------------------------------------
 
@@ -2860,13 +2968,15 @@ CREATE TABLE `tbljobseducation` (
 --
 
 INSERT INTO `tbljobseducation` (`jeduc_id`, `jeduc_jobId`, `jeduc_text`, `jeduc_categoryId`, `jeduc_points`) VALUES
-(1, 1, 'While a high school diploma or its equivalent is common, some employers may prefer candidates with an associate’s or bachelor’s degree in animal science, agriculture, or a related field', 0, 0),
+(1, 1, 'While a high school diploma or its equivalent is common, some employers may prefer candidates with an associate’s or bachelor’s degree in animal science, agriculture, or a related field', 2, 100),
 (2, 8, 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', 2, 5),
 (3, 8, 'Etiam dapibus non ante quis fermentum. Aliquam nibh ipsum, tincidunt id nisl posuere, commodo viverra orci. Donec sagittis libero ultrices velit auctor faucibus. Nunc quis congue sapien. Sed iaculis augue vitae tortor dignissim tristique. Nunc vulputate, tortor a iaculis porta, velit augue egestas lacus, sed pellentesque neque tellus eu odio. Morbi vehicula sit amet urna tempus aliquam. Pellentesque id dui at augue lobortis congue quis vel lacus. Quisque ac erat turpis. Donec ligula est, faucibus sed purus sit amet, imperdiet volutpat augue. Proin eget sapien sed metus sodales lobortis quis ut mauris. Fusce rhoncus semper enim, nec venenatis nibh gravida et. Vestibulum tempus eros eu arcu sollicitudin rutrum.', 9, 30),
 (4, 9, 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', 2, 5),
 (5, 9, 'Etiam dapibus non ante quis fermentum. Aliquam nibh ipsum, tincidunt id nisl posuere, commodo viverra orci. Donec sagittis libero ultrices velit auctor faucibus. Nunc quis congue sapien. Sed iaculis augue vitae tortor dignissim tristique. Nunc vulputate, tortor a iaculis porta, velit augue egestas lacus, sed pellentesque neque tellus eu odio. Morbi vehicula sit amet urna tempus aliquam. Pellentesque id dui at augue lobortis congue quis vel lacus. Quisque ac erat turpis. Donec ligula est, faucibus sed purus sit amet, imperdiet volutpat augue. Proin eget sapien sed metus sodales lobortis quis ut mauris. Fusce rhoncus semper enim, nec venenatis nibh gravida et. Vestibulum tempus eros eu arcu sollicitudin rutrum.', 9, 30),
 (6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 2, 10),
-(7, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 3, 5);
+(7, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 3, 5),
+(8, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 2, 50),
+(9, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 3, 300);
 
 -- --------------------------------------------------------
 
@@ -2887,7 +2997,8 @@ CREATE TABLE `tbljobsknowledge` (
 --
 
 INSERT INTO `tbljobsknowledge` (`jknow_id`, `jknow_jobId`, `jknow_text`, `jknow_knowledgeId`, `jknow_points`) VALUES
-(8, 1, 'Knowledge of modern technologies used in livestock farming, such as automated feeding systems, health monitoring devices, and genetic testing.', 3, 0);
+(8, 1, 'Knowledge of modern technologies used in livestock farming, such as automated feeding systems, health monitoring devices, and genetic testing.', 3, 0),
+(9, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 1, 100);
 
 -- --------------------------------------------------------
 
@@ -2910,14 +3021,15 @@ CREATE TABLE `tbljobsmaster` (
 INSERT INTO `tbljobsmaster` (`jobM_id`, `jobM_title`, `jobM_description`, `jobM_createdAt`, `jobM_status`) VALUES
 (1, 'Livestock Production Supervisor', 'A Livestock Supervisor oversees daily operations on farms that raise animals for consumption or product use. They manage feeding, health care, and humane treatment of livestock, supervise farm workers, and prepare reports on production and management. Additionally, they coordinate breeding, monitor animal health, and ensure compliance with regulations. If you’re interested in related roles, Livestock Production Managers oversee farm operations for milk, meat, wool, and other products, focusing on safety and yield optimization. ', '2024-08-06 08:48:22', 1),
 (2, 'Production Supervisor', '', '2024-08-01 12:48:39', 0),
-(3, 'Marketing Intern', '', '2024-08-08 01:48:52', 1),
+(3, 'Marketing Intern', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', '2024-08-08 01:48:52', 1),
 (4, 'Commercial Capability Development Intern', '', '2024-08-12 18:49:03', 1),
 (5, 'Production Shift Supervisor (Tetra Line)', '', '2024-08-15 07:49:19', 0),
 (6, 'Quality Assurance Analyst', '', '2024-08-16 09:49:28', 1),
 (7, 'Human Resources Supervisor', '', '2024-08-10 16:49:40', 0),
 (8, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 08:49:55', 0),
 (9, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 10:50:05', 0),
-(10, 'Programmer', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', '2024-08-24 10:50:15', 0);
+(10, 'Programmer', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', '2024-08-24 10:50:15', 0),
+(11, 'Janitor', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vehicula dui gravida ligula fringilla, sed scelerisque mi placerat. Sed in feugiat elit. Donec sed lorem viverra, pharetra risus id, congue tortor. Proin aliquet risus sed neque imperdiet feugiat. Curabitur blandit mattis odio lacinia sollicitudin. Curabitur tempor risus quis sem bibendum aliquet. Integer vel nulla vel risus euismod molestie et sit amet tortor. Sed lacinia, felis id ullamcorper condimentum, odio enim posuere nisi, vitae faucibus nisi libero vel risus. Suspendisse malesuada enim eget nulla mollis, eu tempor quam cursus. Maecenas blandit luctus turpis, et venenatis nulla aliquam eget. In in lectus blandit, eleifend diam in, vehicula nibh.', '2024-09-12 09:30:22', 1);
 
 -- --------------------------------------------------------
 
@@ -2946,7 +3058,10 @@ INSERT INTO `tbljobsmasterduties` (`duties_id`, `duties_jobId`, `duties_text`) V
 (8, 9, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo.'),
 (9, 9, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus luctus velit fringilla arcu suscipit, sed blandit est viverra. Nunc finibus elit id dictum maximus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla lobortis tristique commodo. Interdum et malesuada fames ac ante ipsum primis in faucibus. In velit purus, interdum eu eros sit amet, posuere dignissim lectus. Donec massa erat, iaculis in sodales ut, dictum et magna. Interdum et malesuada fames ac ante ipsum primis in faucibus. Duis venenatis suscipit sodales. Donec quis consequat libero. Ut maximus ultrices tortor, eget iaculis felis molestie ac. Cras non pharetra dui. Cras ac magna justo.'),
 (10, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.'),
-(11, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.');
+(11, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.'),
+(12, 11, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vehicula dui gravida ligula fringilla, sed scelerisque mi placerat. Sed in feugiat elit. Donec sed lorem viverra, pharetra risus id, congue tortor. Proin aliquet risus sed neque imperdiet feugiat. Curabitur blandit mattis odio lacinia sollicitudin. Curabitur tempor risus quis sem bibendum aliquet. Integer vel nulla vel risus euismod molestie et sit amet tortor. Sed lacinia, felis id ullamcorper condimentum, odio enim posuere nisi, vitae faucibus nisi libero vel risus. Suspendisse malesuada enim eget nulla mollis, eu tempor quam cursus. Maecenas blandit luctus turpis, et venenatis nulla aliquam eget. In in lectus blandit, eleifend diam in, vehicula nibh.'),
+(13, 11, 'Ut nec enim et nisl suscipit dignissim. Nulla odio sem, commodo eget dictum ac, consectetur ac neque. Pellentesque fringilla sed neque vitae bibendum. Fusce vel nibh eu arcu iaculis vulputate mattis eleifend nulla. Nullam libero elit, sodales sed enim a, ullamcorper tincidunt urna. Proin ac commodo tortor, sit amet congue nisi. Maecenas bibendum nunc quis feugiat bibendum. Aenean egestas vulputate nisi eget dictum.'),
+(14, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.');
 
 -- --------------------------------------------------------
 
@@ -2972,7 +3087,9 @@ INSERT INTO `tbljobsskills` (`jskills_id`, `jskills_jobId`, `jskills_text`, `jsk
 (3, 8, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 9, 30),
 (4, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 30),
 (5, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 9, 30),
-(6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 2, 30);
+(6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 2, 30),
+(7, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 1, 100),
+(8, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 2, 50);
 
 -- --------------------------------------------------------
 
@@ -2998,7 +3115,9 @@ INSERT INTO `tbljobstrainings` (`jtrng_id`, `jtrng_jobId`, `jtrng_text`, `jtrng_
 (3, 8, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 10),
 (4, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 1, 5),
 (5, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 10),
-(6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 3, 10);
+(6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 3, 10),
+(7, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 4, 50),
+(8, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 2, 100);
 
 -- --------------------------------------------------------
 
@@ -3022,7 +3141,8 @@ INSERT INTO `tbljobsworkexperience` (`jwork_id`, `jwork_jobId`, `jwork_duration`
 (1, 1, '8 hours a day', 'A genuine interest in the farming industry and a commitment to animal welfare.\r\nRemember that specific job requirements may vary depending on the organization and the type of livestock being raised. ', 0),
 (2, 8, '2', 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 0),
 (3, 9, '2', 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 0),
-(4, 10, '10', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 0);
+(4, 10, '10', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 0),
+(5, 11, '1', 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.\nJanitor', 100);
 
 -- --------------------------------------------------------
 
@@ -3036,6 +3156,57 @@ CREATE TABLE `tbllicensemaster` (
   `license_master_typeId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tbllicensemaster`
+--
+
+INSERT INTO `tbllicensemaster` (`license_master_id`, `license_master_name`, `license_master_typeId`) VALUES
+(1, 'Accountancy', 1),
+(2, 'Aeronautical Engineering\r\n', 1),
+(3, 'Agricultural Engineering\r\n', 1),
+(4, 'Agricultural and Biosystems Engineering\r\n', 1),
+(5, 'Agriculture', 1),
+(6, 'Architecture', 1),
+(7, 'Chemical Engineering\r\n', 1),
+(8, 'Chemistry', 1),
+(9, 'Civil Engineering\r\n', 1),
+(10, 'Criminology', 1),
+(11, 'Customs Brokers\r\n', 1),
+(12, 'Dentistry', 1),
+(13, 'Electronics Engineering\r\n', 1),
+(14, 'Electrical Engineering\r\n', 1),
+(15, 'Environmental Planning\r\n', 1),
+(16, 'Fisheries Technology\r\n', 1),
+(17, 'Forestry', 1),
+(18, 'Geodetic Engineering\r\n', 1),
+(19, 'Geology\r\n', 1),
+(20, 'Guidance and Counseling\r\n', 1),
+(21, 'Interior Design\r\n', 1),
+(22, 'Landscape Architecture\r\n', 1),
+(23, 'Librarianship\r\n', 1),
+(24, 'Marine Deck and Marine Engineer Officers\r\n', 1),
+(25, 'Mechanical Engineering\r\n', 1),
+(26, 'Medical Technology\r\n', 1),
+(27, 'Medicine', 1),
+(28, 'Midwifery', 1),
+(29, 'Mining Engineering\r\n', 1),
+(30, 'Naval Architecture\r\n', 1),
+(31, 'Nursing\r\n', 1),
+(32, 'Nutrition and Dietetics\r\n', 1),
+(33, 'Occupational Therapy\r\n', 1),
+(34, 'Optometry\r\n', 1),
+(35, 'Pharmacy', 1),
+(36, 'Physical Therapy\r\n', 1),
+(37, 'Professional Teachers\r\n', 1),
+(38, 'Psychology', 1),
+(39, 'Radiologic Technology\r\n', 1),
+(40, 'Real Estate Service\r\n', 1),
+(41, 'Respiratory Therapy\r\n', 1),
+(42, 'Sanitary Engineering\r\n', 1),
+(43, 'Social Work\r\n', 1),
+(44, 'Speech-Language Pathology\r\n', 1),
+(45, 'Veterinary Medicine\r\n', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -3046,6 +3217,13 @@ CREATE TABLE `tbllicensetype` (
   `license_type_id` int(11) NOT NULL,
   `license_type_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbllicensetype`
+--
+
+INSERT INTO `tbllicensetype` (`license_type_id`, `license_type_name`) VALUES
+(1, ' Professional Regulation Commission (PRC)');
 
 -- --------------------------------------------------------
 
@@ -3125,6 +3303,29 @@ INSERT INTO `tblpersonaltraining` (`perT_id`, `perT_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tblstatus`
+--
+
+CREATE TABLE `tblstatus` (
+  `status_id` int(11) NOT NULL,
+  `status_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblstatus`
+--
+
+INSERT INTO `tblstatus` (`status_id`, `status_name`) VALUES
+(1, 'Pending'),
+(2, 'Process'),
+(3, 'Accept'),
+(4, 'Decline'),
+(5, 'Exam'),
+(6, 'Interview');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tblsupervisor`
 --
 
@@ -3159,14 +3360,15 @@ ALTER TABLE `tbladmin`
 ALTER TABLE `tblapplications`
   ADD PRIMARY KEY (`app_id`),
   ADD KEY `personal_info_id` (`app_candId`),
-  ADD KEY `apply_position_id` (`app_jobMId`),
-  ADD KEY `fk_app_status` (`app_appSId`);
+  ADD KEY `apply_position_id` (`app_jobMId`);
 
 --
 -- Indexes for table `tblapplicationstatus`
 --
 ALTER TABLE `tblapplicationstatus`
-  ADD PRIMARY KEY (`appS_id`);
+  ADD PRIMARY KEY (`appS_id`),
+  ADD KEY `appS_appId` (`appS_appId`),
+  ADD KEY `appS_statusId` (`appS_statusId`);
 
 --
 -- Indexes for table `tblcandconsent`
@@ -3201,7 +3403,9 @@ ALTER TABLE `tblcandidates`
 -- Indexes for table `tblcandknowledge`
 --
 ALTER TABLE `tblcandknowledge`
-  ADD KEY `canknow_canId` (`canknow_canId`);
+  ADD PRIMARY KEY (`canknow_id`),
+  ADD KEY `canknow_canId` (`canknow_canId`),
+  ADD KEY `canknow_knowledgeId` (`canknow_knowledgeId`);
 
 --
 -- Indexes for table `tblcandlicense`
@@ -3210,6 +3414,12 @@ ALTER TABLE `tblcandlicense`
   ADD PRIMARY KEY (`license_id`),
   ADD KEY `license_canId` (`license_canId`),
   ADD KEY `license_masterId` (`license_masterId`);
+
+--
+-- Indexes for table `tblcandresume`
+--
+ALTER TABLE `tblcandresume`
+  ADD PRIMARY KEY (`canres_id`);
 
 --
 -- Indexes for table `tblcandskills`
@@ -3347,6 +3557,12 @@ ALTER TABLE `tblpersonaltraining`
   ADD PRIMARY KEY (`perT_id`);
 
 --
+-- Indexes for table `tblstatus`
+--
+ALTER TABLE `tblstatus`
+  ADD PRIMARY KEY (`status_id`);
+
+--
 -- Indexes for table `tblsupervisor`
 --
 ALTER TABLE `tblsupervisor`
@@ -3366,55 +3582,67 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblapplications`
 --
 ALTER TABLE `tblapplications`
-  MODIFY `app_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `app_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `tblapplicationstatus`
 --
 ALTER TABLE `tblapplicationstatus`
-  MODIFY `appS_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `appS_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tblcandconsent`
 --
 ALTER TABLE `tblcandconsent`
-  MODIFY `cons_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `cons_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tblcandeducbackground`
 --
 ALTER TABLE `tblcandeducbackground`
-  MODIFY `educ_back_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `educ_back_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `tblcandemploymenthistory`
 --
 ALTER TABLE `tblcandemploymenthistory`
-  MODIFY `empH_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `empH_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `tblcandidates`
 --
 ALTER TABLE `tblcandidates`
-  MODIFY `cand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `cand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `tblcandknowledge`
+--
+ALTER TABLE `tblcandknowledge`
+  MODIFY `canknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tblcandlicense`
 --
 ALTER TABLE `tblcandlicense`
-  MODIFY `license_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `license_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `tblcandresume`
+--
+ALTER TABLE `tblcandresume`
+  MODIFY `canres_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `tblcandskills`
 --
 ALTER TABLE `tblcandskills`
-  MODIFY `skills_id` int(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `skills_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `tblcandtraining`
 --
 ALTER TABLE `tblcandtraining`
-  MODIFY `training_id` int(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `training_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `tblcourses`
@@ -3444,61 +3672,61 @@ ALTER TABLE `tblforgotpassword`
 -- AUTO_INCREMENT for table `tbljobpassing`
 --
 ALTER TABLE `tbljobpassing`
-  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tbljobseducation`
 --
 ALTER TABLE `tbljobseducation`
-  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tbljobsknowledge`
 --
 ALTER TABLE `tbljobsknowledge`
-  MODIFY `jknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `jknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tbljobsmaster`
 --
 ALTER TABLE `tbljobsmaster`
-  MODIFY `jobM_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `jobM_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tbljobsmasterduties`
 --
 ALTER TABLE `tbljobsmasterduties`
-  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `tbljobsskills`
 --
 ALTER TABLE `tbljobsskills`
-  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `tbljobstrainings`
 --
 ALTER TABLE `tbljobstrainings`
-  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `tbljobsworkexperience`
 --
 ALTER TABLE `tbljobsworkexperience`
-  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbllicensemaster`
 --
 ALTER TABLE `tbllicensemaster`
-  MODIFY `license_master_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `license_master_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
 
 --
 -- AUTO_INCREMENT for table `tbllicensetype`
 --
 ALTER TABLE `tbllicensetype`
-  MODIFY `license_type_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `license_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblpersonalknowledge`
@@ -3519,6 +3747,12 @@ ALTER TABLE `tblpersonaltraining`
   MODIFY `perT_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
+-- AUTO_INCREMENT for table `tblstatus`
+--
+ALTER TABLE `tblstatus`
+  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
 -- AUTO_INCREMENT for table `tblsupervisor`
 --
 ALTER TABLE `tblsupervisor`
@@ -3532,9 +3766,15 @@ ALTER TABLE `tblsupervisor`
 -- Constraints for table `tblapplications`
 --
 ALTER TABLE `tblapplications`
-  ADD CONSTRAINT `fk_app_status` FOREIGN KEY (`app_appSId`) REFERENCES `tblapplicationstatus` (`appS_id`),
   ADD CONSTRAINT `tblapplications_ibfk_1` FOREIGN KEY (`app_candId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `tblapplications_ibfk_2` FOREIGN KEY (`app_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
+
+--
+-- Constraints for table `tblapplicationstatus`
+--
+ALTER TABLE `tblapplicationstatus`
+  ADD CONSTRAINT `tblapplicationstatus_ibfk_1` FOREIGN KEY (`appS_appId`) REFERENCES `tblapplications` (`app_id`),
+  ADD CONSTRAINT `tblapplicationstatus_ibfk_2` FOREIGN KEY (`appS_statusId`) REFERENCES `tblstatus` (`status_id`);
 
 --
 -- Constraints for table `tblcandconsent`
@@ -3560,7 +3800,8 @@ ALTER TABLE `tblcandemploymenthistory`
 -- Constraints for table `tblcandknowledge`
 --
 ALTER TABLE `tblcandknowledge`
-  ADD CONSTRAINT `tblcandknowledge_ibfk_1` FOREIGN KEY (`canknow_canId`) REFERENCES `tblcandidates` (`cand_id`);
+  ADD CONSTRAINT `tblcandknowledge_ibfk_1` FOREIGN KEY (`canknow_canId`) REFERENCES `tblcandidates` (`cand_id`),
+  ADD CONSTRAINT `tblcandknowledge_ibfk_2` FOREIGN KEY (`canknow_knowledgeId`) REFERENCES `tblpersonalknowledge` (`knowledge_id`);
 
 --
 -- Constraints for table `tblcandlicense`
