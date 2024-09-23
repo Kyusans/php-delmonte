@@ -727,7 +727,7 @@ class Admin
     $pointsByCategory['education']['maxPoints'] = $result['max_educ_points'] ?? 0;
 
     // Experience Points
-    $sql = "SELECT SUM(DISTINCT jwe.jwork_points) AS exp_points, 
+    $sql = "SELECT SUM(jwe.jwork_points) AS exp_points, 
             (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :job_id) AS max_exp_points
             FROM tbljobsworkexperience jwe
             LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
@@ -741,7 +741,7 @@ class Admin
     $pointsByCategory['experience']['maxPoints'] = $result['max_exp_points'] ?? 0;
 
     // Skills Points
-    $sql = "SELECT SUM(DISTINCT js.jskills_points) AS skills_points, 
+    $sql = "SELECT SUM(js.jskills_points) AS skills_points, 
             (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :job_id) AS max_skills_points
             FROM tbljobsskills js
             LEFT JOIN tblcandskills cs ON js.jskills_skillsId = cs.skills_perSId
@@ -755,7 +755,7 @@ class Admin
     $pointsByCategory['skills']['maxPoints'] = $result['max_skills_points'] ?? 0;
 
     // Training Points
-    $sql = "SELECT SUM(DISTINCT jt.jtrng_points) AS training_points, 
+    $sql = "SELECT SUM(jt.jtrng_points) AS training_points, 
             (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :job_id) AS max_training_points
             FROM tbljobstrainings jt
             LEFT JOIN tblcandtraining ct ON jt.jtrng_trainingId = ct.training_perTId
