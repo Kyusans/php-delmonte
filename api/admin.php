@@ -691,6 +691,7 @@ class Admin
 
   function getCandidateProfile($json)
   {
+    // {"cand_id": 7, "job_id": 11}
     include "connection.php";
     $returnValue = [];
     $data = json_decode($json, true);
@@ -878,6 +879,51 @@ class Admin
     // Return results
     return json_encode($returnValue);
   }
+
+  function getJobInterviewDetails($json)
+  {
+    // {"jobId": 11}
+    include "connection.php";
+    $returnValue = [];
+    $data = json_decode($json, true);
+    $returnValue["interviewMaster"] = $this->getInterviewMaster($data['jobId']);
+    $returnValue["interviewCriteria"] = $this->getInterviewCriteria($data['jobId']);
+    $returnValue["interviewCandidate"] = $this->getInterviewCandidate();
+    return json_encode($returnValue);
+  }
+
+  function getInterviewMaster($jobId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $jobId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getInterviewCriteria($interviewId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblinterviewcriteria WHERE inter_criteria_interviewId = :interviewId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':interviewId', $interviewId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
+  function getInterviewCandidate()
+  {
+    include "connection.php";
+    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS FullName FROM tblapplications a
+            INNER JOIN tblapplicationstatus b ON b.appS_appId = a.app_id
+            INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
+            WHERE b.appS_statusId = 6";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : [];
+  }
+
 
   function addInterviewMaster($json)
   {
@@ -1170,6 +1216,9 @@ switch ($operation) {
     break;
   case "addInterviewMaster":
     echo $admin->addInterviewMaster($json);
+    break;
+  case "getJobInterviewDetails":
+    echo $admin->getJobInterviewDetails($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
