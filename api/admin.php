@@ -203,8 +203,12 @@ class Admin
     $stmt->execute();
     $returnValue["jobPassing"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) as FullName FROM tblapplications a 
-            INNER JOIN tblcandidates b ON a.app_candId = b.cand_id 
+    $sql = "SELECT b.cand_id, 
+            CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, e.status_name 
+            FROM tblapplications a
+            INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
+            INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
+            INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
             WHERE a.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -687,6 +691,7 @@ class Admin
 
   function getCandidateProfile($json)
   {
+    // {"cand_id": 7, "job_id": 11}
     include "connection.php";
     $returnValue = [];
     $data = json_decode($json, true);
@@ -727,7 +732,7 @@ class Admin
     $pointsByCategory['education']['maxPoints'] = $result['max_educ_points'] ?? 0;
 
     // Experience Points
-    $sql = "SELECT SUM(jwe.jwork_points) AS exp_points, 
+    $sql = "SELECT SUM(DISTINCT jwe.jwork_points) AS exp_points, 
             (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :job_id) AS max_exp_points
             FROM tbljobsworkexperience jwe
             LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
@@ -741,7 +746,7 @@ class Admin
     $pointsByCategory['experience']['maxPoints'] = $result['max_exp_points'] ?? 0;
 
     // Skills Points
-    $sql = "SELECT SUM(js.jskills_points) AS skills_points, 
+    $sql = "SELECT SUM(DISTINCT js.jskills_points) AS skills_points, 
             (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :job_id) AS max_skills_points
             FROM tbljobsskills js
             LEFT JOIN tblcandskills cs ON js.jskills_skillsId = cs.skills_perSId
@@ -755,7 +760,7 @@ class Admin
     $pointsByCategory['skills']['maxPoints'] = $result['max_skills_points'] ?? 0;
 
     // Training Points
-    $sql = "SELECT SUM(jt.jtrng_points) AS training_points, 
+    $sql = "SELECT SUM(DISTINCT jt.jtrng_points) AS training_points, 
             (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :job_id) AS max_training_points
             FROM tbljobstrainings jt
             LEFT JOIN tblcandtraining ct ON jt.jtrng_trainingId = ct.training_perTId
@@ -789,7 +794,7 @@ class Admin
     $criteria = [];
 
     // Education: Check if the candidate's education meets the job criteria
-    $sql = "SELECT c.course_categoryName, (CASE WHEN b.educ_coursesId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+    $sql = "SELECT DISTINCT c.course_categoryName, (CASE WHEN b.educ_coursesId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
             FROM tbljobseducation je
             INNER JOIN tblcoursescategory c ON je.jeduc_categoryId = c.course_categoryId
             LEFT JOIN tblcandeducbackground b ON b.educ_coursesId IN (
@@ -807,7 +812,7 @@ class Admin
     $criteria["education"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     // Experience: Check if the candidate's experience meets the job criteria
-    $sql = "SELECT jwe.jwork_responsibilities, 
+    $sql = "SELECT DISTINCT jwe.jwork_responsibilities, 
               (CASE WHEN ceh.empH_positionName IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobsworkexperience jwe
               LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
@@ -820,8 +825,8 @@ class Admin
     $criteria["experience"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     // Skills: Check if the candidate's skills meet the job criteria
-    $sql = "SELECT ps.perS_name, 
-                     (CASE WHEN cs.skills_perSId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
+    $sql = "SELECT DISTINCT ps.perS_name, 
+              (CASE WHEN cs.skills_perSId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobsskills js
               INNER JOIN tblpersonalskills ps ON js.jskills_skillsId = ps.perS_id
               LEFT JOIN tblcandskills cs ON cs.skills_perSId = ps.perS_id
@@ -834,7 +839,7 @@ class Admin
     $criteria["skills"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     // Training: Check if the candidate's training meets the job criteria
-    $sql = "SELECT pt.perT_name, 
+    $sql = "SELECT DISTINCT pt.perT_name, 
               (CASE WHEN ct.training_perTId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobstrainings jt
               INNER JOIN tblpersonaltraining pt ON jt.jtrng_trainingId = pt.perT_id
@@ -848,7 +853,7 @@ class Admin
     $criteria["training"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     // Knowledge: Check if the candidate's knowledge meets the job criteria
-    $sql = "SELECT pk.knowledge_name, 
+    $sql = "SELECT DISTINCT pk.knowledge_name, 
               (CASE WHEN ck.canknow_knowledgeId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobsknowledge jk
               INNER JOIN tblpersonalknowledge pk ON jk.jknow_knowledgeId = pk.knowledge_id
@@ -874,6 +879,132 @@ class Admin
     // Return results
     return json_encode($returnValue);
   }
+
+  function getJobInterviewDetails($json)
+  {
+    // {"jobId": 11}
+    include "connection.php";
+    $returnValue = [];
+    $data = json_decode($json, true);
+    $returnValue["interviewMaster"] = $this->getInterviewMaster($data['jobId']);
+    $returnValue["interviewCriteria"] = $this->getInterviewCriteria($data['jobId']);
+    $returnValue["interviewCandidate"] = $this->getInterviewCandidate();
+    return json_encode($returnValue);
+  }
+
+  function getInterviewMaster($jobId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $jobId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getInterviewCriteria($interviewId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblinterviewcriteria WHERE inter_criteria_interviewId = :interviewId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':interviewId', $interviewId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
+  function getInterviewCandidate()
+  {
+    include "connection.php";
+    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS FullName FROM tblapplications a
+            INNER JOIN tblapplicationstatus b ON b.appS_appId = a.app_id
+            INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
+            WHERE b.appS_statusId = 6";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : [];
+  }
+
+
+  function addInterviewMaster($json)
+  {
+    // {"master": {"jobId": 11, "passingPercentage": 60}, "details": [{"name": "Technical", "points": 10}, {"name": "Managerial", "points": 5}, {"name": "Leadership", "points": 15}]}
+    include "connection.php";
+    $conn->beginTransaction();
+    try {
+      $data = json_decode($json, true);
+      $master = $data['master'];
+      $details = $data['details'];
+      $sql = "INSERT INTO tblinterviewmaster(interviewM_jobId, interviewM_passingPercentage) VALUES (:jobId, :passingPercentage)";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $master['jobId']);
+      $stmt->bindParam(":passingPercentage", $master['passingPercentage']);
+      $stmt->execute();
+      $interviewId = $conn->lastInsertId();
+      $sql = "INSERT INTO tblinterviewcriteria(inter_criteria_interviewId, inter_criteria_name, inter_criteria_points) VALUES (:interviewId, :name, :points)";
+      $stmt = $conn->prepare($sql);
+      foreach ($details as $detail) {
+        $stmt->bindParam(":interviewId", $interviewId);
+        $stmt->bindParam(":name", $detail['name']);
+        $stmt->bindParam(":points", $detail['points']);
+        $stmt->execute();
+      }
+      $conn->commit();
+      return 1;
+    } catch (\Throwable $th) {
+      $conn->rollBack();
+      return 0;
+    }
+  }
+  
+  function updateInterviewMaster($json){
+    // {"jobId": 11, "passingPercentage": 100}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinterviewmaster SET interviewM_passingPercentage = :passingPercentage WHERE interviewM_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":passingPercentage", $data['passingPercentage']);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function updateInterviewCriteria($json){
+    // {"points": 200, "name": "Gwapa", "criteriaId": 2}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinterviewcriteria SET inter_criteria_points = :points, inter_criteria_name = :name WHERE inter_criteria_id = :criteriaId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":criteriaId", $data['criteriaId']);
+    $stmt->bindParam(":name", $data['name']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function addInterviewCriteria($json){
+    // {"points": 100, "name": "Wala pay uyab", "interviewId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinterviewcriteria(inter_criteria_interviewId, inter_criteria_name, inter_criteria_points) VALUES (:interviewId, :name, :points)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":interviewId", $data['interviewId']);
+    $stmt->bindParam(":name", $data['name']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function deleteInterviewCriteria($json){
+    // {"criteriaId": 2}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "DELETE FROM tblinterviewcriteria WHERE inter_criteria_id = :criteriaId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":criteriaId", $data['criteriaId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+  
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -976,9 +1107,6 @@ function calculateCandidatePoints($candId, $jobId)
     'percentage' => $percentage,
   ];
 }
-
-
-
 
 function recordExists($value, $table, $column)
 {
@@ -1135,6 +1263,24 @@ switch ($operation) {
     break;
   case "getCandidateProfile":
     echo $admin->getCandidateProfile($json);
+    break;
+  case "addInterviewMaster":
+    echo $admin->addInterviewMaster($json);
+    break;
+  case "getJobInterviewDetails":
+    echo $admin->getJobInterviewDetails($json);
+    break;
+  case "updateInterviewMaster":
+    echo $admin->updateInterviewMaster($json);
+    break;
+  case "updateInterviewCriteria":
+    echo $admin->updateInterviewCriteria($json);
+    break;
+  case "addInterviewCriteria":
+    echo $admin->addInterviewCriteria($json);
+    break;
+  case "deleteInterviewCriteria":
+    echo $admin->deleteInterviewCriteria($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
