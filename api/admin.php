@@ -955,6 +955,18 @@ class Admin
       return 0;
     }
   }
+
+  function updateInterviewMaster($json){
+    // {"jobId": 11, "passingPercentage": 100}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinterviewmaster SET interviewM_passingPercentage = :passingPercentage WHERE interviewM_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":passingPercentage", $data['passingPercentage']);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -1219,6 +1231,9 @@ switch ($operation) {
     break;
   case "getJobInterviewDetails":
     echo $admin->getJobInterviewDetails($json);
+    break;
+  case "updateInterviewMaster":
+    echo $admin->updateInterviewMaster($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
