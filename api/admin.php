@@ -967,6 +967,19 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function updateInterviewCriteria($json){
+    // {"points": 200, "name": "Gwapa", "criteriaId": 2}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinterviewcriteria SET inter_criteria_points = :points, inter_criteria_name = :name WHERE inter_criteria_id = :criteriaId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":criteriaId", $data['criteriaId']);
+    $stmt->bindParam(":name", $data['name']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -1234,6 +1247,9 @@ switch ($operation) {
     break;
   case "updateInterviewMaster":
     echo $admin->updateInterviewMaster($json);
+    break;
+  case "updateInterviewCriteria":
+    echo $admin->updateInterviewCriteria($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
