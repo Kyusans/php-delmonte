@@ -955,7 +955,7 @@ class Admin
       return 0;
     }
   }
-
+  
   function updateInterviewMaster($json){
     // {"jobId": 11, "passingPercentage": 100}
     include "connection.php";
@@ -980,6 +980,20 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function addInterviewCriteria($json){
+    // {"points": 100, "name": "Wala pay uyab", "interviewId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinterviewcriteria(inter_criteria_interviewId, inter_criteria_name, inter_criteria_points) VALUES (:interviewId, :name, :points)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":interviewId", $data['interviewId']);
+    $stmt->bindParam(":name", $data['name']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+  
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -1250,6 +1264,9 @@ switch ($operation) {
     break;
   case "updateInterviewCriteria":
     echo $admin->updateInterviewCriteria($json);
+    break;
+  case "addInterviewCriteria":
+    echo $admin->addInterviewCriteria($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
