@@ -993,6 +993,17 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function deleteInterviewCriteria($json){
+    // {"criteriaId": 2}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "DELETE FROM tblinterviewcriteria WHERE inter_criteria_id = :criteriaId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":criteriaId", $data['criteriaId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
   
 } //admin
 
@@ -1267,6 +1278,9 @@ switch ($operation) {
     break;
   case "addInterviewCriteria":
     echo $admin->addInterviewCriteria($json);
+    break;
+  case "deleteInterviewCriteria":
+    echo $admin->deleteInterviewCriteria($json);
     break;
   default:
     echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
