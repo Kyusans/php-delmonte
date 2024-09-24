@@ -214,6 +214,8 @@ class Admin
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $returnValue["interview"] = $this->getJobInterviewDetails($data['jobId']);
     foreach ($returnValue["candidates"] as &$candidate) {
       $candidate['points'] = calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
     }
@@ -880,16 +882,25 @@ class Admin
     return json_encode($returnValue);
   }
 
-  function getJobInterviewDetails($json)
+  function getJobInterviewDetails($jobId)
   {
-    // {"jobId": 11}
     include "connection.php";
     $returnValue = [];
-    $data = json_decode($json, true);
-    $returnValue["interviewMaster"] = $this->getInterviewMaster($data['jobId']);
-    $returnValue["interviewCriteria"] = $this->getInterviewCriteria($data['jobId']);
-    $returnValue["interviewCandidate"] = $this->getInterviewCandidate();
-    return json_encode($returnValue);
+
+    $interviewMaster = $this->getInterviewMaster($jobId);
+
+    if (!empty($interviewMaster)) {
+      $interviewId = $interviewMaster[0]['interviewM_id'];
+      $returnValue["interviewMaster"] = $interviewMaster;
+      $returnValue["interviewCriteria"] = $this->getInterviewCriteria($interviewId);
+    } else {
+      $returnValue["interviewMaster"] = 0;
+      $returnValue["interviewCriteria"] = 0;
+    }
+
+    $returnValue["interviewCandidate"] = $this->getInterviewCandidate($jobId);
+
+    return $returnValue;
   }
 
   function getInterviewMaster($jobId)
@@ -912,17 +923,19 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
-  function getInterviewCandidate()
+  function getInterviewCandidate($jobId)
   {
     include "connection.php";
     $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS FullName FROM tblapplications a
-            INNER JOIN tblapplicationstatus b ON b.appS_appId = a.app_id
-            INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
-            WHERE b.appS_statusId = 6";
+              INNER JOIN tblapplicationstatus b ON b.appS_appId = a.app_id
+              INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
+              WHERE b.appS_statusId = 6 AND a.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $jobId);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : [];
   }
+
 
 
   function addInterviewMaster($json)
@@ -955,8 +968,9 @@ class Admin
       return 0;
     }
   }
-  
-  function updateInterviewMaster($json){
+
+  function updateInterviewMaster($json)
+  {
     // {"jobId": 11, "passingPercentage": 100}
     include "connection.php";
     $data = json_decode($json, true);
@@ -968,7 +982,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function updateInterviewCriteria($json){
+  function updateInterviewCriteria($json)
+  {
     // {"points": 200, "name": "Gwapa", "criteriaId": 2}
     include "connection.php";
     $data = json_decode($json, true);
@@ -981,7 +996,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function addInterviewCriteria($json){
+  function addInterviewCriteria($json)
+  {
     // {"points": 100, "name": "Wala pay uyab", "interviewId": 1}
     include "connection.php";
     $data = json_decode($json, true);
@@ -994,7 +1010,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function deleteInterviewCriteria($json){
+  function deleteInterviewCriteria($json)
+  {
     // {"criteriaId": 2}
     include "connection.php";
     $data = json_decode($json, true);
@@ -1004,7 +1021,6 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
-  
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -1283,6 +1299,6 @@ switch ($operation) {
     echo $admin->deleteInterviewCriteria($json);
     break;
   default:
-    echo "WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO";
+    echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
     break;
 }
