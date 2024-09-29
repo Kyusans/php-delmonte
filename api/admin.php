@@ -203,6 +203,11 @@ class Admin
     $stmt->execute();
     $returnValue["jobPassing"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
+    $sql = "SELECT * FROM tblstatus";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $returnValue["status"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
     $sql = "SELECT b.cand_id, 
             CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, e.status_name 
             FROM tblapplications a
@@ -933,20 +938,20 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':jobId', $jobId);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : [];
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
 
 
   function addInterviewMaster($json)
   {
-    // {"master": {"jobId": 11, "passingPercentage": 60}, "details": [{"name": "Technical", "points": 10}, {"name": "Managerial", "points": 5}, {"name": "Leadership", "points": 15}]}
+    // {"master": {"jobId": 11, "passingPercentage": 60}, "detail": [{"name": "Technical", "points": 10}, {"name": "Managerial", "points": 5}, {"name": "Leadership", "points": 15}]}
     include "connection.php";
     $conn->beginTransaction();
     try {
       $data = json_decode($json, true);
       $master = $data['master'];
-      $details = $data['details'];
+      $details = $data['detail'];
       $sql = "INSERT INTO tblinterviewmaster(interviewM_jobId, interviewM_passingPercentage) VALUES (:jobId, :passingPercentage)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobId", $master['jobId']);
