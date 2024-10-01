@@ -208,13 +208,15 @@ class Admin
     $stmt->execute();
     $returnValue["status"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.cand_id, 
-            CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, e.status_name 
+    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, e.status_name
             FROM tblapplications a
             INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
             INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
             INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
-            WHERE a.app_jobMId = :jobId";
+            WHERE a.app_jobMId = :jobId
+            AND d.appS_date = (SELECT MAX(sub_d.appS_date) 
+            FROM tblapplicationstatus sub_d 
+            WHERE sub_d.appS_appId = d.appS_appId)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
@@ -1026,6 +1028,77 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function changeApplicantStatus($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $appId = $this->applicationIds($data['jobId'], $data['candId']);
+    $date = getCurrentDate();
+    $id = json_encode($appId[0]['app_id']);
+    $sql = "INSERT tblapplicationstatus(appS_appId, appS_statusId, appS_date) VALUES(:id, :status, :date)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":status", $data['status']);
+    $stmt->bindParam(":id", $id);
+    $stmt->bindParam(":date", $date);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function applicationIds($jobId, $candId)
+  {
+    include "connection.php";
+    $sql = "SELECT app_id FROM tblapplications WHERE app_jobMId = :jobId AND app_candId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
+  // para ni sa pag conduct og interview
+  function getCriteriaForInterview($json)
+  {
+
+    // {"jobId": 11}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $interviewMasterId = $this->getInterviewMasterId($data['jobId']);
+    if (empty($interviewMasterId)) return 0;
+    $id = json_encode($interviewMasterId[0]['interviewM_id']);
+    $sql = "SELECT * FROM tblinterviewcriteria WHERE inter_criteria_interviewId = :interviewMasterId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":interviewMasterId", $id);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getInterviewMasterId($jobId)
+  {
+    // {"jobId": 11}
+    include "connection.php";
+    $sql = "SELECT interviewM_id FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function scoreInterviewApplicant($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinterviewcandpoints(interviewP_criteriaId, interviewP_candId, interviewP_points) VALUES(:criteriaId, :candId, :points)";
+    $stmt = $conn->prepare($sql);
+    foreach ($data as $score) {
+      $stmt->execute([
+        ':criteriaId' => $score['criteriaId'],
+        ':candId' => $score['candId'],
+        ':points' => $score['points'],
+      ]);
+    }
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -1302,6 +1375,15 @@ switch ($operation) {
     break;
   case "deleteInterviewCriteria":
     echo $admin->deleteInterviewCriteria($json);
+    break;
+  case "changeApplicantStatus":
+    echo $admin->changeApplicantStatus($json);
+    break;
+  case "getCriteriaForInterview":
+    echo json_encode($admin->getCriteriaForInterview($json));
+    break;
+  case "scoreInterviewApplicant":
+    echo $admin->scoreInterviewApplicant($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
