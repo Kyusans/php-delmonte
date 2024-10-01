@@ -1057,13 +1057,28 @@ class Admin
   }
 
   // para ni sa pag conduct og interview
-  function getCriteriaForInterview($json){
+  function getCriteriaForInterview($json)
+  {
     // {"jobId": 11}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT * FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
+    $interviewMasterId = $this->getInterviewMasterId($data['jobId']);
+    if(empty($interviewMasterId)) return 0;
+    $id = json_encode($interviewMasterId[0]['interviewM_id']);
+    $sql = "SELECT * FROM tblinterviewcriteria WHERE inter_criteria_interviewId = :interviewMasterId";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->bindParam(":interviewMasterId", $id);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getInterviewMasterId($jobId)
+  {
+    // {"jobId": 11}
+    include "connection.php";
+    $sql = "SELECT interviewM_id FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $jobId);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
