@@ -1059,11 +1059,12 @@ class Admin
   // para ni sa pag conduct og interview
   function getCriteriaForInterview($json)
   {
+
     // {"jobId": 11}
     include "connection.php";
     $data = json_decode($json, true);
     $interviewMasterId = $this->getInterviewMasterId($data['jobId']);
-    if(empty($interviewMasterId)) return 0;
+    if (empty($interviewMasterId)) return 0;
     $id = json_encode($interviewMasterId[0]['interviewM_id']);
     $sql = "SELECT * FROM tblinterviewcriteria WHERE inter_criteria_interviewId = :interviewMasterId";
     $stmt = $conn->prepare($sql);
@@ -1081,6 +1082,22 @@ class Admin
     $stmt->bindParam(":jobId", $jobId);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function scoreInterviewApplicant($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinterviewcandpoints(interviewP_criteriaId, interviewP_candId, interviewP_points) VALUES(:criteriaId, :candId, :points)";
+    $stmt = $conn->prepare($sql);
+    foreach ($data as $score) {
+      $stmt->execute([
+        ':criteriaId' => $score['criteriaId'],
+        ':candId' => $score['candId'],
+        ':points' => $score['points'],
+      ]);
+    }
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } //admin
 
@@ -1364,6 +1381,9 @@ switch ($operation) {
     break;
   case "getCriteriaForInterview":
     echo json_encode($admin->getCriteriaForInterview($json));
+    break;
+  case "scoreInterviewApplicant":
+    echo $admin->scoreInterviewApplicant($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
