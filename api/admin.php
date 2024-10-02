@@ -1099,7 +1099,7 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function getCandInterviewScore($json)
+  function getCandInterviewResult($json)
   {
     $returnValue = [];
     // {"candId": 7, "jobId": 11}
@@ -1109,20 +1109,21 @@ class Admin
     $jobId = $data['jobId'];
     $interviewMasterId = $this->getInterviewMasterId($jobId);
     if (empty($interviewMasterId)) return 0;
-    $sql = "SELECT SUM(interviewP_points) as candPoints
-            FROM tblinterviewcandpoints 
-            WHERE interviewP_candId = :candId";
+    $sql = "SELECT SUM(interviewP_points) as candPoints FROM tblinterviewcandpoints a 
+            INNER JOIN tblinterviewcriteria b ON b.inter_criteria_id = a.interviewP_criteriaId
+            WHERE a.interviewP_candId = :candId AND b.inter_criteria_status = 1";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candId', $candId);
     $stmt->execute();
-    $returnValue['candTotalPoints'] = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
+    $candTotalPoints = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['candPoints'] : 0;
 
     $sql = "SELECT SUM(b.inter_criteria_points) as totalPoints FROM tblinterviewmaster a
             INNER JOIN tblinterviewcriteria b ON a.interviewM_id = b.inter_criteria_interviewId
-            WHERE a.interviewM_jobId = 11  AND b.inter_criteria_status = 1";
+            WHERE a.interviewM_jobId = :jobId AND b.inter_criteria_status = 1";
     $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $jobId);
     $stmt->execute();
-    $returnValue['totalPoints'] = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
+    $totalPoints = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['totalPoints'] : 0;
 
     $sql = "SELECT b.inter_criteria_name, b.inter_criteria_points as totalPoints, c.interviewP_points as candPoints FROM tblinterviewmaster a
             INNER JOIN tblinterviewcriteria b ON a.interviewM_id = b.inter_criteria_interviewId
@@ -1132,7 +1133,13 @@ class Admin
     $stmt->bindParam(':candId', $candId);
     $stmt->bindParam(':jobId', $jobId);
     $stmt->execute();
-    $returnValue['criteriaScore'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    $criteriaScore = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    if (empty($criteriaScore)) return 0;
+
+    $returnValue['candTotalPoints'] = $candTotalPoints;
+    $returnValue['totalPoints'] = $totalPoints;
+    $returnValue['criteriaScore'] = $criteriaScore;
 
     return json_encode($returnValue);
   }
@@ -1422,8 +1429,8 @@ switch ($operation) {
   case "scoreInterviewApplicant":
     echo $admin->scoreInterviewApplicant($json);
     break;
-  case "getCandInterviewScore":
-    echo $admin->getCandInterviewScore($json);
+  case "getCandInterviewResult":
+    echo $admin->getCandInterviewResult($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
