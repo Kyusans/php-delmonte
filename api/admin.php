@@ -34,7 +34,6 @@ class Admin
       $stmt->bindParam(":passing_jobId", $jobMasterId);
       $stmt->bindParam(":passing_points", $jobMaster['passingPercentage']);
       $stmt->execute();
-
       $sql = "INSERT INTO tbljobsmasterduties (duties_jobId, duties_text) VALUES (:duties_jobId, :duties_text)";
       foreach ($jobMasterDuties as $duty) {
         $stmt = $conn->prepare($sql);
@@ -42,43 +41,42 @@ class Admin
         $stmt->bindParam(":duties_text", $duty['duties']);
         $stmt->execute();
       }
-
-      $sql = "INSERT INTO tbljobseducation (jeduc_jobId, jeduc_text, jeduc_categoryId, jeduc_points) VALUES (:jeduc_jobId, :jeduc_text, :jeduc_categoryId, :points)";
+      // jeduc_text
+      $sql = "INSERT INTO tbljobseducation (jeduc_jobId, jeduc_categoryId, jeduc_points) VALUES (:jeduc_jobId, :jeduc_categoryId, :points)";
       foreach ($jobEducation as $education) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jeduc_jobId", $jobMasterId);
-        $stmt->bindParam(":jeduc_text", $education['jobEducation']);
+        // $stmt->bindParam(":jeduc_text", $education['jobEducation']);
         $stmt->bindParam(":jeduc_categoryId", $education['courseCategory']);
         $stmt->bindParam(":points", $education['points']);
         $stmt->execute();
       }
-
-      $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_trainingId, jtrng_points) VALUES (:jtrng_jobId, :jtrng_text, :jtrng_trainingId, :points)";
+      // jtrng_text
+      $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_trainingId, jtrng_points) VALUES (:jtrng_jobId, :jtrng_trainingId, :points)";
       foreach ($jobTraining as $training) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jtrng_jobId", $jobMasterId);
-        $stmt->bindParam(":jtrng_text", $training['jobTraining']);
+        // $stmt->bindParam(":jtrng_text", $training['jobTraining']);
         $stmt->bindParam(":jtrng_trainingId", $training['training']);
         $stmt->bindParam(":points", $training['points']);
         $stmt->execute();
       }
-
-      $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_text, jknow_knowledgeId, jknow_points) VALUES (:jknow_jobId, :jknow_text, :jknow_knowledgeId, :points)";
-      // $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_text) VALUES (:jknow_jobId, :jknow_text)";
+      // jknow_text
+      $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_knowledgeId, jknow_points) VALUES (:jknow_jobId, :jknow_knowledgeId, :points)";
       foreach ($jobKnowledge as $knowledge) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jknow_jobId", $jobMasterId);
-        $stmt->bindParam(":jknow_text", $knowledge['jobKnowledge']);
+        // $stmt->bindParam(":jknow_text", $knowledge['jobKnowledge']);
         $stmt->bindParam(":jknow_knowledgeId", $knowledge['knowledgeId']);
         $stmt->bindParam(":points", $knowledge['points']);
         $stmt->execute();
       }
-
-      $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_text, jskills_skillsId, jskills_points) VALUES (:jskills_jobId, :jskills_text, :jskills_skillsId, :points)";
+      // jskills_text
+      $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_skillsId, jskills_points) VALUES (:jskills_jobId, :jskills_skillsId, :points)";
       foreach ($jobSkills as $skill) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jskills_jobId", $jobMasterId);
-        $stmt->bindParam(":jskills_text", $skill['jobSkill']);
+        // $stmt->bindParam(":jskills_text", $skill['jobSkill']);
         $stmt->bindParam(":jskills_skillsId", $skill['skill']);
         $stmt->bindParam(":points", $skill['points']);
         $stmt->execute();
@@ -167,25 +165,33 @@ class Admin
     $stmt->execute();
     $returnValue["jobDuties"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT * FROM tbljobseducation WHERE jeduc_jobId  = :jobId";
+    $sql = "SELECT a.*, b.course_categoryName  FROM tbljobseducation a 
+            INNER JOIN tblcoursescategory b ON b.course_categoryId = a.jeduc_categoryId
+            WHERE jeduc_jobId  = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     $returnValue["jobEducation"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT * FROM tbljobstrainings WHERE jtrng_jobId  = :jobId";
+    $sql = "SELECT a.*, b.perT_name FROM tbljobstrainings a
+            INNER JOIN tblpersonaltraining b ON b.perT_id = a.jtrng_trainingId
+            WHERE jtrng_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     $returnValue["jobTrainings"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT * FROM tbljobsknowledge WHERE jknow_jobId  = :jobId";
+    $sql = "SELECT a.*, b.knowledge_name FROM tbljobsknowledge a
+            INNER JOIN tblpersonalknowledge b ON b.knowledge_id = a.jknow_knowledgeId
+            WHERE jknow_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     $returnValue["jobKnowledge"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT * FROM tbljobsskills WHERE jskills_jobId  = :jobId";
+    $sql = "SELECT a.*, b.perS_name FROM tbljobsskills a
+            INNER JOIN tblpersonalskills b ON b.perS_id = a.jskills_skillsId
+            WHERE jskills_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
@@ -1107,8 +1113,14 @@ class Admin
     $data = json_decode($json, true);
     $candId = $data['candId'];
     $jobId = $data['jobId'];
-    $interviewMasterId = $this->getInterviewMasterId($jobId);
-    if (empty($interviewMasterId)) return 0;
+
+    $sql = "SELECT interviewM_passingPercentage FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    $passingPercentage = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
+    // return json_encode($passingPercentage["interviewM_passingPercentage"]);
+
     $sql = "SELECT SUM(interviewP_points) as candPoints FROM tblinterviewcandpoints a 
             INNER JOIN tblinterviewcriteria b ON b.inter_criteria_id = a.interviewP_criteriaId
             WHERE a.interviewP_candId = :candId AND b.inter_criteria_status = 1";
@@ -1137,9 +1149,12 @@ class Admin
 
     if (empty($criteriaScore)) return 0;
 
+    $candidatePercentage = ($candTotalPoints / $totalPoints) * 100;
+
     $returnValue['candTotalPoints'] = $candTotalPoints;
     $returnValue['totalPoints'] = $totalPoints;
     $returnValue['criteriaScore'] = $criteriaScore;
+    $returnValue['isPassed'] = $candidatePercentage <= $passingPercentage["interviewM_passingPercentage"] ? 0 : 1;
 
     return json_encode($returnValue);
   }
