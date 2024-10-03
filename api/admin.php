@@ -380,15 +380,14 @@ class Admin
 
   function addJobEducation($json)
   {
-    // {"points": 10, "courseCategory": 3, "jobEducation": "jobEducation", "jobId": 11}
+    // {"points": 10, "courseCategory": 3, "jobId": 11}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobseducation (jeduc_points, jeduc_categoryId, jeduc_jobId, jeduc_text) VALUES (:points, :courseCategory, :jobId, :jobEducation)";
+    $sql = "INSERT INTO tbljobseducation (jeduc_points, jeduc_categoryId, jeduc_jobId) VALUES (:points, :courseCategory, :jobId)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":courseCategory", $data['courseCategory']);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":jobEducation", $data['jobEducation']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -449,14 +448,13 @@ class Admin
 
   function addJobSkills($json)
   {
-    // {"jobId": 11, "skillText": "skills", "skillId": 3, "points": 10}
+    // {"jobId": 11, "skillId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_text, jskills_skillsId, jskills_points) 
-            VALUES (:jobId, :skillText, :skillId, :points)";
+    $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_skillsId, jskills_points) 
+            VALUES (:jobId, :skillId, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":skillText", $data['skillText']);
     $stmt->bindParam(":skillId", $data['skillId']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
@@ -489,14 +487,13 @@ class Admin
 
   function addJobTraining($json)
   {
-    // {"jobId": 11, "trainingText": "training", "trainingId": 3, "points": 10}
+    // {"jobId": 11, "trainingId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_trainingId, jtrng_points) 
-            VALUES (:jobId, :trainingText, :trainingId, :points)";
+    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_trainingId, jtrng_points) 
+            VALUES (:jobId, :trainingId, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":trainingText", $data['trainingText']);
     $stmt->bindParam(":trainingId", $data['trainingId']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
@@ -599,13 +596,12 @@ class Admin
 
   function addJobKnowledge($json)
   {
-    // {"jobId": 11, "knowledgeText": "knowledge", "points": 10, "knowledgeId": 2}
+    // {"jobId": 11, "points": 10, "knowledgeId": 2}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobsknowledge(jknow_jobId, jknow_text, jknow_points, jknow_knowledgeId) VALUES (:jobId, :knowledgeText, :points, :knowledgeId)";
+    $sql = "INSERT INTO tbljobsknowledge(jknow_jobId, jknow_points, jknow_knowledgeId) VALUES (:jobId, :points, :knowledgeId)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":knowledgeText", $data['knowledgeText']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":knowledgeId", $data['knowledgeId']);
     $stmt->execute();
