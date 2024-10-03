@@ -380,29 +380,27 @@ class Admin
 
   function addJobEducation($json)
   {
-    // {"points": 10, "courseCategory": 3, "jobEducation": "jobEducation", "jobId": 11}
+    // {"points": 10, "courseCategory": 3, "jobId": 11}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobseducation (jeduc_points, jeduc_categoryId, jeduc_jobId, jeduc_text) VALUES (:points, :courseCategory, :jobId, :jobEducation)";
+    $sql = "INSERT INTO tbljobseducation (jeduc_points, jeduc_categoryId, jeduc_jobId) VALUES (:points, :courseCategory, :jobId)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":courseCategory", $data['courseCategory']);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":jobEducation", $data['jobEducation']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
   function updateJobEducation($json)
   {
-    // {"points": 10, "courseCategory": 3, "educationText": "jobEducation", "jobId": 11, "id": 1}
+    // {"points": 10, "courseCategory": 3, "jobId": 11, "id": 1}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tbljobseducation SET jeduc_points = :points, jeduc_categoryId = :courseCategory, jeduc_text = :educationText WHERE jeduc_id = :id";
+    $sql = "UPDATE tbljobseducation SET jeduc_points = :points, jeduc_categoryId = :courseCategory WHERE jeduc_id = :id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":courseCategory", $data['courseCategory']);
-    $stmt->bindParam(":educationText", $data['educationText']);
     $stmt->bindParam(":id", $data['id']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
@@ -434,12 +432,11 @@ class Admin
 
   function updateJobSkills($json)
   {
-    // {"id": 3, "skillText": "skills", "skillId": 3, "points": 10}
+    // {"id": 3, "skillId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tbljobsskills SET jskills_text = :skillText, jskills_skillsId = :skillId, jskills_points = :points WHERE jskills_id = :id";
+    $sql = "UPDATE tbljobsskills SET jskills_skillsId = :skillId, jskills_points = :points WHERE jskills_id = :id";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":skillText", $data['skillText']);
     $stmt->bindParam(":skillId", $data['skillId']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":id", $data['id']);
@@ -449,14 +446,13 @@ class Admin
 
   function addJobSkills($json)
   {
-    // {"jobId": 11, "skillText": "skills", "skillId": 3, "points": 10}
+    // {"jobId": 11, "skillId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_text, jskills_skillsId, jskills_points) 
-            VALUES (:jobId, :skillText, :skillId, :points)";
+    $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_skillsId, jskills_points) 
+            VALUES (:jobId, :skillId, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":skillText", $data['skillText']);
     $stmt->bindParam(":skillId", $data['skillId']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
@@ -489,14 +485,13 @@ class Admin
 
   function addJobTraining($json)
   {
-    // {"jobId": 11, "trainingText": "training", "trainingId": 3, "points": 10}
+    // {"jobId": 11, "trainingId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_trainingId, jtrng_points) 
-            VALUES (:jobId, :trainingText, :trainingId, :points)";
+    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_trainingId, jtrng_points) 
+            VALUES (:jobId, :trainingId, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":trainingText", $data['trainingText']);
     $stmt->bindParam(":trainingId", $data['trainingId']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
@@ -505,10 +500,10 @@ class Admin
 
   function updateJobTraining($json)
   {
-    // {"id": 10, "trainingText": "trainingsssssss", "trainingId": 3, "points": 10}
+    // {"id": 10, "trainingId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tbljobstrainings SET jtrng_text = :trainingText, jtrng_trainingId = :trainingId, jtrng_points = :points WHERE jtrng_id = :id";
+    $sql = "UPDATE tbljobstrainings SET jtrng_trainingId = :trainingId, jtrng_points = :points WHERE jtrng_id = :id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":trainingText", $data['trainingText']);
     $stmt->bindParam(":trainingId", $data['trainingId']);
@@ -599,13 +594,12 @@ class Admin
 
   function addJobKnowledge($json)
   {
-    // {"jobId": 11, "knowledgeText": "knowledge", "points": 10, "knowledgeId": 2}
+    // {"jobId": 11, "points": 10, "knowledgeId": 2}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobsknowledge(jknow_jobId, jknow_text, jknow_points, jknow_knowledgeId) VALUES (:jobId, :knowledgeText, :points, :knowledgeId)";
+    $sql = "INSERT INTO tbljobsknowledge(jknow_jobId, jknow_points, jknow_knowledgeId) VALUES (:jobId, :points, :knowledgeId)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":knowledgeText", $data['knowledgeText']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":knowledgeId", $data['knowledgeId']);
     $stmt->execute();
@@ -614,12 +608,11 @@ class Admin
 
   function updateJobKnowledge($json)
   {
-    // {"id": 11, "knowledgeText": "knowledge NATIN TO", "points": 10, "knowledgeId": 2}
+    // {"id": 11, "points": 10, "knowledgeId": 2}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tbljobsknowledge SET jknow_text = :knowledgeText, jknow_points = :points, jknow_knowledgeId = :knowledgeId WHERE jknow_id = :id";
+    $sql = "UPDATE tbljobsknowledge SET jknow_points = :points, jknow_knowledgeId = :knowledgeId WHERE jknow_id = :id";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":knowledgeText", $data['knowledgeText']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":knowledgeId", $data['knowledgeId']);
     $stmt->bindParam(":id", $data['id']);
