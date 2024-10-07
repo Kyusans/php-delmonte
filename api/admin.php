@@ -1106,7 +1106,8 @@ class Admin
     $data = json_decode($json, true);
     $candId = $data['candId'];
     $jobId = $data['jobId'];
-
+    $interviewMasterId = json_encode($this->getInterviewMasterId($jobId)[0]['interviewM_id']);
+    $id = $interviewMasterId; 
     $sql = "SELECT interviewM_passingPercentage FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $jobId);
@@ -1116,9 +1117,11 @@ class Admin
 
     $sql = "SELECT SUM(interviewP_points) as candPoints FROM tblinterviewcandpoints a 
             INNER JOIN tblinterviewcriteria b ON b.inter_criteria_id = a.interviewP_criteriaId
-            WHERE a.interviewP_candId = :candId AND b.inter_criteria_status = 1";
+            INNER JOIN tblinterviewmaster c ON c.interviewM_id = b.inter_criteria_interviewId
+            WHERE a.interviewP_candId = :candId AND b.inter_criteria_status = 1 AND c.interviewM_id = :interviewMasterId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candId', $candId);
+    $stmt->bindParam("interviewMasterId", $id);
     $stmt->execute();
     $candTotalPoints = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['candPoints'] : 0;
 
