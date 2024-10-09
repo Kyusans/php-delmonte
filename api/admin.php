@@ -920,20 +920,35 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function addInterviewCriteriaMaster($json){
+  function addInterviewCriteriaMaster($json)
+  {
     // {"jobId": 11, "criteriaId": 7, "points": 100}
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "INSERT INTO tblinterviewcriteriamaster(inter_criteria_jobId, inter_criteria_criteriaId, inter_criteria_points)
             VALUES (:jobId, :criteriaId, :points)";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $data['jobId']); 
+    $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->bindParam(":criteriaId", $data['criteriaId']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+  function getInterviewCriteriaMaster($json)
+  {
+    // {"jobId": 11}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT a.inter_criteria_id, b.criteria_inter_name, c.interview_categ_name, a.inter_criteria_points FROM tblinterviewcriteriamaster a 
+            INNER JOIN tblinterviewcriteria b ON b.criteria_inter_id = a.inter_criteria_criteriaId
+            INNER JOIN tblinterviewcategory c ON c.interview_categ_id = b.criteria_inter_categId
+            WHERE inter_criteria_jobId = :jobId AND a.inter_criteria_status = 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 
   function deleteInterviewCriteria($json)
   {
@@ -1265,6 +1280,9 @@ switch ($operation) {
     break;
   case "addInterviewCriteriaMaster":
     echo $admin->addInterviewCriteriaMaster($json);
+    break;
+  case "getInterviewCriteriaMaster":
+    echo json_encode($admin->getInterviewCriteriaMaster($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
