@@ -91,6 +91,11 @@ class Admin
         $stmt->bindParam(":points", $experience['points']);
         $stmt->execute();
       }
+
+      $sql = "INSERT INTO tblinterviewpassingpercent(passing_jobId, passing_percent) VALUES (:passing_jobId, 50)";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":passing_jobId", $jobMasterId);
+      $stmt->execute();
       $conn->commit();
       return 1;
     } catch (PDOException $th) {
@@ -892,136 +897,50 @@ class Admin
   {
     include "connection.php";
     $returnValue = [];
-
-    $interviewMaster = $this->getInterviewMaster($jobId);
-
-    if (!empty($interviewMaster)) {
-      $interviewId = $interviewMaster[0]['interviewM_id'];
-      $returnValue["interviewMaster"] = $interviewMaster;
-      $returnValue["interviewCriteria"] = $this->getInterviewCriteria($interviewId);
-    } else {
-      $returnValue["interviewMaster"] = 0;
-      $returnValue["interviewCriteria"] = 0;
-    }
-
-    $returnValue["interviewCandidate"] = $this->getInterviewCandidate($jobId);
-
+    $returnValue["interviewPassingPercent"] = $this->getInterviewPassingPercent($jobId);
     return $returnValue;
   }
 
-  function getInterviewMaster($jobId)
+  function getInterviewPassingPercent($jobId)
   {
     include "connection.php";
-    $sql = "SELECT * FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
+    $sql = "SELECT passing_percent FROM tblinterviewpassingpercent WHERE passing_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':jobId', $jobId);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getInterviewCriteria($interviewId)
+  function getInterviewCategory()
   {
     include "connection.php";
-    $sql = "SELECT * FROM tblinterviewcriteria WHERE inter_criteria_interviewId = :interviewId AND inter_criteria_status = 1";
+    $sql = "SELECT * FROM tblinterviewcategory WHERE interview_categ_status = 1";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':interviewId', $interviewId);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getInterviewCandidate($jobId)
-  {
-    include "connection.php";
-    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS FullName FROM tblapplications a
-              INNER JOIN tblapplicationstatus b ON b.appS_appId = a.app_id
-              INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
-              WHERE b.appS_statusId = 6 AND a.app_jobMId = :jobId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':jobId', $jobId);
-    $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-  }
-
-
-
-  function addInterviewMaster($json)
-  {
-    // {"master": {"jobId": 11, "passingPercentage": 60}, "detail": [{"name": "Technical", "points": 10}, {"name": "Managerial", "points": 5}, {"name": "Leadership", "points": 15}]}
-    include "connection.php";
-    $conn->beginTransaction();
-    try {
-      $data = json_decode($json, true);
-      $master = $data['master'];
-      $details = $data['detail'];
-      $sql = "INSERT INTO tblinterviewmaster(interviewM_jobId, interviewM_passingPercentage) VALUES (:jobId, :passingPercentage)";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(":jobId", $master['jobId']);
-      $stmt->bindParam(":passingPercentage", $master['passingPercentage']);
-      $stmt->execute();
-      $interviewId = $conn->lastInsertId();
-      $sql = "INSERT INTO tblinterviewcriteria(inter_criteria_interviewId, inter_criteria_name, inter_criteria_points) VALUES (:interviewId, :name, :points)";
-      $stmt = $conn->prepare($sql);
-      foreach ($details as $detail) {
-        $stmt->bindParam(":interviewId", $interviewId);
-        $stmt->bindParam(":name", $detail['name']);
-        $stmt->bindParam(":points", $detail['points']);
-        $stmt->execute();
-      }
-      $conn->commit();
-      return 1;
-    } catch (\Throwable $th) {
-      $conn->rollBack();
-      return 0;
-    }
-  }
-
-  function updateInterviewMaster($json)
-  {
-    // {"jobId": 11, "passingPercentage": 100}
+  function addInterviewCriteriaMaster($json){
+    // {"jobId": 11, "criteriaId": 7, "points": 100}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tblinterviewmaster SET interviewM_passingPercentage = :passingPercentage WHERE interviewM_jobId = :jobId";
+    $sql = "INSERT INTO tblinterviewcriteriamaster(inter_criteria_jobId, inter_criteria_criteriaId, inter_criteria_points)
+            VALUES (:jobId, :criteriaId, :points)";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":passingPercentage", $data['passingPercentage']);
-    $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->execute();
-    return $stmt->rowCount() > 0 ? 1 : 0;
-  }
-
-  function updateInterviewCriteria($json)
-  {
-    // {"points": 200, "name": "Gwapa", "criteriaId": 2}
-    include "connection.php";
-    $data = json_decode($json, true);
-    $sql = "UPDATE tblinterviewcriteria SET inter_criteria_points = :points, inter_criteria_name = :name WHERE inter_criteria_id = :criteriaId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":jobId", $data['jobId']); 
     $stmt->bindParam(":criteriaId", $data['criteriaId']);
-    $stmt->bindParam(":name", $data['name']);
-    $stmt->execute();
-    return $stmt->rowCount() > 0 ? 1 : 0;
-  }
-
-  function addInterviewCriteria($json)
-  {
-    // {"points": 100, "name": "Wala pay uyab", "interviewId": 1}
-    include "connection.php";
-    $data = json_decode($json, true);
-    $sql = "INSERT INTO tblinterviewcriteria(inter_criteria_interviewId, inter_criteria_name, inter_criteria_points) VALUES (:interviewId, :name, :points)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":interviewId", $data['interviewId']);
-    $stmt->bindParam(":name", $data['name']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
 
   function deleteInterviewCriteria($json)
   {
     // {"criteriaId": 2}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tblinterviewcriteria SET inter_criteria_status = 0 WHERE inter_criteria_id = :criteriaId";
+    $sql = "UPDATE tblinterviewcriteriamaster SET inter_criteria_status = 0 WHERE inter_criteria_id = :criteriaId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":criteriaId", $data['criteriaId']);
     $stmt->execute();
@@ -1055,33 +974,6 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
-  // para ni sa pag conduct og interview
-  function getCriteriaForInterview($json)
-  {
-    // {"jobId": 11}
-    include "connection.php";
-    $data = json_decode($json, true);
-    $interviewMasterId = $this->getInterviewMasterId($data['jobId']);
-    if (empty($interviewMasterId)) return 0;
-    $id = json_encode($interviewMasterId[0]['interviewM_id']);
-    $sql = "SELECT * FROM tblinterviewcriteria WHERE inter_criteria_interviewId = :interviewMasterId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":interviewMasterId", $id);
-    $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
-  }
-
-  function getInterviewMasterId($jobId)
-  {
-    // {"jobId": 11}
-    include "connection.php";
-    $sql = "SELECT interviewM_id FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $jobId);
-    $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
-  }
-
   function scoreInterviewApplicant($json)
   {
     include "connection.php";
@@ -1096,63 +988,6 @@ class Admin
       ]);
     }
     return $stmt->rowCount() > 0 ? 1 : 0;
-  }
-
-  function getCandInterviewResult($json)
-  {
-    $returnValue = [];
-    // {"candId": 7, "jobId": 11}
-    include "connection.php";
-    $data = json_decode($json, true);
-    $candId = $data['candId'];
-    $jobId = $data['jobId'];
-    $interviewMasterId = json_encode($this->getInterviewMasterId($jobId)[0]['interviewM_id']);
-    $id = $interviewMasterId; 
-    $sql = "SELECT interviewM_passingPercentage FROM tblinterviewmaster WHERE interviewM_jobId = :jobId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $jobId);
-    $stmt->execute();
-    $passingPercentage = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
-    // return json_encode($passingPercentage["interviewM_passingPercentage"]);
-
-    $sql = "SELECT SUM(interviewP_points) as candPoints FROM tblinterviewcandpoints a 
-            INNER JOIN tblinterviewcriteria b ON b.inter_criteria_id = a.interviewP_criteriaId
-            INNER JOIN tblinterviewmaster c ON c.interviewM_id = b.inter_criteria_interviewId
-            WHERE a.interviewP_candId = :candId AND b.inter_criteria_status = 1 AND c.interviewM_id = :interviewMasterId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':candId', $candId);
-    $stmt->bindParam("interviewMasterId", $id);
-    $stmt->execute();
-    $candTotalPoints = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['candPoints'] : 0;
-
-    $sql = "SELECT SUM(b.inter_criteria_points) as totalPoints FROM tblinterviewmaster a
-            INNER JOIN tblinterviewcriteria b ON a.interviewM_id = b.inter_criteria_interviewId
-            WHERE a.interviewM_jobId = :jobId AND b.inter_criteria_status = 1";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':jobId', $jobId);
-    $stmt->execute();
-    $totalPoints = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['totalPoints'] : 0;
-
-    $sql = "SELECT b.inter_criteria_name, b.inter_criteria_points as totalPoints, c.interviewP_points as candPoints FROM tblinterviewmaster a
-            INNER JOIN tblinterviewcriteria b ON a.interviewM_id = b.inter_criteria_interviewId
-            INNER JOIN tblinterviewcandpoints c ON b.inter_criteria_id = c.interviewP_criteriaId
-            WHERE a.interviewM_jobId = :jobId AND c.interviewP_candId = :candId AND b.inter_criteria_status = 1";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':candId', $candId);
-    $stmt->bindParam(':jobId', $jobId);
-    $stmt->execute();
-    $criteriaScore = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-
-    if (empty($criteriaScore)) return 0;
-
-    $candidatePercentage = ($candTotalPoints / $totalPoints) * 100;
-
-    $returnValue['candTotalPoints'] = $candTotalPoints;
-    $returnValue['totalPoints'] = $totalPoints;
-    $returnValue['criteriaScore'] = $criteriaScore;
-    $returnValue['isPassed'] = $candidatePercentage <= $passingPercentage["interviewM_passingPercentage"] ? 0 : 1;
-
-    return json_encode($returnValue);
   }
 } //admin
 
@@ -1413,20 +1248,8 @@ switch ($operation) {
   case "getCandidateProfile":
     echo $admin->getCandidateProfile($json);
     break;
-  case "addInterviewMaster":
-    echo $admin->addInterviewMaster($json);
-    break;
   case "getJobInterviewDetails":
     echo $admin->getJobInterviewDetails($json);
-    break;
-  case "updateInterviewMaster":
-    echo $admin->updateInterviewMaster($json);
-    break;
-  case "updateInterviewCriteria":
-    echo $admin->updateInterviewCriteria($json);
-    break;
-  case "addInterviewCriteria":
-    echo $admin->addInterviewCriteria($json);
     break;
   case "deleteInterviewCriteria":
     echo $admin->deleteInterviewCriteria($json);
@@ -1434,14 +1257,14 @@ switch ($operation) {
   case "changeApplicantStatus":
     echo $admin->changeApplicantStatus($json);
     break;
-  case "getCriteriaForInterview":
-    echo json_encode($admin->getCriteriaForInterview($json));
-    break;
   case "scoreInterviewApplicant":
     echo $admin->scoreInterviewApplicant($json);
     break;
-  case "getCandInterviewResult":
-    echo $admin->getCandInterviewResult($json);
+  case "getInterviewCategory":
+    echo json_encode($admin->getInterviewCategory());
+    break;
+  case "addInterviewCriteriaMaster":
+    echo $admin->addInterviewCriteriaMaster($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
