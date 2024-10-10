@@ -1027,6 +1027,17 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+  function getCriteriaForInterview($json)
+  {
+    // {"jobId": 11}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tblinterviewcriteriamaster WHERE inter_criteria_jobId = :jobId AND inter_criteria_status = 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -1312,6 +1323,9 @@ switch ($operation) {
     break;
   case "getCriteriaAndCategory":
     echo $admin->getCriteriaAndCategory($json);
+    break;
+  case "getCriteriaForInterview":
+    echo json_encode($admin->getCriteriaForInterview($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
