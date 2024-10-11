@@ -979,10 +979,11 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tblinterviewcandpoints(interviewP_criteriaId, interviewP_candId, interviewP_points) VALUES(:criteriaId, :candId, :points)";
+    $sql = "INSERT INTO tblinterviewcandpoints(interviewP_jobId, interviewP_criteriaId, interviewP_candId, interviewP_points) VALUES(:jobId, :criteriaId, :candId, :points)";
     $stmt = $conn->prepare($sql);
     foreach ($data as $score) {
       $stmt->execute([
+        ':jobId' => $score['jobId'],
         ':criteriaId' => $score['criteriaId'],
         ':candId' => $score['candId'],
         ':points' => $score['points'],
@@ -1032,11 +1033,41 @@ class Admin
     // {"jobId": 11}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT * FROM tblinterviewcriteriamaster WHERE inter_criteria_jobId = :jobId AND inter_criteria_status = 1";
+    $sql = "SELECT a.inter_criteria_id, a.inter_criteria_points, b.criteria_inter_name, c.interview_categ_name FROM tblinterviewcriteriamaster a
+            INNER JOIN tblinterviewcriteria b ON b.criteria_inter_id = a.inter_criteria_criteriaId
+            INNER JOIN tblinterviewcategory c ON c.interview_categ_id = b.criteria_inter_categId
+            WHERE inter_criteria_jobId = :jobId AND inter_criteria_status = 1
+            ORDER BY b.criteria_inter_categId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getCandInterviewResult($json)
+  {
+    // {"candId": 6, "jobId": 11}
+    $returnValue = [];
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT a.interviewP_points AS CandPoints, b.inter_criteria_points AS CriteriaPoint, c.criteria_inter_name FROM tblinterviewcandpoints a
+            INNER JOIN tblinterviewcriteriamaster b ON b.inter_criteria_id = a.interviewP_criteriaId
+            INNER JOIN tblinterviewcriteria c ON c.criteria_inter_id = b.inter_criteria_criteriaId
+            WHERE b.inter_criteria_status = 1 AND a.interviewP_candId = :candId AND b.inter_criteria_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':candId', $data['candId']);
+    $stmt->bindParam(':jobId', $data['jobId']);
+    $stmt->execute();
+    $returnValue["candCriteriaPoints"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    $sql = "SELECT SUM(a.interviewP_points) as candTotalPoints, SUM(b.inter_criteria_points) as criteriaTotalPoints FROM tblinterviewcandpoints a
+            INNER JOIN tblinterviewcriteriamaster b ON b.inter_criteria_id = a.interviewP_criteriaId
+            WHERE interviewP_candId = :candId AND interviewP_jobId = :jobId AND b.inter_criteria_status = 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':candId', $data['candId']);
+    $stmt->bindParam(':jobId', $data['jobId']);
+    $stmt->execute();
+    $returnValue["totalPoints"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    return json_encode($returnValue);
   }
 } //admin
 
@@ -1326,6 +1357,9 @@ switch ($operation) {
     break;
   case "getCriteriaForInterview":
     echo json_encode($admin->getCriteriaForInterview($json));
+    break;
+  case "getCandInterviewResult":
+    echo $admin->getCandInterviewResult($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
