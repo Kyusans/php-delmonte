@@ -1069,6 +1069,19 @@ class Admin
     $returnValue["totalPoints"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
     return json_encode($returnValue);
   }
+
+  function updateJobPassingPercent($json)
+  {
+    // {"jobId": 11, "passingPercent": 80}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobpassing SET passing_points = :passingPercent WHERE passing_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $data['jobId']);
+    $stmt->bindParam(':passingPercent', $data['passingPercent']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function calculateCandidatePoints($candId, $jobId)
@@ -1360,6 +1373,9 @@ switch ($operation) {
     break;
   case "getCandInterviewResult":
     echo $admin->getCandInterviewResult($json);
+    break;
+  case "updateJobPassingPercent":
+    echo $admin->updateJobPassingPercent($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
