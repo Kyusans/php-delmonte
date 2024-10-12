@@ -1046,29 +1046,39 @@ class Admin
 
   function getCandInterviewResult($json)
   {
-    // {"candId": 6, "jobId": 11}
     $returnValue = [];
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT a.interviewP_points AS CandPoints, b.inter_criteria_points AS CriteriaPoint, c.criteria_inter_name FROM tblinterviewcandpoints a
-            INNER JOIN tblinterviewcriteriamaster b ON b.inter_criteria_id = a.interviewP_criteriaId
-            INNER JOIN tblinterviewcriteria c ON c.criteria_inter_id = b.inter_criteria_criteriaId
-            WHERE b.inter_criteria_status = 1 AND a.interviewP_candId = :candId AND b.inter_criteria_jobId = :jobId";
+
+    $sql = "SELECT a.interviewP_points AS CandPoints, b.inter_criteria_points AS CriteriaPoint, c.criteria_inter_name 
+              FROM tblinterviewcandpoints a
+              INNER JOIN tblinterviewcriteriamaster b ON b.inter_criteria_id = a.interviewP_criteriaId
+              INNER JOIN tblinterviewcriteria c ON c.criteria_inter_id = b.inter_criteria_criteriaId
+              WHERE b.inter_criteria_status = 1 AND a.interviewP_candId = :candId AND b.inter_criteria_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candId', $data['candId']);
     $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
     $returnValue["candCriteriaPoints"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
-    $sql = "SELECT SUM(a.interviewP_points) as candTotalPoints, SUM(b.inter_criteria_points) as criteriaTotalPoints FROM tblinterviewcandpoints a
-            INNER JOIN tblinterviewcriteriamaster b ON b.inter_criteria_id = a.interviewP_criteriaId
-            WHERE interviewP_candId = :candId AND interviewP_jobId = :jobId AND b.inter_criteria_status = 1";
+
+    $sql = "SELECT SUM(a.interviewP_points) as candTotalPoints, SUM(b.inter_criteria_points) as criteriaTotalPoints 
+              FROM tblinterviewcandpoints a
+              INNER JOIN tblinterviewcriteriamaster b ON b.inter_criteria_id = a.interviewP_criteriaId
+              WHERE interviewP_candId = :candId AND interviewP_jobId = :jobId AND b.inter_criteria_status = 1";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candId', $data['candId']);
     $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
-    $returnValue["totalPoints"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+    $totalPoints = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
+
+    if ($totalPoints['criteriaTotalPoints'] === null) {
+      return -1;
+    }
+
     return json_encode($returnValue);
   }
+
 
   function updateJobPassingPercent($json)
   {
@@ -1083,7 +1093,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function updateInterviewPassingPercent($json){
+  function updateInterviewPassingPercent($json)
+  {
     // {"jobId": 11, "passingPercent": 80}
     include "connection.php";
     $data = json_decode($json, true);
