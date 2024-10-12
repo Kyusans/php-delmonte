@@ -107,7 +107,7 @@ class Admin
   function getAllJobs()
   {
     include "connection.php";
-    $sql = "SELECT a.*, COUNT(b.app_id ) as Total_Applied 
+    $sql = "SELECT a.*, COUNT(b.app_id) as Total_Applied 
               FROM tbljobsmaster a  
               LEFT JOIN tblapplications b 
               ON a.jobM_id = b.app_jobMId  
@@ -1050,21 +1050,27 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
 
-    $sql = "SELECT a.interviewP_points AS CandPoints, b.inter_criteria_points AS CriteriaPoint, c.criteria_inter_name 
-              FROM tblinterviewcandpoints a
-              INNER JOIN tblinterviewcriteriamaster b ON b.inter_criteria_id = a.interviewP_criteriaId
+    // Fetch all active criteria for the job and left join with the candidate's points
+    $sql = "SELECT COALESCE(a.interviewP_points, 0) AS CandPoints, b.inter_criteria_points AS CriteriaPoint, c.criteria_inter_name 
+              FROM tblinterviewcriteriamaster b
               INNER JOIN tblinterviewcriteria c ON c.criteria_inter_id = b.inter_criteria_criteriaId
-              WHERE b.inter_criteria_status = 1 AND a.interviewP_candId = :candId AND b.inter_criteria_jobId = :jobId";
+              LEFT JOIN tblinterviewcandpoints a ON a.interviewP_criteriaId = b.inter_criteria_id 
+              AND a.interviewP_candId = :candId 
+              WHERE b.inter_criteria_status = 1 AND b.inter_criteria_jobId = :jobId";
+
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candId', $data['candId']);
     $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
     $returnValue["candCriteriaPoints"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
-    $sql = "SELECT SUM(a.interviewP_points) as candTotalPoints, SUM(b.inter_criteria_points) as criteriaTotalPoints 
-              FROM tblinterviewcandpoints a
-              INNER JOIN tblinterviewcriteriamaster b ON b.inter_criteria_id = a.interviewP_criteriaId
-              WHERE interviewP_candId = :candId AND interviewP_jobId = :jobId AND b.inter_criteria_status = 1";
+    // Calculate the total points
+    $sql = "SELECT SUM(COALESCE(a.interviewP_points, 0)) as candTotalPoints, SUM(b.inter_criteria_points) as criteriaTotalPoints 
+              FROM tblinterviewcriteriamaster b
+              LEFT JOIN tblinterviewcandpoints a ON a.interviewP_criteriaId = b.inter_criteria_id 
+              AND a.interviewP_candId = :candId 
+              WHERE b.inter_criteria_status = 1 AND b.inter_criteria_jobId = :jobId";
+
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candId', $data['candId']);
     $stmt->bindParam(':jobId', $data['jobId']);
@@ -1074,10 +1080,13 @@ class Admin
 
     if ($totalPoints['criteriaTotalPoints'] === null) {
       return -1;
+    } else {
+      $returnValue["totalPoints"] = $totalPoints;
     }
 
     return json_encode($returnValue);
   }
+
 
 
   function updateJobPassingPercent($json)
