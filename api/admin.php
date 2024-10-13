@@ -287,6 +287,7 @@ class Admin
     $stmt->execute();
     $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
     $returnValue["interview"] = $this->getJobInterviewDetails($data);
+    $returnValue['exam'] = $this->getExamDetails($data['jobId']);
     foreach ($returnValue["candidates"] as &$candidate) {
       $candidate['points'] = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
     }
@@ -1274,7 +1275,7 @@ class Admin
   {
     // {"master":{"name":"Sample Exam","typeId":2,"jobId":11,"duration":60},    
     // "questions":{"questionMaster":[{"text":"What is the capital of France?","typeId":1,"points":10,"options":[{"text":"Paris","isCorrect":1},{"text":"London","isCorrect":0},{"text":"Berlin","isCorrect":0},{"text":"Madrid","isCorrect":0}]},{"text":"What is 2 + 2?","typeId":1,"points":5,"options":[{"text":"3","isCorrect":0},{"text":"4","isCorrect":1},{"text":"5","isCorrect":0}]}]}}
-    
+
     include "connection.php";
     $data = json_decode($json, true);
     $conn->beginTransaction();
@@ -1322,6 +1323,52 @@ class Admin
       $conn->rollBack();
       return $e->getMessage();
     }
+  }
+  function getExam($jobId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblexam WHERE exam_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $jobId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getExamDetails($jobId)
+  {
+    include "connection.php";
+    $returnValue = [];
+    $exam = $this->getExam($jobId);
+    if ($exam !== 0) {
+      $returnValue['examMaster'] = $exam;
+      $returnValue['questionMaster'] = $this->getExamQuestions($exam[0]['exam_id']);
+    } else {
+      $returnValue = 0;
+    }
+    return $returnValue;
+  }
+
+  function getExamQuestions($examId)
+  {
+    $returnValue = [];
+    include "connection.php";
+    $sql = "SELECT * FROM tblexamquestion WHERE examQ_examId = :examId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':examId', $examId);
+    $stmt->execute();
+    $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sqlOption = "SELECT * FROM tblexamchoices WHERE examC_questionId = :questionId";
+    $stmtOption = $conn->prepare($sqlOption);
+
+    foreach ($questions as &$question) {
+      $stmtOption->bindParam(':questionId', $question['examQ_id']);
+      $stmtOption->execute();
+      $question['options'] = $stmtOption->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $returnValue['questions'] = $questions;
+    return $returnValue;
   }
 } //admin
 
@@ -1468,6 +1515,9 @@ switch ($operation) {
     break;
   case "addExam":
     echo $admin->addExam($json);
+    break;
+  case "getExamDetails":
+    echo $admin->getExamDetails($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
