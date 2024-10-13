@@ -3,6 +3,60 @@ include "headers.php";
 
 class Admin
 {
+
+  function recordExists($value, $table, $column)
+  {
+    include "connection.php";
+    $sql = "SELECT COUNT(*) FROM $table WHERE $column = :value";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":value", $value);
+    $stmt->execute();
+    $count = $stmt->fetchColumn();
+    return $count > 0;
+  }
+
+  function uploadImage()
+  {
+    if (isset($_FILES["file"])) {
+      $file = $_FILES['file'];
+      // print_r($file);
+      $fileName = $_FILES['file']['name'];
+      $fileTmpName = $_FILES['file']['tmp_name'];
+      $fileSize = $_FILES['file']['size'];
+      $fileError = $_FILES['file']['error'];
+      // $fileType = $_FILES['file']['type'];
+
+      $fileExt = explode(".", $fileName);
+      $fileActualExt = strtolower(end($fileExt));
+
+      $allowed = ["jpg", "jpeg", "png"];
+
+      if (in_array($fileActualExt, $allowed)) {
+        if ($fileError === 0) {
+          if ($fileSize < 25000000) {
+            $fileNameNew = uniqid("", true) . "." . $fileActualExt;
+            $fileDestination =  'images/' . $fileNameNew;
+            move_uploaded_file($fileTmpName, $fileDestination);
+            return $fileNameNew;
+          } else {
+            return 4;
+          }
+        } else {
+          return 3;
+        }
+      } else {
+        return 2;
+      }
+    } else {
+      return "";
+    }
+  }
+
+  function getCurrentDate()
+  {
+    $today = new DateTime("now", new DateTimeZone('Asia/Manila'));
+    return $today->format('Y-m-d h:i:s A');
+  }
   function addJobMaster($json)
   {
     include "connection.php";
@@ -16,7 +70,7 @@ class Admin
     $jobKnowledge = $data['jobKnowledge'];
     $jobSkills = $data['jobSkill'];
     $jobWorkExperience = $data['jobExperience'];
-    $todayDate = getCurrentDate();
+    $todayDate = $this->getCurrentDate();
 
     try {
       $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status, jobM_createdAt) VALUES (:jobM_title, :jobM_description, :jobM_status, :jobM_createdAt)";
@@ -233,10 +287,112 @@ class Admin
     $stmt->execute();
     $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
     $returnValue["interview"] = $this->getJobInterviewDetails($data);
+    $returnValue['exam'] = $this->getExamDetails($data['jobId']);
     foreach ($returnValue["candidates"] as &$candidate) {
-      $candidate['points'] = calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
+      $candidate['points'] = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
     }
     return json_encode($returnValue);
+  }
+
+  function calculateCandidatePoints($candId, $jobId)
+  {
+    include "connection.php";
+    $totalPoints = 0;
+    $maxPoints = 0;
+
+    // Education Points
+    $sql = "SELECT SUM(DISTINCT c.jeduc_points) as educ_points, 
+          (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
+          FROM tblcourses a
+          INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
+          INNER JOIN tbljobseducation c ON c.jeduc_categoryId = b.course_categoryId
+          INNER JOIN tblcandeducbackground d ON d.educ_coursesId = a.courses_id
+          WHERE d.educ_canId = :candId AND c.jeduc_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $educationPoints = $result['educ_points'] ?? 0;
+    $maxEducationPoints = $result['max_educ_points'] ?? 0;
+    $totalPoints += $educationPoints;
+    $maxPoints += $maxEducationPoints;
+
+    // Work Experience Points
+    $sql = "SELECT SUM(DISTINCT a.jwork_points) AS exp_points, 
+          (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) AS max_exp_points
+          FROM tbljobsworkexperience a
+          INNER JOIN tblapplications b ON b.app_jobMId = a.jwork_jobId
+          INNER JOIN tblcandemploymenthistory c ON c.empH_candId = b.app_candId
+          WHERE INSTR(a.jwork_responsibilities, c.empH_positionName) > 0
+          AND c.empH_candId = :candId AND a.jwork_jobId = :jobId
+          AND TIMESTAMPDIFF(YEAR, c.empH_startDate, c.empH_endDate) >= a.jwork_duration";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $experiencePoints = $result['exp_points'] ?? 0;
+    $maxExperiencePoints = $result['max_exp_points'] ?? 0;
+    $totalPoints += $experiencePoints;
+    $maxPoints += $maxExperiencePoints;
+
+    // Skills Points
+    $sql = "SELECT SUM(DISTINCT j.jskills_points) as skills_points, 
+          (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :jobId) as max_skills_points
+          FROM tbljobsskills j 
+          INNER JOIN tblcandskills c ON j.jskills_skillsId = c.skills_perSId 
+          WHERE c.skills_candId = :candId AND j.jskills_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $skillsPoints = $result['skills_points'] ?? 0;
+    $maxSkillsPoints = $result['max_skills_points'] ?? 0;
+    $totalPoints += $skillsPoints;
+    $maxPoints += $maxSkillsPoints;
+
+    // Training Points
+    $sql = "SELECT SUM(DISTINCT j.jtrng_points) as training_points, 
+          (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :jobId) as max_training_points
+          FROM tbljobstrainings j 
+          INNER JOIN tblcandtraining c ON j.jtrng_trainingId = c.training_perTId 
+          WHERE c.training_candId = :candId AND j.jtrng_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $trainingPoints = $result['training_points'] ?? 0;
+    $maxTrainingPoints = $result['max_training_points'] ?? 0;
+    $totalPoints += $trainingPoints;
+    $maxPoints += $maxTrainingPoints;
+
+    // Knowledge Points
+    $sql = "SELECT SUM(DISTINCT j.jknow_points) as knowledge_points, 
+          (SELECT SUM(jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :jobId) as max_knowledge_points
+          FROM tbljobsknowledge j 
+          INNER JOIN tblcandknowledge c ON j.jknow_knowledgeId = c.canknow_knowledgeId 
+          WHERE c.canknow_canId = :candId AND j.jknow_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $knowledgePoints = $result['knowledge_points'] ?? 0;
+    $maxKnowledgePoints = $result['max_knowledge_points'] ?? 0;
+    $totalPoints += $knowledgePoints;
+    $maxPoints += $maxKnowledgePoints;
+
+    // Calculate percentage
+    $percentage = ($maxPoints > 0) ? round(($totalPoints / $maxPoints) * 100, 2) : 0;
+
+    return [
+      'maxPoints' => $maxPoints,
+      'totalPoints' => $totalPoints,
+      'percentage' => $percentage,
+    ];
   }
 
   function getLookUpTables()
@@ -953,7 +1109,7 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $appId = $this->applicationIds($data['jobId'], $data['candId']);
-    $date = getCurrentDate();
+    $date = $this->getCurrentDate();
     $id = json_encode($appId[0]['app_id']);
     $sql = "INSERT tblapplicationstatus(appS_appId, appS_statusId, appS_date) VALUES(:id, :status, :date)";
     $stmt = $conn->prepare($sql);
@@ -1114,162 +1270,107 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
-} //admin
 
-function calculateCandidatePoints($candId, $jobId)
-{
-  include "connection.php";
-  $totalPoints = 0;
-  $maxPoints = 0;
+  function addExam($json)
+  {
+    // {"master":{"name":"Sample Exam","typeId":2,"jobId":11,"duration":60},    
+    // "questions":{"questionMaster":[{"text":"What is the capital of France?","typeId":1,"points":10,"options":[{"text":"Paris","isCorrect":1},{"text":"London","isCorrect":0},{"text":"Berlin","isCorrect":0},{"text":"Madrid","isCorrect":0}]},{"text":"What is 2 + 2?","typeId":1,"points":5,"options":[{"text":"3","isCorrect":0},{"text":"4","isCorrect":1},{"text":"5","isCorrect":0}]}]}}
 
-  // Education Points
-  $sql = "SELECT SUM(DISTINCT c.jeduc_points) as educ_points, 
-          (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
-          FROM tblcourses a
-          INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
-          INNER JOIN tbljobseducation c ON c.jeduc_categoryId = b.course_categoryId
-          INNER JOIN tblcandeducbackground d ON d.educ_coursesId = a.courses_id
-          WHERE d.educ_canId = :candId AND c.jeduc_jobId = :jobId";
-  $stmt = $conn->prepare($sql);
-  $stmt->bindParam(":candId", $candId);
-  $stmt->bindParam(":jobId", $jobId);
-  $stmt->execute();
-  $result = $stmt->fetch(PDO::FETCH_ASSOC);
-  $educationPoints = $result['educ_points'] ?? 0;
-  $maxEducationPoints = $result['max_educ_points'] ?? 0;
-  $totalPoints += $educationPoints;
-  $maxPoints += $maxEducationPoints;
-
-  // Work Experience Points
-  $sql = "SELECT SUM(DISTINCT a.jwork_points) AS exp_points, 
-          (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) AS max_exp_points
-          FROM tbljobsworkexperience a
-          INNER JOIN tblapplications b ON b.app_jobMId = a.jwork_jobId
-          INNER JOIN tblcandemploymenthistory c ON c.empH_candId = b.app_candId
-          WHERE INSTR(a.jwork_responsibilities, c.empH_positionName) > 0
-          AND c.empH_candId = :candId AND a.jwork_jobId = :jobId
-          AND TIMESTAMPDIFF(YEAR, c.empH_startDate, c.empH_endDate) >= a.jwork_duration";
-  $stmt = $conn->prepare($sql);
-  $stmt->bindParam(":candId", $candId);
-  $stmt->bindParam(":jobId", $jobId);
-  $stmt->execute();
-  $result = $stmt->fetch(PDO::FETCH_ASSOC);
-  $experiencePoints = $result['exp_points'] ?? 0;
-  $maxExperiencePoints = $result['max_exp_points'] ?? 0;
-  $totalPoints += $experiencePoints;
-  $maxPoints += $maxExperiencePoints;
-
-  // Skills Points
-  $sql = "SELECT SUM(DISTINCT j.jskills_points) as skills_points, 
-          (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :jobId) as max_skills_points
-          FROM tbljobsskills j 
-          INNER JOIN tblcandskills c ON j.jskills_skillsId = c.skills_perSId 
-          WHERE c.skills_candId = :candId AND j.jskills_jobId = :jobId";
-  $stmt = $conn->prepare($sql);
-  $stmt->bindParam(":candId", $candId);
-  $stmt->bindParam(":jobId", $jobId);
-  $stmt->execute();
-  $result = $stmt->fetch(PDO::FETCH_ASSOC);
-  $skillsPoints = $result['skills_points'] ?? 0;
-  $maxSkillsPoints = $result['max_skills_points'] ?? 0;
-  $totalPoints += $skillsPoints;
-  $maxPoints += $maxSkillsPoints;
-
-  // Training Points
-  $sql = "SELECT SUM(DISTINCT j.jtrng_points) as training_points, 
-          (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :jobId) as max_training_points
-          FROM tbljobstrainings j 
-          INNER JOIN tblcandtraining c ON j.jtrng_trainingId = c.training_perTId 
-          WHERE c.training_candId = :candId AND j.jtrng_jobId = :jobId";
-  $stmt = $conn->prepare($sql);
-  $stmt->bindParam(":candId", $candId);
-  $stmt->bindParam(":jobId", $jobId);
-  $stmt->execute();
-  $result = $stmt->fetch(PDO::FETCH_ASSOC);
-  $trainingPoints = $result['training_points'] ?? 0;
-  $maxTrainingPoints = $result['max_training_points'] ?? 0;
-  $totalPoints += $trainingPoints;
-  $maxPoints += $maxTrainingPoints;
-
-  // Knowledge Points
-  $sql = "SELECT SUM(DISTINCT j.jknow_points) as knowledge_points, 
-          (SELECT SUM(jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :jobId) as max_knowledge_points
-          FROM tbljobsknowledge j 
-          INNER JOIN tblcandknowledge c ON j.jknow_knowledgeId = c.canknow_knowledgeId 
-          WHERE c.canknow_canId = :candId AND j.jknow_jobId = :jobId";
-  $stmt = $conn->prepare($sql);
-  $stmt->bindParam(":candId", $candId);
-  $stmt->bindParam(":jobId", $jobId);
-  $stmt->execute();
-  $result = $stmt->fetch(PDO::FETCH_ASSOC);
-  $knowledgePoints = $result['knowledge_points'] ?? 0;
-  $maxKnowledgePoints = $result['max_knowledge_points'] ?? 0;
-  $totalPoints += $knowledgePoints;
-  $maxPoints += $maxKnowledgePoints;
-
-  // Calculate percentage
-  $percentage = ($maxPoints > 0) ? round(($totalPoints / $maxPoints) * 100, 2) : 0;
-
-  return [
-    'maxPoints' => $maxPoints,
-    'totalPoints' => $totalPoints,
-    'percentage' => $percentage,
-  ];
-}
-
-function recordExists($value, $table, $column)
-{
-  include "connection.php";
-  $sql = "SELECT COUNT(*) FROM $table WHERE $column = :value";
-  $stmt = $conn->prepare($sql);
-  $stmt->bindParam(":value", $value);
-  $stmt->execute();
-  $count = $stmt->fetchColumn();
-  return $count > 0;
-}
-
-function uploadImage()
-{
-  if (isset($_FILES["file"])) {
-    $file = $_FILES['file'];
-    // print_r($file);
-    $fileName = $_FILES['file']['name'];
-    $fileTmpName = $_FILES['file']['tmp_name'];
-    $fileSize = $_FILES['file']['size'];
-    $fileError = $_FILES['file']['error'];
-    // $fileType = $_FILES['file']['type'];
-
-    $fileExt = explode(".", $fileName);
-    $fileActualExt = strtolower(end($fileExt));
-
-    $allowed = ["jpg", "jpeg", "png"];
-
-    if (in_array($fileActualExt, $allowed)) {
-      if ($fileError === 0) {
-        if ($fileSize < 25000000) {
-          $fileNameNew = uniqid("", true) . "." . $fileActualExt;
-          $fileDestination =  'images/' . $fileNameNew;
-          move_uploaded_file($fileTmpName, $fileDestination);
-          return $fileNameNew;
-        } else {
-          return 4;
+    include "connection.php";
+    $data = json_decode($json, true);
+    $conn->beginTransaction();
+    try {
+      $master = $data['master'];
+      $questions = $data['questions'];
+      $todayDate = $this->getCurrentDate();
+      $sql = "INSERT INTO tblexam(exam_name, exam_typeId, exam_jobMId, exam_duration, exam_createdAt, exam_updatedAt)
+                  VALUES (:exam_name, :exam_typeId, :exam_jobId, :exam_duration, :exam_createdAt, :exam_updatedAt)";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':exam_name', $master['name']);
+      $stmt->bindParam(':exam_typeId', $master['typeId']);
+      $stmt->bindParam(':exam_jobId', $master['jobId']);
+      $stmt->bindParam(':exam_duration', $master['duration']);
+      $stmt->bindParam(':exam_createdAt', $todayDate);
+      $stmt->bindParam(':exam_updatedAt', $todayDate);
+      $stmt->execute();
+      $examId = $conn->lastInsertId();
+      $sqlQuestion = "INSERT INTO tblexamquestion(examQ_examId, examQ_text, examQ_typeId, examQ_createdAt, examQ_updatedAt, examQ_points)
+                          VALUES (:examQ_examId, :examQ_text, :examQ_typeId, :examQ_createdAt, :examQ_updatedAt, :examQ_points)";
+      $stmtQuestion = $conn->prepare($sqlQuestion);
+      $sqlOption = "INSERT INTO tblexamchoices(examC_questionId, examC_text, examC_isCorrect)
+                        VALUES (:examC_questionId, :examC_text, :examC_isCorrect)";
+      $stmtOption = $conn->prepare($sqlOption);
+      foreach ($questions['questionMaster'] as $question) {
+        $stmtQuestion->bindParam(':examQ_examId', $examId);
+        $stmtQuestion->bindParam(':examQ_text', $question['text']);
+        $stmtQuestion->bindParam(':examQ_typeId', $question['typeId']);
+        $stmtQuestion->bindParam(':examQ_createdAt', $todayDate);
+        $stmtQuestion->bindParam(':examQ_updatedAt', $todayDate);
+        $stmtQuestion->bindParam(':examQ_points', $question['points']);
+        $stmtQuestion->execute();
+        $questionId = $conn->lastInsertId();
+        foreach ($question['options'] as $option) {
+          $stmtOption->bindParam(':examC_questionId', $questionId);
+          $stmtOption->bindParam(':examC_text', $option['text']);
+          $stmtOption->bindParam(':examC_isCorrect', $option['isCorrect']);
+          $stmtOption->execute();
         }
-      } else {
-        return 3;
       }
-    } else {
-      return 2;
-    }
-  } else {
-    return "";
-  }
-}
 
-function getCurrentDate()
-{
-  $today = new DateTime("now", new DateTimeZone('Asia/Manila'));
-  return $today->format('Y-m-d h:i:s A');
-}
+      $conn->commit();
+      return 1;
+    } catch (PDOException $e) {
+      $conn->rollBack();
+      return $e->getMessage();
+    }
+  }
+  function getExam($jobId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblexam WHERE exam_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $jobId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getExamDetails($jobId)
+  {
+    include "connection.php";
+    $returnValue = [];
+    $exam = $this->getExam($jobId);
+    if ($exam !== 0) {
+      $returnValue['examMaster'] = $exam;
+      $returnValue['questionMaster'] = $this->getExamQuestions($exam[0]['exam_id']);
+    } else {
+      $returnValue = 0;
+    }
+    return $returnValue;
+  }
+
+  function getExamQuestions($examId)
+  {
+    $returnValue = [];
+    include "connection.php";
+    $sql = "SELECT * FROM tblexamquestion WHERE examQ_examId = :examId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':examId', $examId);
+    $stmt->execute();
+    $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sqlOption = "SELECT * FROM tblexamchoices WHERE examC_questionId = :questionId";
+    $stmtOption = $conn->prepare($sqlOption);
+
+    foreach ($questions as &$question) {
+      $stmtOption->bindParam(':questionId', $question['examQ_id']);
+      $stmtOption->execute();
+      $question['options'] = $stmtOption->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $returnValue['questions'] = $questions;
+    return $returnValue;
+  }
+} //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
 $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
@@ -1411,6 +1512,12 @@ switch ($operation) {
     break;
   case "updateInterviewPassingPercent":
     echo $admin->updateInterviewPassingPercent($json);
+    break;
+  case "addExam":
+    echo $admin->addExam($json);
+    break;
+  case "getExamDetails":
+    echo $admin->getExamDetails($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
