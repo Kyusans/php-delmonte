@@ -1471,6 +1471,14 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getCourseCategory(){
+    include "connection.php";
+    $sql = "SELECT * FROM tblcoursescategory";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1628,6 +1636,9 @@ switch ($operation) {
     break;
   case "updateExamMaster":
     echo $admin->updateExamMaster($json);
+    break;
+  case "getCourseCategory":
+    echo json_encode($admin->getCourseCategory());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
