@@ -1412,6 +1412,50 @@ class Admin
       return $th;
     }
   }
+
+  function updateExamQuestion($json){
+    // {"questionId": 6, "text": "What is the capital of Francessss?", "typeId": 1, "points": 10, "options": [{"text": "Parisssss", "isCorrect": 1}, {"text": "Londonssss", "isCorrect": 0}, {"text": "Berlinsssss", "isCorrect": 0}, {"text": "Madriddddd", "isCorrect": 0}]}
+    include "connection.php";
+    $conn->beginTransaction();
+    try {
+      $data = json_decode($json, true);
+      $currentDate = $this->getCurrentDate();
+    
+      $sqlUpdateQuestion = "UPDATE tblexamquestion SET examQ_text = :examQ_text, examQ_typeId = :examQ_typeId, 
+                            examQ_updatedAt = :examQ_updatedAt, examQ_points = :examQ_points WHERE examQ_id = :examQ_id";
+      $stmtUpdateQuestion = $conn->prepare($sqlUpdateQuestion);
+      $stmtUpdateQuestion->bindParam(':examQ_text', $data['text']);
+      $stmtUpdateQuestion->bindParam(':examQ_typeId', $data['typeId']);
+      $stmtUpdateQuestion->bindParam(':examQ_updatedAt', $currentDate);
+      $stmtUpdateQuestion->bindParam(':examQ_points', $data['points']);
+      $stmtUpdateQuestion->bindParam(':examQ_id', $data['questionId']);
+      $stmtUpdateQuestion->execute();
+      
+      $sqlDeleteOptions = "DELETE FROM tblexamchoices WHERE examC_questionId = :examQ_id";
+      $stmtDeleteOptions = $conn->prepare($sqlDeleteOptions);
+      $stmtDeleteOptions->bindParam(':examQ_id', $data['questionId']);
+      $stmtDeleteOptions->execute();
+      
+      if (isset($data['options']) && is_array($data['options'])) {
+        $sqlInsertOption = "INSERT INTO tblexamchoices(examC_questionId, examC_text, examC_isCorrect)
+                            VALUES (:examC_questionId, :examC_text, :examC_isCorrect)";
+        $stmtInsertOption = $conn->prepare($sqlInsertOption);
+        foreach ($data['options'] as $option) {
+          $stmtInsertOption->bindParam(':examC_questionId', $data['questionId']);
+          $stmtInsertOption->bindParam(':examC_text', $option['text']);
+          $isCorrect = $option['isCorrect'];
+          $stmtInsertOption->bindParam(':examC_isCorrect', $isCorrect);
+          $stmtInsertOption->execute();
+        }
+      }
+      
+      $conn->commit();
+      return 1;
+    } catch (\Throwable $th) {
+      $conn->rollBack();
+      return $th;
+    }
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1563,6 +1607,9 @@ switch ($operation) {
     break;
   case "addExamQuestions":
     echo $admin->addExamQuestions($json);
+    break;
+  case "updateExamQuestion":
+    echo $admin->updateExamQuestion($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
