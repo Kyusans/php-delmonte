@@ -1456,6 +1456,21 @@ class Admin
       return $th;
     }
   }
+
+  function updateExamMaster($json){
+    // {"examId": 2, "name": "Sample Exam", "duration": 60}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $dateNow = $this->getCurrentDate();
+    $sql = "UPDATE tblexam SET exam_name = :exam_name, exam_duration = :exam_duration, exam_updatedAt = :exam_updatedAt WHERE exam_id = :exam_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':exam_id', $data['examId']);
+    $stmt->bindParam(':exam_name', $data['name']);
+    $stmt->bindParam(':exam_duration', $data['duration']);
+    $stmt->bindParam(':exam_updatedAt', $dateNow);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1610,6 +1625,9 @@ switch ($operation) {
     break;
   case "updateExamQuestion":
     echo $admin->updateExamQuestion($json);
+    break;
+  case "updateExamMaster":
+    echo $admin->updateExamMaster($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
