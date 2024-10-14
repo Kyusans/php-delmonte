@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 10, 2024 at 12:08 AM
+-- Generation Time: Oct 14, 2024 at 02:58 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -101,6 +101,44 @@ INSERT INTO `tblapplicationstatus` (`appS_id`, `appS_appId`, `appS_statusId`, `a
 (35, 15, 6, '2024-10-05 05:17:54'),
 (36, 15, 5, '2024-10-05 05:18:04'),
 (37, 11, 5, '2024-10-05 06:29:06');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblbackgroundcheck`
+--
+
+CREATE TABLE `tblbackgroundcheck` (
+  `backcheck_id` int(11) NOT NULL,
+  `backcheck_candId` int(11) NOT NULL,
+  `backcheck_typeId` int(11) NOT NULL,
+  `backcheck_result` int(11) NOT NULL,
+  `backcheck_statusId` int(11) NOT NULL,
+  `backcheck_image` int(11) NOT NULL,
+  `backcheck_initiationDate` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblbackgroundcheckstatus`
+--
+
+CREATE TABLE `tblbackgroundcheckstatus` (
+  `backcheckS_id` int(11) NOT NULL,
+  `backcheckS_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblbackgroundchecktype`
+--
+
+CREATE TABLE `tblbackgroundchecktype` (
+  `backcheckT_id` int(11) NOT NULL,
+  `backcheckT_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -500,14 +538,16 @@ CREATE TABLE `tblexam` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tblexamapplicantanswer`
+-- Table structure for table `tblexamcandidateanswer`
 --
 
-CREATE TABLE `tblexamapplicantanswer` (
-  `examA_id` int(11) NOT NULL,
-  `examA_resultId` int(11) NOT NULL,
-  `examA_questionId` int(11) NOT NULL,
-  `examA_choiceId` int(11) NOT NULL
+CREATE TABLE `tblexamcandidateanswer` (
+  `examcandA_id` int(11) NOT NULL,
+  `examcandA_resultId` int(11) NOT NULL,
+  `examcandA_questionId` int(11) NOT NULL,
+  `examcandA_choiceId` int(11) DEFAULT NULL,
+  `examcandA_essay` text DEFAULT NULL,
+  `examcandA_pointsEarned` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -535,7 +575,8 @@ CREATE TABLE `tblexamquestion` (
   `examQ_text` varchar(50) NOT NULL,
   `examQ_typeId` int(11) NOT NULL,
   `examQ_createdAt` date NOT NULL,
-  `examQ_updatedAt` date NOT NULL
+  `examQ_updatedAt` date NOT NULL,
+  `examQ_points` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -568,7 +609,7 @@ CREATE TABLE `tblexamresult` (
   `examR_candId` int(11) NOT NULL,
   `examR_examId` int(11) NOT NULL,
   `examR_score` int(50) NOT NULL,
-  `examR_date` date NOT NULL
+  `examR_date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -3069,8 +3110,19 @@ CREATE TABLE `tblinterviewcandpoints` (
 
 CREATE TABLE `tblinterviewcategory` (
   `interview_categ_id` int(11) NOT NULL,
-  `interview_categ_name` text NOT NULL
+  `interview_categ_name` text NOT NULL,
+  `interview_categ_status` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblinterviewcategory`
+--
+
+INSERT INTO `tblinterviewcategory` (`interview_categ_id`, `interview_categ_name`, `interview_categ_status`) VALUES
+(1, 'Technical', 1),
+(2, 'Behavioral', 1),
+(3, 'Situational', 1),
+(4, 'Analytical', 1);
 
 -- --------------------------------------------------------
 
@@ -3084,6 +3136,27 @@ CREATE TABLE `tblinterviewcriteria` (
   `criteria_inter_categId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblinterviewcriteria`
+--
+
+INSERT INTO `tblinterviewcriteria` (`criteria_inter_id`, `criteria_inter_name`, `criteria_inter_categId`) VALUES
+(7, 'Proficiency in specific software or programming languages', 1),
+(8, 'Understanding of technical concepts', 1),
+(9, 'Experience with certain technologies', 1),
+(10, 'Teamwork', 2),
+(11, 'Communication', 2),
+(12, 'Adaptability', 2),
+(13, 'Leadership', 2),
+(14, 'Conflict Resolution', 3),
+(15, 'Decision-Making', 3),
+(16, 'Handling Pressure', 3),
+(17, 'Project Management', 3),
+(18, 'Problem Solving', 4),
+(19, 'Logical Reasoning', 4),
+(20, 'Attention to Detail', 4),
+(21, 'Data Interpretation', 4);
+
 -- --------------------------------------------------------
 
 --
@@ -3093,11 +3166,30 @@ CREATE TABLE `tblinterviewcriteria` (
 CREATE TABLE `tblinterviewcriteriamaster` (
   `inter_criteria_id` int(11) NOT NULL,
   `inter_criteria_jobId` int(11) NOT NULL,
-  `inter_criteria_categId` int(11) NOT NULL,
-  `inter_criteria_name` text NOT NULL,
+  `inter_criteria_criteriaId` int(11) NOT NULL,
   `inter_criteria_points` int(11) NOT NULL,
   `inter_criteria_status` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblinterviewcriteriamaster`
+--
+
+INSERT INTO `tblinterviewcriteriamaster` (`inter_criteria_id`, `inter_criteria_jobId`, `inter_criteria_criteriaId`, `inter_criteria_points`, `inter_criteria_status`) VALUES
+(23, 11, 7, 100, 0),
+(24, 11, 8, 200, 0),
+(25, 11, 9, 200, 0),
+(26, 11, 10, 200, 1),
+(27, 11, 7, 200, 0),
+(28, 11, 10, 200, 0),
+(29, 11, 15, 10, 1),
+(30, 11, 11, 200, 1),
+(31, 11, 8, 200, 1),
+(32, 11, 9, 200, 1),
+(33, 11, 13, 200, 0),
+(34, 11, 19, 10000, 1),
+(35, 11, 16, 200, 1),
+(36, 11, 13, 200, 1);
 
 -- --------------------------------------------------------
 
@@ -3126,18 +3218,35 @@ INSERT INTO `tblinterviewpassingpercent` (`passing_id`, `passing_jobId`, `passin
 (8, 8, 50),
 (9, 9, 50),
 (10, 10, 50),
-(11, 11, 50),
-(12, 1, 50),
-(13, 2, 50),
-(14, 3, 50),
-(15, 4, 50),
-(16, 5, 50),
-(17, 6, 50),
-(18, 7, 50),
-(19, 8, 50),
-(20, 9, 50),
-(21, 10, 50),
-(22, 11, 50);
+(11, 11, 50);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbljoboffer`
+--
+
+CREATE TABLE `tbljoboffer` (
+  `joboffer_id` int(11) NOT NULL,
+  `joboffer_candId` int(11) NOT NULL,
+  `joboffer_jobMId` int(11) NOT NULL,
+  `joboffer_date` date NOT NULL,
+  `joboffer_statusId` int(11) NOT NULL,
+  `joboffer_salary` decimal(10,2) NOT NULL,
+  `joboffer_document` varchar(255) NOT NULL,
+  `joboffer_expiryDate` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbljobofferstatus`
+--
+
+CREATE TABLE `tbljobofferstatus` (
+  `jobofferS_id` int(11) NOT NULL,
+  `jobofferS_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -3300,7 +3409,8 @@ INSERT INTO `tbljobsmasterduties` (`duties_id`, `duties_jobId`, `duties_text`) V
 (10, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.'),
 (11, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.'),
 (12, 11, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vehicula dui gravida ligula fringilla, sed scelerisque mi placerat. Sed in feugiat elit. Donec sed lorem viverra, pharetra risus id, congue tortor. Proin aliquet risus sed neque imperdiet feugiat. Curabitur blandit mattis odio lacinia sollicitudin. Curabitur tempor risus quis sem bibendum aliquet. Integer vel nulla vel risus euismod molestie et sit amet tortor. Sed lacinia, felis id ullamcorper condimentum, odio enim posuere nisi, vitae faucibus nisi libero vel risus. Suspendisse malesuada enim eget nulla mollis, eu tempor quam cursus. Maecenas blandit luctus turpis, et venenatis nulla aliquam eget. In in lectus blandit, eleifend diam in, vehicula nibh.'),
-(13, 11, 'Ut nec enim et nisl suscipit dignissim. Nulla odio sem, commodo eget dictum ac, consectetur ac neque. Pellentesque fringilla sed neque vitae bibendum. Fusce vel nibh eu arcu iaculis vulputate mattis eleifend nulla. Nullam libero elit, sodales sed enim a, ullamcorper tincidunt urna. Proin ac commodo tortor, sit amet congue nisi. Maecenas bibendum nunc quis feugiat bibendum. Aenean egestas vulputate nisi eget dictum.');
+(13, 11, 'Ut nec enim et nisl suscipit dignissim. Nulla odio sem, commodo eget dictum ac, consectetur ac neque. Pellentesque fringilla sed neque vitae bibendum. Fusce vel nibh eu arcu iaculis vulputate mattis eleifend nulla. Nullam libero elit, sodales sed enim a, ullamcorper tincidunt urna. Proin ac commodo tortor, sit amet congue nisi. Maecenas bibendum nunc quis feugiat bibendum. Aenean egestas vulputate nisi eget dictum.'),
+(15, 11, 'Hello');
 
 -- --------------------------------------------------------
 
@@ -3536,6 +3646,44 @@ INSERT INTO `tblpersonaltraining` (`perT_id`, `perT_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tblphysicalexam`
+--
+
+CREATE TABLE `tblphysicalexam` (
+  `pe_id` int(11) NOT NULL,
+  `pe_candId` int(11) NOT NULL,
+  `pe_image` varchar(255) NOT NULL,
+  `pe_typeId` int(11) NOT NULL,
+  `pe_result` text NOT NULL,
+  `pe_statusId` int(11) NOT NULL,
+  `pe_date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblphysicalexamstatus`
+--
+
+CREATE TABLE `tblphysicalexamstatus` (
+  `peS_id` int(11) NOT NULL,
+  `peS_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblphysicalexamtype`
+--
+
+CREATE TABLE `tblphysicalexamtype` (
+  `peT_id` int(11) NOT NULL,
+  `peT_name` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tblstatus`
 --
 
@@ -3625,6 +3773,26 @@ ALTER TABLE `tblapplicationstatus`
   ADD PRIMARY KEY (`appS_id`),
   ADD KEY `appS_appId` (`appS_appId`),
   ADD KEY `appS_statusId` (`appS_statusId`);
+
+--
+-- Indexes for table `tblbackgroundcheck`
+--
+ALTER TABLE `tblbackgroundcheck`
+  ADD KEY `backcheck_candId` (`backcheck_candId`),
+  ADD KEY `backcheck_statusId` (`backcheck_statusId`),
+  ADD KEY `backcheck_typeId` (`backcheck_typeId`);
+
+--
+-- Indexes for table `tblbackgroundcheckstatus`
+--
+ALTER TABLE `tblbackgroundcheckstatus`
+  ADD PRIMARY KEY (`backcheckS_id`);
+
+--
+-- Indexes for table `tblbackgroundchecktype`
+--
+ALTER TABLE `tblbackgroundchecktype`
+  ADD PRIMARY KEY (`backcheckT_id`);
 
 --
 -- Indexes for table `tblcandconsent`
@@ -3722,19 +3890,20 @@ ALTER TABLE `tblexam`
   ADD KEY `exam_jobMId` (`exam_jobMId`);
 
 --
--- Indexes for table `tblexamapplicantanswer`
+-- Indexes for table `tblexamcandidateanswer`
 --
-ALTER TABLE `tblexamapplicantanswer`
-  ADD PRIMARY KEY (`examA_id`),
-  ADD KEY `examA_choiceId` (`examA_choiceId`),
-  ADD KEY `examA_questionId` (`examA_questionId`),
-  ADD KEY `examA_resultId` (`examA_resultId`);
+ALTER TABLE `tblexamcandidateanswer`
+  ADD PRIMARY KEY (`examcandA_id`),
+  ADD KEY `examA_choiceId` (`examcandA_choiceId`),
+  ADD KEY `examA_questionId` (`examcandA_questionId`),
+  ADD KEY `examA_resultId` (`examcandA_resultId`);
 
 --
 -- Indexes for table `tblexamchoices`
 --
 ALTER TABLE `tblexamchoices`
-  ADD PRIMARY KEY (`examC_id`);
+  ADD PRIMARY KEY (`examC_id`),
+  ADD KEY `examC_questionId` (`examC_questionId`);
 
 --
 -- Indexes for table `tblexamquestion`
@@ -3805,7 +3974,7 @@ ALTER TABLE `tblinterviewcriteria`
 ALTER TABLE `tblinterviewcriteriamaster`
   ADD PRIMARY KEY (`inter_criteria_id`),
   ADD KEY `inter_criteria_interviewId` (`inter_criteria_jobId`),
-  ADD KEY `inter_criteria_categId` (`inter_criteria_categId`);
+  ADD KEY `inter_criteria_criteriaId` (`inter_criteria_criteriaId`);
 
 --
 -- Indexes for table `tblinterviewpassingpercent`
@@ -3813,6 +3982,21 @@ ALTER TABLE `tblinterviewcriteriamaster`
 ALTER TABLE `tblinterviewpassingpercent`
   ADD PRIMARY KEY (`passing_id`),
   ADD KEY `passing_jobId` (`passing_jobId`);
+
+--
+-- Indexes for table `tbljoboffer`
+--
+ALTER TABLE `tbljoboffer`
+  ADD PRIMARY KEY (`joboffer_id`),
+  ADD KEY `joboffer_candId` (`joboffer_candId`),
+  ADD KEY `joboffer_statusId` (`joboffer_statusId`),
+  ADD KEY `joboffer_jobMId` (`joboffer_jobMId`);
+
+--
+-- Indexes for table `tbljobofferstatus`
+--
+ALTER TABLE `tbljobofferstatus`
+  ADD PRIMARY KEY (`jobofferS_id`);
 
 --
 -- Indexes for table `tbljobpassing`
@@ -3910,6 +4094,27 @@ ALTER TABLE `tblpersonaltraining`
   ADD PRIMARY KEY (`perT_id`);
 
 --
+-- Indexes for table `tblphysicalexam`
+--
+ALTER TABLE `tblphysicalexam`
+  ADD PRIMARY KEY (`pe_id`),
+  ADD KEY `pe_candId` (`pe_candId`),
+  ADD KEY `pe_statusId` (`pe_statusId`),
+  ADD KEY `pe_typeId` (`pe_typeId`);
+
+--
+-- Indexes for table `tblphysicalexamstatus`
+--
+ALTER TABLE `tblphysicalexamstatus`
+  ADD PRIMARY KEY (`peS_id`);
+
+--
+-- Indexes for table `tblphysicalexamtype`
+--
+ALTER TABLE `tblphysicalexamtype`
+  ADD PRIMARY KEY (`peT_id`);
+
+--
 -- Indexes for table `tblstatus`
 --
 ALTER TABLE `tblstatus`
@@ -3948,6 +4153,18 @@ ALTER TABLE `tblapplications`
 --
 ALTER TABLE `tblapplicationstatus`
   MODIFY `appS_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+
+--
+-- AUTO_INCREMENT for table `tblbackgroundcheckstatus`
+--
+ALTER TABLE `tblbackgroundcheckstatus`
+  MODIFY `backcheckS_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tblbackgroundchecktype`
+--
+ALTER TABLE `tblbackgroundchecktype`
+  MODIFY `backcheckT_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tblcandconsent`
@@ -4028,10 +4245,10 @@ ALTER TABLE `tblexam`
   MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `tblexamapplicantanswer`
+-- AUTO_INCREMENT for table `tblexamcandidateanswer`
 --
-ALTER TABLE `tblexamapplicantanswer`
-  MODIFY `examA_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `tblexamcandidateanswer`
+  MODIFY `examcandA_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tblexamchoices`
@@ -4079,25 +4296,37 @@ ALTER TABLE `tblinterviewcandpoints`
 -- AUTO_INCREMENT for table `tblinterviewcategory`
 --
 ALTER TABLE `tblinterviewcategory`
-  MODIFY `interview_categ_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `interview_categ_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tblinterviewcriteria`
 --
 ALTER TABLE `tblinterviewcriteria`
-  MODIFY `criteria_inter_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `criteria_inter_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `tblinterviewcriteriamaster`
 --
 ALTER TABLE `tblinterviewcriteriamaster`
-  MODIFY `inter_criteria_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `inter_criteria_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `tblinterviewpassingpercent`
 --
 ALTER TABLE `tblinterviewpassingpercent`
   MODIFY `passing_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+
+--
+-- AUTO_INCREMENT for table `tbljoboffer`
+--
+ALTER TABLE `tbljoboffer`
+  MODIFY `joboffer_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tbljobofferstatus`
+--
+ALTER TABLE `tbljobofferstatus`
+  MODIFY `jobofferS_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tbljobpassing`
@@ -4133,7 +4362,7 @@ ALTER TABLE `tbljobsmaster`
 -- AUTO_INCREMENT for table `tbljobsmasterduties`
 --
 ALTER TABLE `tbljobsmasterduties`
-  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `tbljobsskills`
@@ -4184,6 +4413,24 @@ ALTER TABLE `tblpersonaltraining`
   MODIFY `perT_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
+-- AUTO_INCREMENT for table `tblphysicalexam`
+--
+ALTER TABLE `tblphysicalexam`
+  MODIFY `pe_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tblphysicalexamstatus`
+--
+ALTER TABLE `tblphysicalexamstatus`
+  MODIFY `peS_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tblphysicalexamtype`
+--
+ALTER TABLE `tblphysicalexamtype`
+  MODIFY `peT_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `tblstatus`
 --
 ALTER TABLE `tblstatus`
@@ -4224,6 +4471,14 @@ ALTER TABLE `tblapplications`
 ALTER TABLE `tblapplicationstatus`
   ADD CONSTRAINT `tblapplicationstatus_ibfk_1` FOREIGN KEY (`appS_appId`) REFERENCES `tblapplications` (`app_id`),
   ADD CONSTRAINT `tblapplicationstatus_ibfk_2` FOREIGN KEY (`appS_statusId`) REFERENCES `tblstatus` (`status_id`);
+
+--
+-- Constraints for table `tblbackgroundcheck`
+--
+ALTER TABLE `tblbackgroundcheck`
+  ADD CONSTRAINT `tblbackgroundcheck_ibfk_1` FOREIGN KEY (`backcheck_candId`) REFERENCES `tblcandidates` (`cand_id`),
+  ADD CONSTRAINT `tblbackgroundcheck_ibfk_2` FOREIGN KEY (`backcheck_statusId`) REFERENCES `tblbackgroundcheckstatus` (`backcheckS_id`),
+  ADD CONSTRAINT `tblbackgroundcheck_ibfk_3` FOREIGN KEY (`backcheck_typeId`) REFERENCES `tblbackgroundchecktype` (`backcheckT_id`);
 
 --
 -- Constraints for table `tblcandconsent`
@@ -4283,23 +4538,8 @@ ALTER TABLE `tblcourses`
 -- Constraints for table `tblexam`
 --
 ALTER TABLE `tblexam`
-  ADD CONSTRAINT `tblexam_ibfk_1` FOREIGN KEY (`exam_typeId`) REFERENCES `tblexamtype` (`examT_id`),
-  ADD CONSTRAINT `tblexam_ibfk_2` FOREIGN KEY (`exam_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
-
---
--- Constraints for table `tblexamapplicantanswer`
---
-ALTER TABLE `tblexamapplicantanswer`
-  ADD CONSTRAINT `tblexamapplicantanswer_ibfk_1` FOREIGN KEY (`examA_choiceId`) REFERENCES `tblexamchoices` (`examC_id`),
-  ADD CONSTRAINT `tblexamapplicantanswer_ibfk_2` FOREIGN KEY (`examA_questionId`) REFERENCES `tblexamquestion` (`examQ_id`),
-  ADD CONSTRAINT `tblexamapplicantanswer_ibfk_3` FOREIGN KEY (`examA_resultId`) REFERENCES `tblexamresult` (`examR_id`);
-
---
--- Constraints for table `tblexamquestion`
---
-ALTER TABLE `tblexamquestion`
-  ADD CONSTRAINT `tblexamquestion_ibfk_1` FOREIGN KEY (`examQ_examId`) REFERENCES `tblexam` (`exam_id`),
-  ADD CONSTRAINT `tblexamquestion_ibfk_2` FOREIGN KEY (`examQ_typeId`) REFERENCES `tblexamquestiontype` (`questionT_id`);
+  ADD CONSTRAINT `tblexam_ibfk_1` FOREIGN KEY (`exam_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`),
+  ADD CONSTRAINT `tblexam_ibfk_2` FOREIGN KEY (`exam_typeId`) REFERENCES `tblexamtype` (`examT_id`);
 
 --
 -- Constraints for table `tblexamresult`
@@ -4332,6 +4572,7 @@ ALTER TABLE `tblinterviewcriteria`
 -- Constraints for table `tblinterviewcriteriamaster`
 --
 ALTER TABLE `tblinterviewcriteriamaster`
+  ADD CONSTRAINT `tblinterviewcriteriamaster_ibfk_1` FOREIGN KEY (`inter_criteria_criteriaId`) REFERENCES `tblinterviewcriteria` (`criteria_inter_id`),
   ADD CONSTRAINT `tblinterviewcriteriamaster_ibfk_2` FOREIGN KEY (`inter_criteria_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
 
 --
@@ -4339,6 +4580,14 @@ ALTER TABLE `tblinterviewcriteriamaster`
 --
 ALTER TABLE `tblinterviewpassingpercent`
   ADD CONSTRAINT `tblinterviewpassingpercent_ibfk_1` FOREIGN KEY (`passing_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
+
+--
+-- Constraints for table `tbljoboffer`
+--
+ALTER TABLE `tbljoboffer`
+  ADD CONSTRAINT `tbljoboffer_ibfk_1` FOREIGN KEY (`joboffer_candId`) REFERENCES `tblcandidates` (`cand_id`),
+  ADD CONSTRAINT `tbljoboffer_ibfk_2` FOREIGN KEY (`joboffer_statusId`) REFERENCES `tbljobofferstatus` (`jobofferS_id`),
+  ADD CONSTRAINT `tbljoboffer_ibfk_3` FOREIGN KEY (`joboffer_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
 
 --
 -- Constraints for table `tbljobseducation`
@@ -4390,6 +4639,14 @@ ALTER TABLE `tbljobsworkexperience`
 --
 ALTER TABLE `tbllicensemaster`
   ADD CONSTRAINT `tbllicensemaster_ibfk_1` FOREIGN KEY (`license_master_typeId`) REFERENCES `tbllicensetype` (`license_type_id`);
+
+--
+-- Constraints for table `tblphysicalexam`
+--
+ALTER TABLE `tblphysicalexam`
+  ADD CONSTRAINT `tblphysicalexam_ibfk_1` FOREIGN KEY (`pe_candId`) REFERENCES `tblcandidates` (`cand_id`),
+  ADD CONSTRAINT `tblphysicalexam_ibfk_2` FOREIGN KEY (`pe_statusId`) REFERENCES `tblphysicalexamstatus` (`peS_id`),
+  ADD CONSTRAINT `tblphysicalexam_ibfk_3` FOREIGN KEY (`pe_typeId`) REFERENCES `tblphysicalexamtype` (`peT_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
