@@ -1495,7 +1495,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getInstitution(){
+  function getInstitution()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblinstitution";
     $stmt = $conn->prepare($sql);
@@ -1503,7 +1504,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getKnowledge(){
+  function getKnowledge()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblpersonalknowledge";
     $stmt = $conn->prepare($sql);
@@ -1511,6 +1513,16 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
+  function getLicenseMaster()
+  {
+    include "connection.php";
+    $sql = "SELECT a.license_master_id, a.license_master_name, b.license_type_name FROM tbllicensemaster a
+            INNER JOIN tbllicensetype b ON b.license_type_id = a.license_master_typeId
+            ORDER BY a.license_master_name";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1680,6 +1692,9 @@ switch ($operation) {
     break;
   case "getKnowledge":
     echo json_encode($admin->getKnowledge());
+    break;
+  case "getLicenseMaster":
+    echo json_encode($admin->getLicenseMaster());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
