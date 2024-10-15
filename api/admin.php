@@ -1413,14 +1413,15 @@ class Admin
     }
   }
 
-  function updateExamQuestion($json){
+  function updateExamQuestion($json)
+  {
     // {"questionId": 6, "text": "What is the capital of Francessss?", "typeId": 1, "points": 10, "options": [{"text": "Parisssss", "isCorrect": 1}, {"text": "Londonssss", "isCorrect": 0}, {"text": "Berlinsssss", "isCorrect": 0}, {"text": "Madriddddd", "isCorrect": 0}]}
     include "connection.php";
     $conn->beginTransaction();
     try {
       $data = json_decode($json, true);
       $currentDate = $this->getCurrentDate();
-    
+
       $sqlUpdateQuestion = "UPDATE tblexamquestion SET examQ_text = :examQ_text, examQ_typeId = :examQ_typeId, 
                             examQ_updatedAt = :examQ_updatedAt, examQ_points = :examQ_points WHERE examQ_id = :examQ_id";
       $stmtUpdateQuestion = $conn->prepare($sqlUpdateQuestion);
@@ -1430,12 +1431,12 @@ class Admin
       $stmtUpdateQuestion->bindParam(':examQ_points', $data['points']);
       $stmtUpdateQuestion->bindParam(':examQ_id', $data['questionId']);
       $stmtUpdateQuestion->execute();
-      
+
       $sqlDeleteOptions = "DELETE FROM tblexamchoices WHERE examC_questionId = :examQ_id";
       $stmtDeleteOptions = $conn->prepare($sqlDeleteOptions);
       $stmtDeleteOptions->bindParam(':examQ_id', $data['questionId']);
       $stmtDeleteOptions->execute();
-      
+
       if (isset($data['options']) && is_array($data['options'])) {
         $sqlInsertOption = "INSERT INTO tblexamchoices(examC_questionId, examC_text, examC_isCorrect)
                             VALUES (:examC_questionId, :examC_text, :examC_isCorrect)";
@@ -1448,7 +1449,7 @@ class Admin
           $stmtInsertOption->execute();
         }
       }
-      
+
       $conn->commit();
       return 1;
     } catch (\Throwable $th) {
@@ -1457,7 +1458,8 @@ class Admin
     }
   }
 
-  function updateExamMaster($json){
+  function updateExamMaster($json)
+  {
     // {"examId": 2, "name": "Sample Exam", "duration": 60}
     include "connection.php";
     $data = json_decode($json, true);
@@ -1472,13 +1474,36 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function getCourseCategory(){
+  function getCourseCategory()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblcoursescategory";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getCourse()
+  {
+    include "connection.php";
+    $sql = "SELECT a.courses_id, a.courses_name, b.course_categoryName, c.crs_type_name FROM tblcourses a
+            INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
+            INNER JOIN tblcoursetype c ON c.crs_type_id = a.courses_courseTypeId
+            ORDER BY a.courses_name";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getInstitution(){
+    include "connection.php";
+    $sql = "SELECT * FROM tblinstitution";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1639,6 +1664,12 @@ switch ($operation) {
     break;
   case "getCourseCategory":
     echo json_encode($admin->getCourseCategory());
+    break;
+  case "getCourse":
+    echo json_encode($admin->getCourse());
+    break;
+  case "getInstitution":
+    echo json_encode($admin->getInstitution());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
