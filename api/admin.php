@@ -1503,6 +1503,13 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
+  function getKnowledge(){
+    include "connection.php";
+    $sql = "SELECT * FROM tblpersonalknowledge";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 
 } //admin
 
@@ -1670,6 +1677,9 @@ switch ($operation) {
     break;
   case "getInstitution":
     echo json_encode($admin->getInstitution());
+    break;
+  case "getKnowledge":
+    echo json_encode($admin->getKnowledge());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
