@@ -1523,6 +1523,15 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getLicenseType()
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tbllicensetype";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1695,6 +1704,9 @@ switch ($operation) {
     break;
   case "getLicenseMaster":
     echo json_encode($admin->getLicenseMaster());
+    break;
+  case "getLicenseType":
+    echo json_encode($admin->getLicenseType());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
