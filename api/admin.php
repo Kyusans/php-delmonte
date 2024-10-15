@@ -1540,6 +1540,14 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getTraining(){
+    include "connection.php";
+    $sql = "SELECT * FROM tblpersonaltraining";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1718,6 +1726,9 @@ switch ($operation) {
     break;
   case "getSkills":
     echo json_encode($admin->getSkills());
+    break;
+  case "getTraining":
+    echo json_encode($admin->getTraining());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
