@@ -1482,6 +1482,7 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
   function getCourse()
   {
     include "connection.php";
@@ -1493,6 +1494,16 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getInstitution(){
+    include "connection.php";
+    $sql = "SELECT * FROM tblinstitution";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1656,6 +1667,9 @@ switch ($operation) {
     break;
   case "getCourse":
     echo json_encode($admin->getCourse());
+    break;
+  case "getInstitution":
+    echo json_encode($admin->getInstitution());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
