@@ -1533,7 +1533,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getSkills(){
+  function getSkills()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblpersonalskills";
     $stmt = $conn->prepare($sql);
@@ -1541,12 +1542,26 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getTraining(){
+  function getTraining()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblpersonaltraining";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function addCourseCategory($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblcoursescategory(course_categoryName) VALUES (:course_categoryName)";
+    foreach ($data as $category) {
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':course_categoryName', $category);
+      $stmt->execute();
+    }
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } //admin
 
@@ -1729,6 +1744,9 @@ switch ($operation) {
     break;
   case "getTraining":
     echo json_encode($admin->getTraining());
+    break;
+  case "addCourseCategory":
+    echo $admin->addCourseCategory($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
