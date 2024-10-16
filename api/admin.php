@@ -1594,6 +1594,17 @@ class Admin
     $newId = $conn->lastInsertId();
     return $stmt->rowCount() > 0 ? $newId : 0;
   }
+
+  function addInstitution($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinstitution(institution_name) VALUES (:institution_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':institution_name', $data['institutionName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1784,6 +1795,9 @@ switch ($operation) {
     break;
   case "addCourse":
     echo $admin->addCourse($json);
+    break;
+  case "addInstitution":
+    echo $admin->addInstitution($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
