@@ -1605,6 +1605,17 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
   }
+
+  function addKnowledge($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblpersonalknowledge(knowledge_name) VALUES (:knowledge_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':knowledge_name', $data['knowledgeName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1798,6 +1809,9 @@ switch ($operation) {
     break;
   case "addInstitution":
     echo $admin->addInstitution($json);
+    break;
+  case "addKnowledge":
+    echo $admin->addKnowledge($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
