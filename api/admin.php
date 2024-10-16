@@ -1551,19 +1551,6 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function addCourseCategory($json)
-  {
-    include "connection.php";
-    $data = json_decode($json, true);
-    $sql = "INSERT INTO tblcoursescategory(course_categoryName) VALUES (:course_categoryName)";
-    foreach ($data as $category) {
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':course_categoryName', $category);
-      $stmt->execute();
-    }
-    return $stmt->rowCount() > 0 ? 1 : 0;
-  }
-
   function getCourseType()
   {
     include "connection.php";
@@ -1580,6 +1567,18 @@ class Admin
     $returnValue['courseCategory'] = $this->getCourseCategory();
     $returnValue['courseType'] = $this->getCourseType();
     return json_encode($returnValue);
+  }
+
+  function addCourseCategory($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblcoursescategory(course_categoryName) VALUES (:course_categoryName)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':course_categoryName', $data["courseCategoryName"]);
+    $stmt->execute();
+    $newId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $newId : 0;
   }
 
   function addCourse($json)
