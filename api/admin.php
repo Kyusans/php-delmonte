@@ -1533,7 +1533,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getSkills(){
+  function getSkills()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblpersonalskills";
     $stmt = $conn->prepare($sql);
@@ -1541,12 +1542,79 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getTraining(){
+  function getTraining()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblpersonaltraining";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getCourseType()
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblcoursetype";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getAddCourseDropdown()
+  {
+    include "connection.php";
+    $returnValue = [];
+    $returnValue['courseCategory'] = $this->getCourseCategory();
+    $returnValue['courseType'] = $this->getCourseType();
+    return json_encode($returnValue);
+  }
+
+  function addCourseCategory($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblcoursescategory(course_categoryName) VALUES (:course_categoryName)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':course_categoryName', $data["courseCategoryName"]);
+    $stmt->execute();
+    $newId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $newId : 0;
+  }
+
+  function addCourse($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblcourses(courses_coursecategoryId, courses_courseTypeId, courses_name) VALUES (:courses_coursecategoryId, :courses_courseTypeId, :courses_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':courses_coursecategoryId', $data['courseCategory']);
+    $stmt->bindParam(':courses_courseTypeId', $data['courseType']);
+    $stmt->bindParam(':courses_name', $data['courseName']);
+    $stmt->execute();
+    $newId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $newId : 0;
+  }
+
+  function addInstitution($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinstitution(institution_name) VALUES (:institution_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':institution_name', $data['institutionName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
+  }
+
+  function addKnowledge($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblpersonalknowledge(knowledge_name) VALUES (:knowledge_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':knowledge_name', $data['knowledgeName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
   }
 } //admin
 
@@ -1729,6 +1797,21 @@ switch ($operation) {
     break;
   case "getTraining":
     echo json_encode($admin->getTraining());
+    break;
+  case "addCourseCategory":
+    echo $admin->addCourseCategory($json);
+    break;
+  case "getAddCourseDropdown":
+    echo $admin->getAddCourseDropdown();
+    break;
+  case "addCourse":
+    echo $admin->addCourse($json);
+    break;
+  case "addInstitution":
+    echo $admin->addInstitution($json);
+    break;
+  case "addKnowledge":
+    echo $admin->addKnowledge($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
