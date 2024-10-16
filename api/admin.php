@@ -1563,6 +1563,38 @@ class Admin
     }
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getCourseType()
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblcoursetype";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getAddCourseDropdown()
+  {
+    include "connection.php";
+    $returnValue = [];
+    $returnValue['courseCategory'] = $this->getCourseCategory();
+    $returnValue['courseType'] = $this->getCourseType();
+    return json_encode($returnValue);
+  }
+
+  function addCourse($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblcourses(courses_coursecategoryId, courses_courseTypeId, courses_name) VALUES (:courses_coursecategoryId, :courses_courseTypeId, :courses_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':courses_coursecategoryId', $data['courseCategory']);
+    $stmt->bindParam(':courses_courseTypeId', $data['courseType']);
+    $stmt->bindParam(':courses_name', $data['courseName']);
+    $stmt->execute();
+    $newId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $newId : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1747,6 +1779,12 @@ switch ($operation) {
     break;
   case "addCourseCategory":
     echo $admin->addCourseCategory($json);
+    break;
+  case "getAddCourseDropdown":
+    echo $admin->getAddCourseDropdown();
+    break;
+  case "addCourse":
+    echo $admin->addCourse($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
