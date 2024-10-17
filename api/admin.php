@@ -1616,6 +1616,18 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
   }
+
+  function addLicenseMaster($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbllicensemaster(license_master_name, license_master_typeId) VALUES (:license_master_name, :license_master_typeId)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':license_master_name', $data['licenseName']);
+    $stmt->bindParam(':license_master_typeId', $data['licenseType']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1812,6 +1824,9 @@ switch ($operation) {
     break;
   case "addKnowledge":
     echo $admin->addKnowledge($json);
+    break;
+  case "addLicenseMaster":
+    echo $admin->addLicenseMaster($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
