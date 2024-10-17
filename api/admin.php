@@ -1662,6 +1662,17 @@ class Admin
     return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
   }
 
+  function updateCourseCategory($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblcoursescategory SET course_categoryName = :course_categoryName WHERE course_categoryId = :course_categoryId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':course_categoryName', $data['courseCategoryName']);
+    $stmt->bindParam(':course_categoryId', $data['courseCategoryId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1870,6 +1881,9 @@ switch ($operation) {
     break;
   case "addTraining":
     echo $admin->addTraining($json);
+    break;
+  case "updateCourseCategory":
+    echo $admin->updateCourseCategory($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
