@@ -1628,6 +1628,40 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
   }
+
+  function addLicenseType($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbllicensetype(license_type_name) VALUES (:license_type_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':license_type_name', $data['licenseTypeName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
+  }
+
+  function addSkills($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblpersonalskills(perS_name) VALUES (:skills_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':skills_name', $data['skillName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
+  }
+
+  function addTraining($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblpersonaltraining(perT_name) VALUES (:perT_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':perT_name', $data['trainingName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
+  }
+
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1827,6 +1861,15 @@ switch ($operation) {
     break;
   case "addLicenseMaster":
     echo $admin->addLicenseMaster($json);
+    break;
+  case "addLicenseType":
+    echo $admin->addLicenseType($json);
+    break;
+  case "addSkills":
+    echo $admin->addSkills($json);
+    break;
+  case "addTraining":
+    echo $admin->addTraining($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
