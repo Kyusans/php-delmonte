@@ -1640,6 +1640,17 @@ class Admin
     return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
   }
 
+  function addSkills($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblpersonalskills(perS_name) VALUES (:skills_name)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':skills_name', $data['skillName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
+  }
+
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1842,6 +1853,9 @@ switch ($operation) {
     break;
   case "addLicenseType":
     echo $admin->addLicenseType($json);
+    break;
+  case "addSkills":
+    echo $admin->addSkills($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
