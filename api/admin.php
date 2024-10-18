@@ -1920,7 +1920,7 @@ class Admin
       throw $e;
     }
   }
-  
+
 
   function getGeneralExam()
   {
@@ -1943,6 +1943,19 @@ class Admin
       $returnValue = 0;
     }
     return $returnValue;
+  }
+
+  function getCandidateExamPoints($json)
+  {
+    // {"candidateId": 7, "examId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tblexamresult WHERE examR_candId = :candidateId AND examR_examId = :examId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':candidateId', $data['candidateId']);
+    $stmt->bindParam(':examId', $data['examId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 } //admin
 
@@ -2206,6 +2219,9 @@ switch ($operation) {
     break;
   case "deleteTraining":
     echo $admin->deleteTraining($json);
+    break;
+  case "getCandidateExamPoints":
+    echo json_encode($admin->getCandidateExamPoints($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
