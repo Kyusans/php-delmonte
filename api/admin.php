@@ -1486,7 +1486,7 @@ class Admin
   function getCourse()
   {
     include "connection.php";
-    $sql = "SELECT a.courses_id, a.courses_name, b.course_categoryName, c.crs_type_name FROM tblcourses a
+    $sql = "SELECT a.courses_id, b.course_categoryId, c.crs_type_id, a.courses_name, b.course_categoryName, c.crs_type_name FROM tblcourses a
             INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
             INNER JOIN tblcoursetype c ON c.crs_type_id = a.courses_courseTypeId
             ORDER BY a.courses_name";
@@ -1662,6 +1662,158 @@ class Admin
     return $stmt->rowCount() > 0 ? $conn->lastInsertId() : 0;
   }
 
+  function updateCourseCategory($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblcoursescategory SET course_categoryName = :course_categoryName WHERE course_categoryId = :course_categoryId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':course_categoryName', $data['courseCategoryName']);
+    $stmt->bindParam(':course_categoryId', $data['courseCategoryId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function updateCourse($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblcourses SET courses_coursecategoryId = :courses_coursecategoryId, courses_courseTypeId = :courses_courseTypeId, courses_name = :courses_name WHERE courses_id = :courses_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':courses_coursecategoryId', $data['courseCategory']);
+    $stmt->bindParam(':courses_courseTypeId', $data['courseType']);
+    $stmt->bindParam(':courses_name', $data['courseName']);
+    $stmt->bindParam(':courses_id', $data['courseId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function updateInstitution($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinstitution SET institution_name = :institution_name WHERE institution_id = :institution_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':institution_name', $data['institutionName']);
+    $stmt->bindParam(':institution_id', $data['institutionId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function updateKnowledge($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblpersonalknowledge SET knowledge_name = :knowledge_name WHERE knowledge_id = :knowledge_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':knowledge_name', $data['knowledgeName']);
+    $stmt->bindParam(':knowledge_id', $data['knowledgeId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function deleteCourseCategory($json)
+  {
+    // {"courseCategoryId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblcoursescategory WHERE course_categoryId = :course_categoryId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':course_categoryId', $data['courseCategoryId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw 0;
+    }
+  }
+
+  function deleteCourse($json)
+  {
+    // {"courseId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblcourses WHERE courses_id = :courses_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':courses_id', $data['courseId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
+  function deleteInstitution($json)
+  {
+    // {"institutionId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblinstitution WHERE institution_id = :institution_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':institution_id', $data['institutionId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
+  function deleteKnowledge($json)
+  {
+    // {"knowledgeId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblpersonalknowledge WHERE knowledge_id = :knowledge_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':knowledge_id', $data['knowledgeId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
+  function getGeneralExam()
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblexam WHERE exam_typeId  = 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getGeneralExamDetails()
+  {
+    include "connection.php";
+    $returnValue = [];
+    $exam = $this->getGeneralExam();
+    if ($exam !== 0) {
+      $returnValue['examMaster'] = $exam;
+      $returnValue['questionMaster'] = $this->getExamQuestions($exam[0]['exam_id']);
+    } else {
+      $returnValue = 0;
+    }
+    return $returnValue;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1870,6 +2022,36 @@ switch ($operation) {
     break;
   case "addTraining":
     echo $admin->addTraining($json);
+    break;
+  case "updateCourseCategory":
+    echo $admin->updateCourseCategory($json);
+    break;
+  case "updateCourse":
+    echo $admin->updateCourse($json);
+    break;
+  case "updateInstitution":
+    echo $admin->updateInstitution($json);
+    break;
+  case "updateKnowledge":
+    echo $admin->updateKnowledge($json);
+    break;
+  case "deleteCourseCategory":
+    echo $admin->deleteCourseCategory($json);
+    break;
+  case "deleteCourse":
+    echo $admin->deleteCourse($json);
+    break;
+  case "deleteInstitution":
+    echo $admin->deleteInstitution($json);
+    break;
+  case "deleteKnowledge":
+    echo $admin->deleteKnowledge($json);
+    break;
+  case "getGeneralExam":
+    echo json_encode($admin->getGeneralExam());
+    break;
+  case "getGeneralExamDetails":
+    echo json_encode($admin->getGeneralExamDetails());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
