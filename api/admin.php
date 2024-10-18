@@ -1725,6 +1725,18 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+  function updateLicenseType($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbllicensetype SET license_type_name = :license_type_name WHERE license_type_id = :license_type_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':license_type_name', $data['licenseTypeName']);
+    $stmt->bindParam(':license_type_id', $data['licenseTypeId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
   function deleteCourseCategory($json)
   {
     // {"courseCategoryId": 1}
@@ -2090,6 +2102,9 @@ switch ($operation) {
     break;
   case "deleteLicenseMaster":
     echo $admin->deleteLicenseMaster($json);
+    break;
+  case "updateLicenseType":
+    echo $admin->updateLicenseType($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
