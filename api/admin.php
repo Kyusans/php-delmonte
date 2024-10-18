@@ -1751,6 +1751,25 @@ class Admin
       throw $e;
     }
   }
+
+  function deleteInstitution($json){
+    // {"institutionId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblinstitution WHERE institution_id = :institution_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':institution_id', $data['institutionId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1978,6 +1997,10 @@ switch ($operation) {
   case "deleteCourse":
     echo $admin->deleteCourse($json);
     break;
+  case "deleteInstitution":
+    echo $admin->deleteInstitution($json);
+    break;
+
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
     break;
