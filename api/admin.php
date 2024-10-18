@@ -1737,6 +1737,18 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+  function updateSkill($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblpersonalskills SET perS_name = :perS_name WHERE perS_id = :perS_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':perS_name', $data['skillName']);
+    $stmt->bindParam(':perS_id', $data['skillId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
   function deleteCourseCategory($json)
   {
     // {"courseCategoryId": 1}
@@ -2129,6 +2141,9 @@ switch ($operation) {
     break;
   case "deleteLicenseType":
     echo $admin->deleteLicenseType($json);
+    break;
+  case "updateSkill":
+    echo $admin->updateSkill($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
