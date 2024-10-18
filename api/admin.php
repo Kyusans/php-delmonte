@@ -1687,6 +1687,18 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function updateInstitution($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinstitution SET institution_name = :institution_name WHERE institution_id = :institution_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':institution_name', $data['institutionName']);
+    $stmt->bindParam(':institution_id', $data['institutionId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1901,6 +1913,9 @@ switch ($operation) {
     break;
   case "updateCourse":
     echo $admin->updateCourse($json);
+    break;
+  case "updateInstitution":
+    echo $admin->updateInstitution($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
