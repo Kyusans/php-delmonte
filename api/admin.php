@@ -1752,7 +1752,8 @@ class Admin
     }
   }
 
-  function deleteInstitution($json){
+  function deleteInstitution($json)
+  {
     // {"institutionId": 1}
     include "connection.php";
     $data = json_decode($json, true);
@@ -1760,6 +1761,26 @@ class Admin
       $sql = "DELETE FROM tblinstitution WHERE institution_id = :institution_id";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(':institution_id', $data['institutionId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
+  function deleteKnowledge($json)
+  {
+    // {"knowledgeId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblpersonalknowledge WHERE knowledge_id = :knowledge_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':knowledge_id', $data['knowledgeId']);
       $stmt->execute();
       return $stmt->rowCount() > 0 ? 1 : 0;
     } catch (PDOException $e) {
@@ -2000,7 +2021,9 @@ switch ($operation) {
   case "deleteInstitution":
     echo $admin->deleteInstitution($json);
     break;
-
+  case "deleteKnowledge":
+    echo $admin->deleteKnowledge($json);
+    break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
     break;
