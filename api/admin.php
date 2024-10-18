@@ -1901,6 +1901,27 @@ class Admin
     }
   }
 
+  function deleteTraining($json)
+  {
+    // {"trainingId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblpersonaltraining WHERE perT_id = :perT_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':perT_id', $data['trainingId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
+  
+
   function getGeneralExam()
   {
     include "connection.php";
@@ -2182,6 +2203,9 @@ switch ($operation) {
     break;
   case "updateTraining":
     echo $admin->updateTraining($json);
+    break;
+  case "deleteTraining":
+    echo $admin->deleteTraining($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
