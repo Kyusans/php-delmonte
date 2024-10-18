@@ -1791,6 +1791,29 @@ class Admin
       throw $e;
     }
   }
+
+  function getGeneralExam()
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblexam WHERE exam_typeId  = 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getGeneralExamDetails()
+  {
+    include "connection.php";
+    $returnValue = [];
+    $exam = $this->getGeneralExam();
+    if ($exam !== 0) {
+      $returnValue['examMaster'] = $exam;
+      $returnValue['questionMaster'] = $this->getExamQuestions($exam[0]['exam_id']);
+    } else {
+      $returnValue = 0;
+    }
+    return $returnValue;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -2023,6 +2046,12 @@ switch ($operation) {
     break;
   case "deleteKnowledge":
     echo $admin->deleteKnowledge($json);
+    break;
+  case "getGeneralExam":
+    echo json_encode($admin->getGeneralExam());
+    break;
+  case "getGeneralExamDetails":
+    echo json_encode($admin->getGeneralExamDetails());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
