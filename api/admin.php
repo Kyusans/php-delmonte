@@ -1516,7 +1516,7 @@ class Admin
   function getLicenseMaster()
   {
     include "connection.php";
-    $sql = "SELECT a.license_master_id, a.license_master_name, b.license_type_name FROM tbllicensemaster a
+    $sql = "SELECT a.license_master_id, b.license_type_id, a.license_master_name, b.license_type_name FROM tbllicensemaster a
             INNER JOIN tbllicensetype b ON b.license_type_id = a.license_master_typeId
             ORDER BY a.license_master_name";
     $stmt = $conn->prepare($sql);
@@ -1708,6 +1708,19 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':knowledge_name', $data['knowledgeName']);
     $stmt->bindParam(':knowledge_id', $data['knowledgeId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function updateLicenseMaster($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbllicensemaster SET license_master_name = :license_master_name, license_master_typeId = :license_master_typeId WHERE license_master_id = :license_master_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':license_master_name', $data['licenseName']);
+    $stmt->bindParam(':license_master_typeId', $data['licenseType']);
+    $stmt->bindParam(':license_master_id', $data['licenseId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -2052,6 +2065,9 @@ switch ($operation) {
     break;
   case "getGeneralExamDetails":
     echo json_encode($admin->getGeneralExamDetails());
+    break;
+  case "updateLicenseMaster":
+    echo $admin->updateLicenseMaster($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
