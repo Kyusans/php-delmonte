@@ -1805,6 +1805,25 @@ class Admin
     }
   }
 
+  function deleteLicenseMaster($json){
+    // {"licenseMasterId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tbllicensemaster WHERE license_master_id = :license_master_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':license_master_id', $data['licenseId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
   function getGeneralExam()
   {
     include "connection.php";
@@ -2068,6 +2087,9 @@ switch ($operation) {
     break;
   case "updateLicenseMaster":
     echo $admin->updateLicenseMaster($json);
+    break;
+  case "deleteLicenseMaster":
+    echo $admin->deleteLicenseMaster($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
