@@ -1869,6 +1869,26 @@ class Admin
     }
   }
 
+  function deleteSkill($json)
+  {
+    // {"skillId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblpersonalskills WHERE perS_id = :perS_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':perS_id', $data['skillId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
   function getGeneralExam()
   {
     include "connection.php";
@@ -2144,6 +2164,9 @@ switch ($operation) {
     break;
   case "updateSkill":
     echo $admin->updateSkill($json);
+    break;
+  case "deleteSkill":
+    echo $admin->deleteSkill($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
