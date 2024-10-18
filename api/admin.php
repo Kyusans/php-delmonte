@@ -1486,7 +1486,7 @@ class Admin
   function getCourse()
   {
     include "connection.php";
-    $sql = "SELECT a.courses_id, a.courses_name, b.course_categoryName, c.crs_type_name FROM tblcourses a
+    $sql = "SELECT a.courses_id, b.course_categoryId, c.crs_type_id, a.courses_name, b.course_categoryName, c.crs_type_name FROM tblcourses a
             INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
             INNER JOIN tblcoursetype c ON c.crs_type_id = a.courses_courseTypeId
             ORDER BY a.courses_name";
@@ -1670,6 +1670,20 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':course_categoryName', $data['courseCategoryName']);
     $stmt->bindParam(':course_categoryId', $data['courseCategoryId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function updateCourse($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblcourses SET courses_coursecategoryId = :courses_coursecategoryId, courses_courseTypeId = :courses_courseTypeId, courses_name = :courses_name WHERE courses_id = :courses_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':courses_coursecategoryId', $data['courseCategory']);
+    $stmt->bindParam(':courses_courseTypeId', $data['courseType']);
+    $stmt->bindParam(':courses_name', $data['courseName']);
+    $stmt->bindParam(':courses_id', $data['courseId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -1884,6 +1898,9 @@ switch ($operation) {
     break;
   case "updateCourseCategory":
     echo $admin->updateCourseCategory($json);
+    break;
+  case "updateCourse":
+    echo $admin->updateCourse($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
