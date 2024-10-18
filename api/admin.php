@@ -1710,7 +1710,27 @@ class Admin
     $stmt->bindParam(':knowledge_id', $data['knowledgeId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
-  }     
+  }
+
+  function deleteCourseCategory($json)
+  {
+    // {"courseCategoryId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblcoursescategory WHERE course_categoryId = :course_categoryId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':course_categoryId', $data['courseCategoryId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw 0;
+    }
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1931,6 +1951,9 @@ switch ($operation) {
     break;
   case "updateKnowledge":
     echo $admin->updateKnowledge($json);
+    break;
+  case "deleteCourseCategory":
+    echo $admin->deleteCourseCategory($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
