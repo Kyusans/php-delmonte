@@ -1817,7 +1817,8 @@ class Admin
     }
   }
 
-  function deleteLicenseMaster($json){
+  function deleteLicenseMaster($json)
+  {
     // {"licenseMasterId": 1}
     include "connection.php";
     $data = json_decode($json, true);
@@ -1825,6 +1826,26 @@ class Admin
       $sql = "DELETE FROM tbllicensemaster WHERE license_master_id = :license_master_id";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(':license_master_id', $data['licenseId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
+  function deleteLicenseType($json)
+  {
+    // {"licenseTypeId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tbllicensetype WHERE license_type_id = :license_type_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':license_type_id', $data['licenseTypeId']);
       $stmt->execute();
       return $stmt->rowCount() > 0 ? 1 : 0;
     } catch (PDOException $e) {
@@ -2105,6 +2126,9 @@ switch ($operation) {
     break;
   case "updateLicenseType":
     echo $admin->updateLicenseType($json);
+    break;
+  case "deleteLicenseType":
+    echo $admin->deleteLicenseType($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
