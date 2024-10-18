@@ -1731,6 +1731,26 @@ class Admin
       throw 0;
     }
   }
+
+  function deleteCourse($json)
+  {
+    // {"courseId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblcourses WHERE courses_id = :courses_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':courses_id', $data['courseId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -1954,6 +1974,9 @@ switch ($operation) {
     break;
   case "deleteCourseCategory":
     echo $admin->deleteCourseCategory($json);
+    break;
+  case "deleteCourse":
+    echo $admin->deleteCourse($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
