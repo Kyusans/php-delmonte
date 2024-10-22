@@ -446,29 +446,11 @@ class Admin
     $conn->beginTransaction();
     try {
       $data = [];
-
-      $sql = "SELECT * FROM tblcoursescategory";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['courseCategory'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-      $sql = "SELECT * FROM tblpersonalskills";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['skills'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-      $sql = "SELECT * FROM tblpersonaltraining";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['training'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-      $sql = "SELECT * FROM tblpersonalknowledge";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['knowledge'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+      $data['courseCategory'] = $this->getCourseCategory();
+      $data['skills'] = $this->getSkills();
+      $data['training'] = $this->getTraining();
+      $data['knowledge'] = $this->getKnowledge();
       $conn->commit();
-
       return json_encode($data);
     } catch (\Throwable $th) {
       $conn->rollBack();
