@@ -1759,7 +1759,7 @@ class Admin
         // Foreign key constraint violation
         return -1;
       }
-      throw 0;
+      // throw 0;
     }
   }
 
@@ -1938,6 +1938,26 @@ class Admin
     $stmt->bindParam(':examId', $data['examId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function sendJobOffer($json)
+  {
+    // {"candId": 7, "jobId": 11, "statusId": 1, "salary": 10000, "document": "document", "expiryDate": "2024-01-01"}  
+    include "connection.php";
+    $data = json_decode($json, true);
+    $date = $this->getCurrentDate();
+    $sql = "INSERT INTO tbljoboffer(joboffer_candId, joboffer_jobMId, joboffer_date, joboffer_statusId, joboffer_salary, joboffer_document, joboffer_expiryDate) 
+            VALUES (:joboffer_candId, :joboffer_jobMId, :joboffer_date, :joboffer_statusId, :joboffer_salary, :joboffer_document, :joboffer_expiryDate)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':joboffer_candId', $data['candId']);
+    $stmt->bindParam(':joboffer_jobMId', $data['jobId']);
+    $stmt->bindParam(':joboffer_date', $date);
+    $stmt->bindParam(':joboffer_statusId', $data['statusId']);
+    $stmt->bindParam(':joboffer_salary', $data['salary']);
+    $stmt->bindParam(':joboffer_document', $data['document']);
+    $stmt->bindParam(':joboffer_expiryDate', $data['expiryDate']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } //admin
 
@@ -2204,6 +2224,9 @@ switch ($operation) {
     break;
   case "getCandidateExamPoints":
     echo json_encode($admin->getCandidateExamPoints($json));
+    break;
+  case "sendJobOffer":
+    echo $admin->sendJobOffer($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
