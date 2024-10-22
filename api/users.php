@@ -80,144 +80,33 @@ class User
 
   function signup($json)
   {
+    // {"lastName":"Bautista","firstName":"John","middleName":"Dela","contact":"09123456789","alternateContact":"09123456789","email":"johnbautista@gmail.com","alternateEmail":"johnbautista@gmail.com","presentAddress":"Manila","permanentAddress":"Manila","dob":"1990-01-01","gender":"Male","password":"password"}
     include "connection.php";
-    $conn->beginTransaction();
-    try {
-      $json = json_decode($json, true);
-      $personalInformation = $json['personalInfo'];
-      $educationalBackground = $json['educationalBackground'] ?? [];
-      $employmentHistory = $json['employmentHistory'] ?? [];
-      $skills = $json['skills'] ?? [];
-      $trainings = $json['trainings'] ?? [];
-      $knowledge = $json['knowledge'] ?? [];
-      $licenses = $json['licenses'] ?? [];
-      $createdDateTime = getCurrentDate();
-      $isSubscribeToEmail = $json['isSubscribeToEmail'] ?? 0;
-      // return json_encode($json);
-      // die();
-      $sql = "INSERT INTO tblcandidates(cand_lastname, cand_firstname, cand_middlename, cand_contactNo,
+    $data = json_decode($json, true);
+    $createdDateTime = getCurrentDate();
+    $sql = "INSERT INTO tblcandidates(cand_lastname, cand_firstname, cand_middlename, cand_contactNo,
                 cand_alternateContactNo, cand_email, cand_alternateEmail, cand_presentAddress,
-                cand_permanentAddress, cand_dateofBirth, cand_sex, cand_sssNo, cand_tinNo,
-                cand_philhealthNo, cand_pagibigNo, cand_password, cand_createdDatetime)
+                cand_permanentAddress, cand_dateofBirth, cand_sex, cand_password, cand_createdDatetime)
                 VALUES(:last_name, :first_name, :middle_name, :contact_number, :alternate_contact_number,
                 :email, :alternate_email, :present_address, :permanent_address, :date_of_birth,
-                :sex, :sss_number, :tin_number, :philhealth_number, :pagibig_number,
-                :personal_password, :created_datetime)";
-      $stmt = $conn->prepare($sql);
+                :sex, :personal_password, :created_datetime)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':last_name', $data['lastName']);
+    $stmt->bindParam(':first_name', $data['firstName']);
+    $stmt->bindParam(':middle_name', $data['middleName']);
+    $stmt->bindParam(':contact_number', $data['contact']);
+    $stmt->bindParam(':alternate_contact_number', $data['alternateContact']);
+    $stmt->bindParam(':email', $data['email']);
+    $stmt->bindParam(':alternate_email', $data['alternateEmail']);
+    $stmt->bindParam(':present_address', $data['presentAddress']);
+    $stmt->bindParam(':permanent_address', $data['permanentAddress']);
+    $stmt->bindParam(':date_of_birth', $data['dob']);
+    $stmt->bindParam(':sex', $data['gender']);
+    $stmt->bindParam(':personal_password', $data['password']);
+    $stmt->bindParam(':created_datetime', $createdDateTime);
+    $stmt->execute();
 
-      $stmt->bindParam(':last_name', $personalInformation['lastName']);
-      $stmt->bindParam(':first_name', $personalInformation['firstName']);
-      $stmt->bindParam(':middle_name', $personalInformation['middleName']);
-      $stmt->bindParam(':contact_number', $personalInformation['contact']);
-      $stmt->bindParam(':alternate_contact_number', $personalInformation['alternateContact']);
-      $stmt->bindParam(':email', $personalInformation['email']);
-      $stmt->bindParam(':alternate_email', $personalInformation['alternateEmail']);
-      $stmt->bindParam(':present_address', $personalInformation['presentAddress']);
-      $stmt->bindParam(':permanent_address', $personalInformation['permanentAddress']);
-      $stmt->bindParam(':date_of_birth', $personalInformation['dob']);
-      $stmt->bindParam(':sex', $personalInformation['gender']);
-      $stmt->bindParam(':sss_number', $personalInformation['sss']);
-      $stmt->bindParam(':tin_number', $personalInformation['tin']);
-      $stmt->bindParam(':philhealth_number', $personalInformation['philhealth']);
-      $stmt->bindParam(':pagibig_number', $personalInformation['pagibig']);
-      $stmt->bindParam(':personal_password', $personalInformation['password']);
-      $stmt->bindParam(':created_datetime', $createdDateTime);
-      $stmt->execute();
-      $newId = $conn->lastInsertId();
-
-      if ($stmt->rowCount() > 0) {
-        if (!empty($educationalBackground)) {
-          $sql = "INSERT INTO tblcandeducbackground (educ_canId, educ_coursesId, educ_institutionId, educ_dateGraduate) 
-          VALUES (:personal_info_id, :educational_courses_id, :educational_institution_id, :educational_date_graduate)";
-
-          foreach ($educationalBackground as $item) {
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':personal_info_id', $newId);
-            $stmt->bindParam(':educational_courses_id', $item['course']);
-            $stmt->bindParam(':educational_institution_id', $item['institution']);
-            $stmt->bindParam(':educational_date_graduate', $item['courseDateGraduated']);
-            $stmt->execute();
-          }
-        }
-
-        if ($stmt->rowCount() > 0 && !empty($employmentHistory)) {
-          $sql = "INSERT INTO tblcandemploymenthistory(empH_candId , empH_positionName, empH_companyName,
-                        empH_startDate, empH_endDate) VALUES (:personal_info_id, :employment_position_name,
-                        :employment_company_name, :employment_start_date, :employment_end_date)";
-          foreach ($employmentHistory as $item) {
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':personal_info_id', $newId);
-            $stmt->bindParam(':employment_position_name', $item['position']);
-            $stmt->bindParam(':employment_company_name', $item['company']);
-            $stmt->bindParam(':employment_start_date', $item['startDate']);
-            $stmt->bindParam(':employment_end_date', $item['endDate']);
-            $stmt->execute();
-          }
-        }
-
-        if ($stmt->rowCount() > 0 && !empty($trainings)) {
-          $sql = "INSERT INTO tblcandtraining (training_candId , training_perTId )
-                        VALUES (:personal_info_id, :personal_training_id)";
-          foreach ($trainings as $item) {
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':personal_info_id', $newId);
-            $stmt->bindParam(':personal_training_id', $item['training']);
-            $stmt->execute();
-          }
-        }
-
-        if ($stmt->rowCount() > 0 && !empty($skills)) {
-          $sql = "INSERT INTO tblcandskills(skills_candId , skills_perSId)
-                        VALUES (:personal_info_id, :personal_skill_id)";
-          foreach ($skills as $item) {
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':personal_info_id', $newId);
-            $stmt->bindParam(':personal_skill_id', $item['skills']);
-            $stmt->execute();
-          }
-        }
-
-        if ($stmt->rowCount() > 0 && !empty($knowledge)) {
-          $sql = "INSERT INTO tblcandknowledge(canknow_canId , canknow_knowledgeId)
-                        VALUES (:personal_info_id, :personal_knowledge_id)";
-          foreach ($knowledge as $item) {
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':personal_info_id', $newId);
-            $stmt->bindParam(':personal_knowledge_id', $item['knowledge']);
-            $stmt->execute();
-          }
-        }
-
-        if ($stmt->rowCount() > 0 && !empty($licenses)) {
-          $sql = "INSERT INTO tblcandlicense(license_number, license_canId, license_masterId) 
-                  VALUES (:license_number, :license_canId, :license_masterId)";
-          foreach ($licenses as $item) {
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':license_number', $item['licenseNumber']);
-            $stmt->bindParam(':license_canId', $newId);
-            $stmt->bindParam(':license_masterId', $item['license']);
-            $stmt->execute();
-          }
-        }
-
-        if ($stmt->rowCount() > 0 && !empty($isSubscribeToEmail)) {
-          $sql = "INSERT INTO tblcandconsent(cons_candId , cons_subscribetoemailupdates) 
-          VALUES (:personal_info_id, :personal_subscribe_to_email)";
-          $stmt = $conn->prepare($sql);
-          $stmt->bindParam(':personal_info_id', $newId);
-          $stmt->bindParam(':personal_subscribe_to_email', $isSubscribeToEmail);
-          $stmt->execute();
-        }
-
-        if ($stmt->rowCount() > 0) {
-          $conn->commit();
-          return 1;
-        }
-      }
-    } catch (PDOException $th) {
-      $conn->rollBack();
-      return $th;
-    }
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
   function updateEducationalBackground($json)
