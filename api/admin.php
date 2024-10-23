@@ -279,7 +279,7 @@ class Admin
             INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
             INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
             WHERE a.app_jobMId = :jobId
-            AND d.appS_date = (SELECT MAX(sub_d.appS_date) 
+            AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
             FROM tblapplicationstatus sub_d 
             WHERE sub_d.appS_appId = d.appS_appId)";
     $stmt = $conn->prepare($sql);
@@ -1088,6 +1088,7 @@ class Admin
 
   function changeApplicantStatus($json)
   {
+    // {"jobId": 12, "candId": 12, "status": 4}
     include "connection.php";
     $data = json_decode($json, true);
     $appId = $this->applicationIds($data['jobId'], $data['candId']);
@@ -1224,8 +1225,6 @@ class Admin
 
     return json_encode($returnValue);
   }
-
-
 
   function updateJobPassingPercent($json)
   {
