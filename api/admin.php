@@ -1088,6 +1088,13 @@ class Admin
     $stmt->execute();
     $criteria["knowledge"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
+    $sql = "SELECT COUNT(`joboffer_id`) AS isJobOffered FROM tbljoboffer WHERE `joboffer_candId` = :cand_id AND `joboffer_jobMId` = :job_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':job_id', $job_id);
+    $stmt->execute();
+    $returnValue["jobOffered"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
     // Add job criteria to returnValue
     $returnValue["criteria"] = $criteria;
 
