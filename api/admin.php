@@ -1109,12 +1109,18 @@ class Admin
     return json_encode($returnValue);
   }
 
-  function getJobInterviewDetails($data)
+  function getJobInterviewDetails($json)
   {
+    // {"jobId": 11}
     include "connection.php";
+    $data = json_decode($json, true);
     $returnValue = [];
     $returnValue["interviewPassingPercent"] = $this->getInterviewPassingPercent($data['jobId']);
-    $returnValue["interviewCriteria"] = $this->getInterviewCriteriaMaster($data);
+    $interviewCriteria = $this->getInterviewCriteriaMaster($data);
+    if ($interviewCriteria === 0) {
+      return 0;
+    }
+    $returnValue["interviewCriteria"] = $interviewCriteria;
     return $returnValue;
   }
 
@@ -2145,7 +2151,7 @@ switch ($operation) {
     echo $admin->getCandidateProfile($json);
     break;
   case "getJobInterviewDetails":
-    echo $admin->getJobInterviewDetails($json);
+    echo json_encode($admin->getJobInterviewDetails($json));
     break;
   case "deleteInterviewCriteria":
     echo $admin->deleteInterviewCriteria($json);
