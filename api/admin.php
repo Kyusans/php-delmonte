@@ -206,6 +206,78 @@ class Admin
     }
   }
 
+  function getJobDetails($json)
+  {
+    // {"jobId": 10}
+    include "connection.php";
+    $returnValue = [];
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tbljobsmaster WHERE jobM_id = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobMaster"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tbljobsmasterduties WHERE duties_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobDuties"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT a.*, b.course_categoryName  FROM tbljobseducation a 
+            INNER JOIN tblcoursescategory b ON b.course_categoryId = a.jeduc_categoryId
+            WHERE jeduc_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobEducation"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT a.*, b.perT_name FROM tbljobstrainings a
+            INNER JOIN tblpersonaltraining b ON b.perT_id = a.jtrng_trainingId
+            WHERE jtrng_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobTrainings"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT a.*, b.knowledge_name FROM tbljobsknowledge a
+            INNER JOIN tblpersonalknowledge b ON b.knowledge_id = a.jknow_knowledgeId
+            WHERE jknow_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobKnowledge"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT a.*, b.perS_name FROM tbljobsskills a
+            INNER JOIN tblpersonalskills b ON b.perS_id = a.jskills_skillsId
+            WHERE jskills_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobSkills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tbljobsworkexperience WHERE jwork_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobExperience"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT passing_points as passing_percentage FROM tbljobpassing WHERE passing_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobPassing"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT * FROM tblstatus";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $returnValue["status"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    // $returnValue["interview"] = $this->getJobInterviewDetails($data);
+
+    return json_encode($returnValue);
+  }
+
   function getSelectedJobs($json)
   {
     // {"jobId": 11}
@@ -1037,12 +1109,18 @@ class Admin
     return json_encode($returnValue);
   }
 
-  function getJobInterviewDetails($data)
+  function getJobInterviewDetails($json)
   {
+    // {"jobId": 11}
     include "connection.php";
+    $data = json_decode($json, true);
     $returnValue = [];
     $returnValue["interviewPassingPercent"] = $this->getInterviewPassingPercent($data['jobId']);
-    $returnValue["interviewCriteria"] = $this->getInterviewCriteriaMaster($data);
+    $interviewCriteria = $this->getInterviewCriteriaMaster($data);
+    if ($interviewCriteria === 0) {
+      return 0;
+    }
+    $returnValue["interviewCriteria"] = $interviewCriteria;
     return $returnValue;
   }
 
@@ -1982,6 +2060,9 @@ switch ($operation) {
   case "getDropDownForAddJobs":
     echo $admin->getDropDownForAddJobs();
     break;
+  case "getJobDetails":
+    echo $admin->getJobDetails($json);
+    break;
   case "getSelectedJobs":
     echo $admin->getSelectedJobs($json);
     break;
@@ -2070,7 +2151,7 @@ switch ($operation) {
     echo $admin->getCandidateProfile($json);
     break;
   case "getJobInterviewDetails":
-    echo $admin->getJobInterviewDetails($json);
+    echo json_encode($admin->getJobInterviewDetails($json));
     break;
   case "deleteInterviewCriteria":
     echo $admin->deleteInterviewCriteria($json);
