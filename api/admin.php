@@ -358,7 +358,7 @@ class Admin
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-    $returnValue["interview"] = $this->getJobInterviewDetails($data);
+    // $returnValue["interview"] = $this->getJobInterviewDetails(json_encode($data));
     $returnValue['exam'] = $this->getExamDetails($data['jobId']);
     foreach ($returnValue["candidates"] as &$candidate) {
       $candidate['points'] = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
@@ -2043,6 +2043,20 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getInterviewCandidates($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName FROM tblapplicationstatus a 
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
+            WHERE a.appS_statusId = 6 AND b.app_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -2314,6 +2328,9 @@ switch ($operation) {
     break;
   case "sendJobOffer":
     echo $admin->sendJobOffer($json);
+    break;
+  case "getInterviewCandidates":
+    echo json_encode($admin->getInterviewCandidates($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
