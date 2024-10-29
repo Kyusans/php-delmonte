@@ -359,7 +359,7 @@ class Admin
     $stmt->execute();
     $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
     // $returnValue["interview"] = $this->getJobInterviewDetails(json_encode($data));
-    $returnValue['exam'] = $this->getExamDetails($data['jobId']);
+    $returnValue['exam'] = $this->getExamDetails($json);
     foreach ($returnValue["candidates"] as &$candidate) {
       $candidate['points'] = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
     }
@@ -1137,7 +1137,7 @@ class Admin
   function getInterviewCategory()
   {
     include "connection.php";
-    $sql = "SELECT * FROM tblinterviewcategory WHERE interview_categ_status = 1";
+    $sql = "SELECT * FROM tblinterviewcategory";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
@@ -1165,6 +1165,7 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "UPDATE tblinterviewcriteriamaster SET inter_criteria_status = 0 WHERE inter_criteria_id = :criteriaId";
+    // $sql = "DELETE FROM tblinterviewcriteriamaster WHERE inter_criteria_id = :criteriaId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":criteriaId", $data['criteriaId']);
     $stmt->execute();
@@ -1401,10 +1402,12 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getExamDetails($jobId)
+  function getExamDetails($json)
   {
     include "connection.php";
     $returnValue = [];
+    $data = json_decode($json, true);
+    $jobId = $data['jobId'];
     $exam = $this->getExam($jobId);
     if ($exam !== 0) {
       $returnValue['examMaster'] = $exam;
@@ -2057,6 +2060,24 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getExamCandidates($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+            FROM tblapplicationstatus a 
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+            WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
+            AND (a.appS_statusId = 5 OR a.appS_statusId = 9 OR a.appS_statusId = 10) 
+            AND b.app_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
@@ -2207,7 +2228,7 @@ switch ($operation) {
     echo $admin->addExam($json);
     break;
   case "getExamDetails":
-    echo $admin->getExamDetails($json);
+    echo json_encode($admin->getExamDetails($json));
     break;
   case "addExamQuestions":
     echo $admin->addExamQuestions($json);
@@ -2331,6 +2352,9 @@ switch ($operation) {
     break;
   case "getInterviewCandidates":
     echo json_encode($admin->getInterviewCandidates($json));
+    break;
+  case "getExamCandidates":
+    echo json_encode($admin->getExamCandidates($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
