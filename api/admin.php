@@ -2051,9 +2051,10 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName FROM tblapplicationstatus a 
+    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name FROM tblapplicationstatus a 
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
+            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
             WHERE a.appS_statusId = 6 AND b.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':jobId', $data['jobId']);
