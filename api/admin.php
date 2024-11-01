@@ -15,43 +15,6 @@ class Admin
     return $count > 0;
   }
 
-  function uploadImage()
-  {
-    if (isset($_FILES["file"])) {
-      $file = $_FILES['file'];
-      // print_r($file);
-      $fileName = $_FILES['file']['name'];
-      $fileTmpName = $_FILES['file']['tmp_name'];
-      $fileSize = $_FILES['file']['size'];
-      $fileError = $_FILES['file']['error'];
-      // $fileType = $_FILES['file']['type'];
-
-      $fileExt = explode(".", $fileName);
-      $fileActualExt = strtolower(end($fileExt));
-
-      $allowed = ["jpg", "jpeg", "png"];
-
-      if (in_array($fileActualExt, $allowed)) {
-        if ($fileError === 0) {
-          if ($fileSize < 25000000) {
-            $fileNameNew = uniqid("", true) . "." . $fileActualExt;
-            $fileDestination =  'images/' . $fileNameNew;
-            move_uploaded_file($fileTmpName, $fileDestination);
-            return $fileNameNew;
-          } else {
-            return 4;
-          }
-        } else {
-          return 3;
-        }
-      } else {
-        return 2;
-      }
-    } else {
-      return "";
-    }
-  }
-
   function getCurrentDate()
   {
     $today = new DateTime("now", new DateTimeZone('Asia/Manila'));
@@ -73,12 +36,13 @@ class Admin
     $todayDate = $this->getCurrentDate();
 
     try {
-      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status, jobM_createdAt) VALUES (:jobM_title, :jobM_description, :jobM_status, :jobM_createdAt)";
+      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status, jobM_createdAt, jobM_totalPoints) VALUES (:jobM_title, :jobM_description, :jobM_status, :jobM_createdAt, :jobM_totalPoints)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobM_title", $jobMaster['title']);
       $stmt->bindParam(":jobM_description", $jobMaster['description']);
       $stmt->bindParam(":jobM_status", $jobMaster['isJobActive']);
       $stmt->bindParam(":jobM_createdAt", $todayDate);
+      $stmt->bindParam(":jobM_totalPoints", $data['totalPoints']);
       $stmt->execute();
 
       $jobMasterId = $conn->lastInsertId();
@@ -2080,6 +2044,43 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 } //admin
+
+function uploadImage()
+{
+  if (isset($_FILES["file"])) {
+    $file = $_FILES['file'];
+    // print_r($file);
+    $fileName = $_FILES['file']['name'];
+    $fileTmpName = $_FILES['file']['tmp_name'];
+    $fileSize = $_FILES['file']['size'];
+    $fileError = $_FILES['file']['error'];
+    // $fileType = $_FILES['file']['type'];
+
+    $fileExt = explode(".", $fileName);
+    $fileActualExt = strtolower(end($fileExt));
+
+    $allowed = ["jpg", "jpeg", "png"];
+
+    if (in_array($fileActualExt, $allowed)) {
+      if ($fileError === 0) {
+        if ($fileSize < 25000000) {
+          $fileNameNew = uniqid("", true) . "." . $fileActualExt;
+          $fileDestination =  'images/' . $fileNameNew;
+          move_uploaded_file($fileTmpName, $fileDestination);
+          return $fileNameNew;
+        } else {
+          return 4;
+        }
+      } else {
+        return 3;
+      }
+    } else {
+      return 2;
+    }
+  } else {
+    return "";
+  }
+}
 
 $json = isset($_POST["json"]) ? $_POST["json"] : "0";
 $operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
