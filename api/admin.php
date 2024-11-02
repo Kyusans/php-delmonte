@@ -2043,6 +2043,20 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function updateJobMaster($json)
+  {
+    // {"jobId": 2, "jobTitle": "Job Title", "jobDescription": "Job Description"}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobsmaster SET jobM_title = :jobM_title, jobM_description = :jobM_description WHERE jobM_id = :jobM_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobM_title', $data['jobTitle']);
+    $stmt->bindParam(':jobM_description', $data['jobDescription']);
+    $stmt->bindParam(':jobM_id', $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -2357,6 +2371,9 @@ switch ($operation) {
     break;
   case "getExamCandidates":
     echo json_encode($admin->getExamCandidates($json));
+    break;
+  case "updateJobMaster":
+    echo $admin->updateJobMaster($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
