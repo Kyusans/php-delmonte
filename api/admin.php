@@ -309,7 +309,7 @@ class Admin
     $stmt->execute();
     $returnValue["status"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, e.status_name
+    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, b.cand_email, e.status_name
             FROM tblapplications a
             INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
             INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
@@ -2015,7 +2015,7 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name FROM tblapplicationstatus a 
+    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, c.cand_email, d.status_name FROM tblapplicationstatus a 
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
@@ -2056,6 +2056,42 @@ class Admin
     $stmt->bindParam(':jobM_id', $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function batchSetInterview($json)
+  {
+    include "connection.php";
+    include "send_email.php";
+    $conn->beginTransaction();
+    try {
+      $data = json_decode($json, true);
+      $candidates = $data['candidates'];
+      $dateNow = $this->getCurrentDate();
+      $date = $data['date'];
+      $jobId = $data['jobId'];
+      $sendEmail = new SendEmail();
+
+      $sql = "INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date) 
+      VALUES (:appS_appId, 6, :appS_date)";
+      foreach ($candidates as $candidate) {
+        $appId = $this->applicationIds($jobId, $candidate['candId']);
+        $id = json_encode($appId[0]['app_id']);
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':appS_appId', $id);
+        $stmt->bindParam(':appS_date', $dateNow);
+        $stmt->execute();
+        $emailSubjtect = "You have been selected for an interview";
+        $emailBody = "Hello " . $candidate['fullName'] . "! You have been selected for an interview.
+        <br><br> The interview date is: " . $date;
+        $sendEmail->sendEmail($candidate['candEmail'], $emailSubjtect, $emailBody);
+      }
+
+      $conn->commit();
+      return 1;
+    } catch (\Throwable $th) {
+      $conn->rollBack();
+      return 0;
+    }
   }
 } //admin
 
@@ -2374,6 +2410,9 @@ switch ($operation) {
     break;
   case "updateJobMaster":
     echo $admin->updateJobMaster($json);
+    break;
+  case "batchSetInterview":
+    echo $admin->batchSetInterview($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
