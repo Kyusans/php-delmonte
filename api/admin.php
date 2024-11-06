@@ -2080,17 +2080,26 @@ class Admin
         $stmt->bindParam(':appS_appId', $id);
         $stmt->bindParam(':appS_date', $dateNow);
         $stmt->execute();
-        $emailSubjtect = "You have been selected for an interview";
+
+        $sql2 = "INSERT INTO tblinterviewschedule (intsched_jobId, intsched_candId, intsched_date) 
+        VALUES (:intsched_jobId, :intsched_candId, :intsched_date)";
+        $stmt2 = $conn->prepare($sql2);
+        $stmt2->bindParam(':intsched_jobId', $jobId);
+        $stmt2->bindParam(':intsched_candId', $candidate['candId']);
+        $stmt2->bindParam(':intsched_date', $date);
+        $stmt2->execute();
+
+        $emailSubject = "You have been selected for an interview";
         $emailBody = "Hello " . $candidate['fullName'] . "! You have been selected for an interview.
         <br><br> The interview date is: " . $date;
-        $sendEmail->sendEmail($candidate['candEmail'], $emailSubjtect, $emailBody);
+        $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
       }
 
       $conn->commit();
       return 1;
     } catch (\Throwable $th) {
       $conn->rollBack();
-      return 0;
+      return $th;
     }
   }
 } //admin
