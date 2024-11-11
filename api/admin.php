@@ -2046,7 +2046,7 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
             FROM tblapplicationstatus a 
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
