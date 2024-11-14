@@ -1123,12 +1123,13 @@ class Admin
     // {"jobId": 11, "criteriaId": 8, "points": 200}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tblinterviewcriteriamaster(inter_criteria_jobId, inter_criteria_criteriaId, inter_criteria_points)
-            VALUES (:jobId, :criteriaId, :points)";
+    $sql = "INSERT INTO tblinterviewcriteriamaster(inter_criteria_jobId, inter_criteria_criteriaId, inter_criteria_question, inter_criteria_points)
+            VALUES (:jobId, :criteriaId, :question, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->bindParam(":criteriaId", $data['criteriaId']);
     $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":question", $data['question']);
     $stmt->execute();
     $lastId = $conn->lastInsertId();
     return $stmt->rowCount() > 0 ? $lastId : 0;
@@ -1219,7 +1220,7 @@ class Admin
   {
     // {"jobId": 11}
     include "connection.php";
-    $sql = "SELECT a.inter_criteria_id, b.criteria_inter_name, c.interview_categ_name, a.inter_criteria_points, b.criteria_inter_id FROM tblinterviewcriteriamaster a 
+    $sql = "SELECT a.inter_criteria_id, a.inter_criteria_question, b.criteria_inter_name, c.interview_categ_name, a.inter_criteria_points, b.criteria_inter_id FROM tblinterviewcriteriamaster a 
             INNER JOIN tblinterviewcriteria b ON b.criteria_inter_id = a.inter_criteria_criteriaId
             INNER JOIN tblinterviewcategory c ON c.interview_categ_id = b.criteria_inter_categId
             WHERE inter_criteria_jobId = :jobId AND a.inter_criteria_status = 1";
