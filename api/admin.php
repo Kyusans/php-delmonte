@@ -2157,6 +2157,25 @@ class Admin
 
     return $candidates;
   }
+
+  function getJobPassingPercentage($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT passing_points as passing_percentage FROM tbljobpassing WHERE passing_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getPendingDetails($json)
+  {
+    $returnValue = [];
+    $returnValue['candidates'] = $this->getPendingCandidates($json);
+    $returnValue['passingPercentage'] = $this->getJobPassingPercentage($json);
+    return $returnValue;
+  }
 } //admin
 
 function uploadImage()
@@ -2478,8 +2497,8 @@ switch ($operation) {
   case "batchSetInterview":
     echo $admin->batchSetInterview($json);
     break;
-  case "getPendingCandidates":
-    echo json_encode($admin->getPendingCandidates($json));
+  case "getPendingDetails":
+    echo json_encode($admin->getPendingDetails($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
