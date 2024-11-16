@@ -2122,32 +2122,59 @@ class Admin
 
   function getPendingCandidates($json)
   {
-    $returnValue = [];
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, b.cand_email, e.status_name
-            FROM tblapplications a
-            INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
-            INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
-            INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
-            WHERE a.app_jobMId = :jobId
-            AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
-            FROM tblapplicationstatus sub_d 
-            WHERE sub_d.appS_appId = d.appS_appId)
-            AND (d.appS_statusId = 1 OR d.appS_statusId = 2) 
-            AND a.app_jobMId = :jobId 
-            ORDER BY b.cand_id DESC";
+
+    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, 
+              b.cand_email, e.status_name
+              FROM tblapplications a
+              INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
+              INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
+              INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
+              WHERE a.app_jobMId = :jobId
+              AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
+              FROM tblapplicationstatus sub_d 
+              WHERE sub_d.appS_appId = d.appS_appId)
+              AND (d.appS_statusId = 1 OR d.appS_statusId = 2) 
+              AND a.app_jobMId = :jobId 
+              ORDER BY b.cand_id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
-    $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-    $returnValue['exam'] = $this->getExamDetails($json);
-    foreach ($returnValue["candidates"] as &$candidate) {
-      // $candidate['points'] = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
-      echo json_encode($this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']));
-      die();
+
+    if ($stmt->rowCount() > 0) {
+      $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } else {
+      return 0;
     }
-    // return $returnValue;
+
+    foreach ($candidates as &$candidate) {
+      $points = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
+      $candidate['maxPoints'] = $points['maxPoints'];
+      $candidate['totalPoints'] = $points['totalPoints'];
+      $candidate['percentage'] = $points['percentage'];
+    }
+
+    return $candidates;
+  }
+
+  function getJobPassingPercentage($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT passing_points as passing_percentage FROM tbljobpassing WHERE passing_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getPendingDetails($json)
+  {
+    $returnValue = [];
+    $returnValue['candidates'] = $this->getPendingCandidates($json);
+    $returnValue['passingPercentage'] = $this->getJobPassingPercentage($json);
+    return $returnValue;
   }
 } //admin
 
@@ -2470,8 +2497,8 @@ switch ($operation) {
   case "batchSetInterview":
     echo $admin->batchSetInterview($json);
     break;
-  case "getPendingCandidates":
-    echo $admin->getPendingCandidates($json);
+  case "getPendingDetails":
+    echo json_encode($admin->getPendingDetails($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
