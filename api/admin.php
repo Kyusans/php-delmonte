@@ -2027,16 +2027,19 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, c.cand_email, d.status_name FROM tblapplicationstatus a 
-            INNER JOIN tblapplications b ON b.app_id = a.appS_appId
-            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
-            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
-             INNER JOIN (
-            SELECT appS_appId, MAX(appS_id) AS latest_appS_id
-            FROM tblapplicationstatus
-            GROUP BY appS_appId
-            ) latest_status ON latest_status.latest_appS_id = a.appS_id
-            WHERE a.appS_statusId = 6 AND b.app_jobMId = :jobId";
+
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
+                    c.cand_email, d.status_name, DATE_FORMAT(e.latest_sched_date, '%b %d %Y') AS schedDate
+              FROM tblapplicationstatus a
+              INNER JOIN tblapplications b ON b.app_id = a.appS_appId
+              INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
+              INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+              INNER JOIN (SELECT intsched_jobId, intsched_candId, MAX(intsched_date) AS latest_sched_date FROM tblinterviewschedule GROUP BY intsched_jobId, intsched_candId) e 
+                    ON e.intsched_jobId = b.app_jobMId AND e.intsched_candId = c.cand_id
+              INNER JOIN (SELECT appS_appId, MAX(appS_id) AS latest_appS_id FROM tblapplicationstatus GROUP BY appS_appId) latest_status 
+                    ON latest_status.latest_appS_id = a.appS_id
+              WHERE a.appS_statusId = 6 AND b.app_jobMId = :jobId ORDER BY e.latest_sched_date";
+
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
@@ -2126,18 +2129,18 @@ class Admin
     $data = json_decode($json, true);
 
     $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, 
-              b.cand_email, e.status_name
-              FROM tblapplications a
-              INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
-              INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
-              INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
-              WHERE a.app_jobMId = :jobId
-              AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
-              FROM tblapplicationstatus sub_d 
-              WHERE sub_d.appS_appId = d.appS_appId)
-              AND (d.appS_statusId = 1 OR d.appS_statusId = 2) 
-              AND a.app_jobMId = :jobId 
-              ORDER BY b.cand_id DESC";
+                b.cand_email, e.status_name
+                FROM tblapplications a
+                INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
+                INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
+                INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
+                WHERE a.app_jobMId = :jobId
+                AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
+                FROM tblapplicationstatus sub_d 
+                WHERE sub_d.appS_appId = d.appS_appId)
+                AND (d.appS_statusId = 1 OR d.appS_statusId = 2) 
+                AND a.app_jobMId = :jobId 
+                ORDER BY b.cand_id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
@@ -2145,7 +2148,7 @@ class Admin
     if ($stmt->rowCount() > 0) {
       $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } else {
-      return 0;
+      return [];
     }
 
     foreach ($candidates as &$candidate) {
@@ -2155,8 +2158,13 @@ class Admin
       $candidate['percentage'] = $points['percentage'];
     }
 
+    usort($candidates, function ($a, $b) {
+      return $b['percentage'] <=> $a['percentage'];
+    });
+
     return $candidates;
   }
+
 
   function getJobPassingPercentage($json)
   {
