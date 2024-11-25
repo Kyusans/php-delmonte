@@ -1234,7 +1234,7 @@ class Admin
     // {"jobId": 11}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT a.inter_criteria_id, a.inter_criteria_points, b.criteria_inter_name, c.interview_categ_name FROM tblinterviewcriteriamaster a
+    $sql = "SELECT a.inter_criteria_id, a.inter_criteria_points, a.inter_criteria_question, b.criteria_inter_name, c.interview_categ_name FROM tblinterviewcriteriamaster a
             INNER JOIN tblinterviewcriteria b ON b.criteria_inter_id = a.inter_criteria_criteriaId
             INNER JOIN tblinterviewcategory c ON c.interview_categ_id = b.criteria_inter_categId
             WHERE inter_criteria_jobId = :jobId AND inter_criteria_status = 1
@@ -2184,6 +2184,42 @@ class Admin
     $returnValue['passingPercentage'] = $this->getJobPassingPercentage($json);
     return $returnValue;
   }
+
+  function getBackgroundCheckCandidates($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+            FROM tblapplicationstatus a 
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+            WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
+            AND (a.appS_statusId = 7) AND b.app_jobMId = :jobId
+            ORDER BY c.cand_id DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getJobOfferCandidates($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+            FROM tblapplicationstatus a 
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+            WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
+            AND (a.appS_statusId = 8) 
+            AND b.app_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -2507,6 +2543,12 @@ switch ($operation) {
     break;
   case "getPendingDetails":
     echo json_encode($admin->getPendingDetails($json));
+    break;
+  case "getBackgroundCheckCandidates":
+    echo json_encode($admin->getBackgroundCheckCandidates($json));
+    break;
+  case "getJobOfferCandidates":
+    echo json_encode($admin->getJobOfferCandidates($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
