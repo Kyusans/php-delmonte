@@ -2202,6 +2202,24 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getJobOfferCandidates($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+            FROM tblapplicationstatus a 
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+            WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
+            AND (a.appS_statusId = 8) 
+            AND b.app_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -2528,6 +2546,9 @@ switch ($operation) {
     break;
   case "getBackgroundCheckCandidates":
     echo json_encode($admin->getBackgroundCheckCandidates($json));
+    break;
+  case "getJobOfferCandidates":
+    echo json_encode($admin->getJobOfferCandidates($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
