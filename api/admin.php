@@ -2010,12 +2010,11 @@ class Admin
     $data = json_decode($json, true);
     $date = $this->getCurrentDate();
     $sql = "INSERT INTO tbljoboffer(joboffer_candId, joboffer_jobMId, joboffer_date, joboffer_statusId, joboffer_salary, joboffer_document, joboffer_expiryDate) 
-            VALUES (:joboffer_candId, :joboffer_jobMId, :joboffer_date, :joboffer_statusId, :joboffer_salary, :joboffer_document, :joboffer_expiryDate)";
+            VALUES (:joboffer_candId, :joboffer_jobMId, :joboffer_date, 3, :joboffer_salary, :joboffer_document, :joboffer_expiryDate)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':joboffer_candId', $data['candId']);
     $stmt->bindParam(':joboffer_jobMId', $data['jobId']);
     $stmt->bindParam(':joboffer_date', $date);
-    $stmt->bindParam(':joboffer_statusId', $data['statusId']);
     $stmt->bindParam(':joboffer_salary', $data['salary']);
     $stmt->bindParam(':joboffer_document', $data['document']);
     $stmt->bindParam(':joboffer_expiryDate', $data['expiryDate']);
