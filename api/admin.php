@@ -1388,6 +1388,7 @@ class Admin
     if ($exam !== 0) {
       $returnValue['examMaster'] = $exam;
       $returnValue['questionMaster'] = $this->getExamQuestions($exam[0]['exam_id']);
+      $returnValue['passingPercentage'] = $this->getExamPassingPercentage($jobId);
     } else {
       $returnValue = 0;
     }
@@ -2028,7 +2029,8 @@ class Admin
     $data = json_decode($json, true);
 
     $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
-                    c.cand_email, d.status_name, DATE_FORMAT(e.latest_sched_date, '%b %d %Y') AS schedDate
+                    c.cand_email, d.status_name, DATE_FORMAT(e.latest_sched_date, '%b %d %Y') AS schedDate,
+                    DATE_FORMAT(e.latest_sched_date, '%l:%i %p') AS schedTime
               FROM tblapplicationstatus a
               INNER JOIN tblapplications b ON b.app_id = a.appS_appId
               INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
@@ -2218,6 +2220,15 @@ class Admin
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getExamPassingPercentage($jobId){
+    include "connection.php";
+    $sql = "SELECT jobM_passpercentage FROM tbljobsmaster WHERE jobM_id = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
   }
 } //admin
 
