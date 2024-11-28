@@ -1118,6 +1118,51 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
+  function addInterviewCategory($json)
+  {
+    // {"categoryName": "Sample Category"}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinterviewcategory(interview_categ_name) VALUES(:categoryName)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":categoryName", $data['interviewCategoryName']);
+    $stmt->execute();
+    $lastId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $lastId : 0;
+  }
+
+  function deleteInterviewCategory($json)
+  {
+    // {"categoryId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblinterviewcategory WHERE interview_categ_id = :categoryId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":categoryId", $data['interviewCategoryId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
+  function updateInterviewCategory($json)
+  {
+    // {"categoryId": 1, "categoryName": "Updated Category"}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinterviewcategory SET interview_categ_name = :categoryName WHERE interview_categ_id = :categoryId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":categoryId", $data['interviewCategoryId']);
+    $stmt->bindParam(":categoryName", $data['interviewCategoryName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
   function addInterviewCriteriaMaster($json)
   {
     // {"jobId": 11, "criteriaId": 8, "points": 200}
@@ -2245,6 +2290,64 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
   }
+
+  function addInterviewCriteria($json)
+  {
+    // {"criteriaName": "Criteria Name", "categoryId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinterviewcriteria (criteria_inter_name, criteria_inter_categId) VALUES (:criteriaName, :categoryId)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":criteriaName", $data['interviewCriteriaName']);
+    $stmt->bindParam(":categoryId", $data['interviewCategoryId']);
+    $stmt->execute();
+    $lastId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $lastId : 0;
+  }
+
+  function getInterviewCriteriaMasterFiles()
+  {
+    include "connection.php";
+    $sql = "SELECT a.criteria_inter_id, a.criteria_inter_name, b.interview_categ_id, b.interview_categ_name FROM tblinterviewcriteria a 
+            INNER JOIN tblinterviewcategory b ON a.criteria_inter_categId = b.interview_categ_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function deleteInterviewCriteriaMaster($json)
+  {
+    // {"criteriaId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblinterviewcriteria WHERE criteria_inter_id = :criteriaId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":criteriaId", $data['criteriaId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
+  function updateInterviewCriteria($json)
+  {
+    // {"criteriaId": 1, "criteriaName": "Updated Criteria Name", "categoryId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinterviewcriteria SET criteria_inter_name = :criteriaName, criteria_inter_categId = :categoryId WHERE criteria_inter_id = :criteriaId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":criteriaId", $data['criteriaId']);
+    $stmt->bindParam(":criteriaName", $data['interviewCriteriaName']);
+    $stmt->bindParam(":categoryId", $data['interviewCategoryId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -2574,6 +2677,27 @@ switch ($operation) {
     break;
   case "getJobOfferCandidates":
     echo json_encode($admin->getJobOfferCandidates($json));
+    break;
+  case "addInterviewCategory":
+    echo $admin->addInterviewCategory($json);
+    break;
+  case "deleteInterviewCategory":
+    echo $admin->deleteInterviewCategory($json);
+    break;
+  case "updateInterviewCategory":
+    echo $admin->updateInterviewCategory($json);
+    break;
+  case "getInterviewCriteriaMasterFiles":
+    echo json_encode($admin->getInterviewCriteriaMasterFiles());
+    break;
+  case "deleteInterviewCriteriaMaster":
+    echo $admin->deleteInterviewCriteriaMaster($json);
+    break;
+  case "addInterviewCriteria":
+    echo $admin->addInterviewCriteria($json);
+    break;
+  case "updateInterviewCriteria":
+    echo $admin->updateInterviewCriteria($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
