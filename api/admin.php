@@ -2291,10 +2291,24 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
   }
 
+  function addInterviewCriteria($json)
+  {
+    // {"criteriaName": "Criteria Name", "categoryId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinterviewcriteria (criteria_inter_name, criteria_inter_categId) VALUES (:criteriaName, :categoryId)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":criteriaName", $data['interviewCriteriaName']);
+    $stmt->bindParam(":categoryId", $data['interviewCategoryId']);
+    $stmt->execute();
+    $lastId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $lastId : 0;
+  }
+
   function getInterviewCriteriaMasterFiles()
   {
     include "connection.php";
-    $sql = "SELECT a.criteria_inter_id, a.criteria_inter_name, b.interview_categ_name FROM tblinterviewcriteria a 
+    $sql = "SELECT a.criteria_inter_id, a.criteria_inter_name, b.interview_categ_id, b.interview_categ_name FROM tblinterviewcriteria a 
             INNER JOIN tblinterviewcategory b ON a.criteria_inter_categId = b.interview_categ_id";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -2319,6 +2333,20 @@ class Admin
       }
       throw $e;
     }
+  }
+
+  function updateInterviewCriteria($json)
+  {
+    // {"criteriaId": 1, "criteriaName": "Updated Criteria Name", "categoryId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinterviewcriteria SET criteria_inter_name = :criteriaName, criteria_inter_categId = :categoryId WHERE criteria_inter_id = :criteriaId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":criteriaId", $data['criteriaId']);
+    $stmt->bindParam(":criteriaName", $data['interviewCriteriaName']);
+    $stmt->bindParam(":categoryId", $data['interviewCategoryId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } //admin
 
@@ -2664,6 +2692,12 @@ switch ($operation) {
     break;
   case "deleteInterviewCriteriaMaster":
     echo $admin->deleteInterviewCriteriaMaster($json);
+    break;
+  case "addInterviewCriteria":
+    echo $admin->addInterviewCriteria($json);
+    break;
+  case "updateInterviewCriteria":
+    echo $admin->updateInterviewCriteria($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
