@@ -1118,6 +1118,18 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
+  function addInterviewCategory($json)
+  {
+    // {"categoryName": "Sample Category"}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblinterviewcategory(interview_categ_name) VALUES(:categoryName)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":categoryName", $data['interviewCategoryName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
   function addInterviewCriteriaMaster($json)
   {
     // {"jobId": 11, "criteriaId": 8, "points": 200}
@@ -2574,6 +2586,9 @@ switch ($operation) {
     break;
   case "getJobOfferCandidates":
     echo json_encode($admin->getJobOfferCandidates($json));
+    break;
+  case "addInterviewCategory":
+    echo $admin->addInterviewCategory($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
