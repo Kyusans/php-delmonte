@@ -1150,6 +1150,19 @@ class Admin
     }
   }
 
+  function updateInterviewCategory($json)
+  {
+    // {"categoryId": 1, "categoryName": "Updated Category"}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinterviewcategory SET interview_categ_name = :categoryName WHERE interview_categ_id = :categoryId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":categoryId", $data['interviewCategoryId']);
+    $stmt->bindParam(":categoryName", $data['interviewCategoryName']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
   function addInterviewCriteriaMaster($json)
   {
     // {"jobId": 11, "criteriaId": 8, "points": 200}
@@ -2612,6 +2625,9 @@ switch ($operation) {
     break;
   case "deleteInterviewCategory":
     echo $admin->deleteInterviewCategory($json);
+    break;
+  case "updateInterviewCategory":
+    echo $admin->updateInterviewCategory($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
