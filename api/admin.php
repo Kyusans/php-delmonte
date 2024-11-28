@@ -2290,6 +2290,16 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getInterviewCriteriaMasterFiles()
+  {
+    include "connection.php";
+    $sql = "SELECT a.criteria_inter_id, a.criteria_inter_name, b.interview_categ_name FROM tblinterviewcriteria a 
+            INNER JOIN tblinterviewcategory b ON a.criteria_inter_categId = b.interview_categ_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -2628,6 +2638,9 @@ switch ($operation) {
     break;
   case "updateInterviewCategory":
     echo $admin->updateInterviewCategory($json);
+    break;
+  case "getInterviewCriteriaMasterFiles":
+    echo json_encode($admin->getInterviewCriteriaMasterFiles());
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
