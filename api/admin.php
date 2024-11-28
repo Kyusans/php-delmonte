@@ -2300,6 +2300,26 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function deleteInterviewCriteriaMaster($json)
+  {
+    // {"criteriaId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblinterviewcriteria WHERE criteria_inter_id = :criteriaId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":criteriaId", $data['criteriaId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
 } //admin
 
 function uploadImage()
@@ -2641,6 +2661,9 @@ switch ($operation) {
     break;
   case "getInterviewCriteriaMasterFiles":
     echo json_encode($admin->getInterviewCriteriaMasterFiles());
+    break;
+  case "deleteInterviewCriteriaMaster":
+    echo $admin->deleteInterviewCriteriaMaster($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
