@@ -1127,7 +1127,27 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":categoryName", $data['interviewCategoryName']);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? 1 : 0;
+    $lastId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $lastId : 0;
+  }
+
+  function deleteInterviewCategory($json)
+  {
+    // {"categoryId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblinterviewcategory WHERE interview_categ_id = :categoryId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":categoryId", $data['interviewCategoryId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        return -1;
+      }
+      throw $e;
+    }
   }
 
   function addInterviewCriteriaMaster($json)
@@ -2589,6 +2609,9 @@ switch ($operation) {
     break;
   case "addInterviewCategory":
     echo $admin->addInterviewCategory($json);
+    break;
+  case "deleteInterviewCategory":
+    echo $admin->deleteInterviewCategory($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
