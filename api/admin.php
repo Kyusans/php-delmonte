@@ -2079,6 +2079,7 @@ class Admin
     $stmt->bindParam(':joboffer_document', $data['document']);
     $stmt->bindParam(':joboffer_expiryDate', $data['expiryDate']);
     $stmt->execute();
+ 
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
@@ -2255,7 +2256,7 @@ class Admin
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
-            AND (a.appS_statusId = 7 OR a.appS_statusId = 13) AND b.app_jobMId = :jobId
+            AND (a.appS_statusId = 7) AND b.app_jobMId = :jobId
             ORDER BY c.cand_id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -2267,11 +2268,16 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
+            f.jobofferS_name as jobOfferStatus, e.joboffer_salary, e.joboffer_document,
+            DATE_FORMAT(e.joboffer_date, '%b %d, %Y') as joboffer_date, 
+            DATE_FORMAT(e.joboffer_expiryDate, '%b %d, %Y') as joboffer_expiryDate
             FROM tblapplicationstatus a 
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+            INNER JOIN tbljoboffer e ON e.joboffer_jobMId = b.app_jobMId
+            INNER JOIN tbljobofferstatus f ON f.jobofferS_id = e.joboffer_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
             AND (a.appS_statusId = 8) 
             AND b.app_jobMId = :jobId";
