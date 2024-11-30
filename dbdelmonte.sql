@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 14, 2024 at 02:58 AM
+-- Generation Time: Nov 29, 2024 at 02:42 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -63,8 +63,20 @@ INSERT INTO `tblapplications` (`app_id`, `app_candId`, `app_jobMId`, `app_dateti
 (11, 7, 1, '2024-09-19 12:07:39'),
 (12, 7, 11, '2024-09-21 11:10:27'),
 (13, 6, 11, '2024-09-23 16:16:11'),
-(14, 10, 11, '2024-09-23 16:16:11'),
-(15, 7, 10, '2024-10-04 15:40:19');
+(15, 7, 10, '2024-10-04 15:40:19'),
+(17, 7, 14, '2024-10-24 07:35:23'),
+(18, 7, 15, '2024-10-24 08:26:08'),
+(19, 11, 15, '2024-10-24 08:55:36'),
+(20, 7, 13, '2024-10-26 20:34:02'),
+(21, 7, 13, '2024-10-26 21:10:42'),
+(22, 11, 1, '2024-11-14 20:59:22'),
+(23, 11, 1, '2024-11-14 21:43:36'),
+(24, 11, 1, '2024-11-14 23:03:18'),
+(25, 11, 1, '2024-11-14 23:05:02'),
+(26, 11, 10, '2024-11-15 13:32:40'),
+(27, 11, 10, '2024-11-15 13:33:11'),
+(28, 7, 1, '2024-11-16 14:32:55'),
+(29, 11, 14, '2024-11-27 15:39:23');
 
 -- --------------------------------------------------------
 
@@ -87,20 +99,105 @@ INSERT INTO `tblapplicationstatus` (`appS_id`, `appS_appId`, `appS_statusId`, `a
 (5, 11, 2, '2024-09-19 12:07:39'),
 (6, 12, 1, '2024-09-21 11:10:27'),
 (7, 13, 1, '2024-09-23 10:20:34'),
-(8, 14, 1, '2024-09-23 10:20:34'),
-(9, 14, 3, '2024-09-24 20:31:50'),
 (26, 13, 2, '2024-10-01 08:13:20'),
 (27, 12, 2, '2024-10-01 08:13:25'),
 (28, 13, 6, '2024-10-01 09:10:55'),
 (29, 12, 6, '2024-10-01 09:42:25'),
-(30, 13, 5, '2024-10-01 12:31:50'),
-(31, 12, 5, '2024-10-01 12:42:09'),
-(32, 11, 6, '2024-10-01 01:02:17'),
 (33, 15, 1, '2024-10-04 15:40:19'),
 (34, 15, 2, '2024-10-05 05:17:08'),
-(35, 15, 6, '2024-10-05 05:17:54'),
-(36, 15, 5, '2024-10-05 05:18:04'),
-(37, 11, 5, '2024-10-05 06:29:06');
+(95, 15, 5, '2024-10-24 05:00:48'),
+(110, 17, 1, '2024-10-24 07:35:23'),
+(111, 17, 2, '2024-10-24 07:35:50'),
+(112, 17, 6, '2024-10-24 07:35:55'),
+(119, 18, 1, '2024-10-24 08:26:08'),
+(120, 18, 2, '2024-10-24 08:28:04'),
+(121, 18, 6, '2024-10-24 08:39:11'),
+(122, 19, 1, '2024-10-24 08:55:36'),
+(127, 12, 5, '2024-10-24 18:23:55'),
+(134, 12, 10, '2024-10-25 00:58:50'),
+(135, 12, 7, '2024-10-25 00:58:50'),
+(136, 12, 8, '2024-10-25 01:05:58'),
+(137, 20, 1, '2024-10-26 20:34:02'),
+(138, 20, 12, '2024-10-26 21:10:17'),
+(139, 21, 1, '2024-10-26 21:10:42'),
+(141, 15, 10, '2024-10-27 17:50:11'),
+(142, 15, 7, '2024-10-27 17:50:11'),
+(161, 12, 11, '2024-11-05 15:58:38'),
+(162, 15, 8, '2024-11-08 09:20:56'),
+(168, 11, 6, '2024-11-08 07:09:32'),
+(169, 17, 5, '2024-11-08 22:33:01'),
+(198, 17, 9, '2024-11-09 11:51:59'),
+(199, 11, 5, '2024-11-09 15:25:57'),
+(206, 11, 9, '2024-11-14 11:54:15'),
+(207, 18, 5, '2024-11-14 14:01:42'),
+(208, 22, 1, '2024-11-14 20:59:22'),
+(209, 22, 12, '2024-11-14 21:07:43'),
+(211, 24, 1, '2024-11-14 23:03:18'),
+(212, 24, 12, '2024-11-14 23:04:03'),
+(213, 25, 1, '2024-11-14 23:05:02'),
+(214, 26, 1, '2024-11-15 13:32:40'),
+(215, 26, 12, '2024-11-15 13:33:01'),
+(216, 27, 1, '2024-11-15 13:33:11'),
+(217, 28, 1, '2024-11-16 14:32:55'),
+(218, 29, 1, '2024-11-27 15:39:23'),
+(219, 29, 2, '2024-11-27 03:39:51'),
+(221, 29, 6, '2024-11-27 08:52:58'),
+(222, 29, 5, '2024-11-27 03:56:01'),
+(223, 29, 9, '2024-11-27 16:03:48'),
+(224, 19, 2, '2024-11-27 04:05:32'),
+(225, 19, 6, '2024-11-27 04:05:41'),
+(226, 19, 5, '2024-11-27 04:06:13'),
+(227, 19, 9, '2024-11-27 16:06:52'),
+(228, 26, 2, '2024-11-27 04:08:44'),
+(229, 26, 6, '2024-11-27 04:08:49'),
+(230, 26, 5, '2024-11-27 04:09:07'),
+(231, 26, 10, '2024-11-27 16:10:27'),
+(232, 26, 7, '2024-11-27 16:10:27'),
+(233, 26, 8, '2024-11-27 04:11:00');
+
+--
+-- Triggers `tblapplicationstatus`
+--
+DELIMITER $$
+CREATE TRIGGER `notify_status_change` AFTER INSERT ON `tblapplicationstatus` FOR EACH ROW BEGIN
+    DECLARE status_message TEXT;
+    DECLARE formatted_date VARCHAR(50);
+    DECLARE interview_date VARCHAR(50);
+    
+    -- Step 3: Check if the status is "Interview"
+    IF (SELECT status_name FROM tblstatus WHERE status_id = NEW.appS_statusId) = 'Interview' THEN
+        -- Retrieve the interview date from tblinterviewschedule and format it in Philippine time
+        SET interview_date = (
+            SELECT DATE_FORMAT(intsched_date, '%M %d, %Y %I:%i %p')
+            FROM tblinterviewschedule
+            WHERE intsched_jobId = (SELECT app_jobMId FROM tblapplications WHERE app_id = NEW.appS_appId)
+            LIMIT 1
+        );
+
+        -- Set the notification message with the interview date
+        SET status_message = CONCAT('You have been scheduled for an interview on ', interview_date, '.');
+    ELSE
+        -- Format the current date in Philippine timezone for other status updates
+        SET formatted_date = DATE_FORMAT(CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+08:00'), '%M %d, %Y %I:%i %p');
+        
+        -- Set a generic status message
+        SET status_message = CONCAT('Your application status has been updated to "', 
+                                    (SELECT status_name FROM tblstatus WHERE status_id = NEW.appS_statusId),
+                                    '" as of ', formatted_date, '.');
+    END IF;
+
+    -- Insert the notification with the formatted message and date
+    INSERT INTO tblnotifications (notification_candId, notification_appId, notification_statusId, notification_message, notification_date)
+    VALUES (
+        (SELECT app_candId FROM tblapplications WHERE app_id = NEW.appS_appId),
+        NEW.appS_appId,
+        NEW.appS_statusId,
+        status_message,
+        CONVERT_TZ(UTC_TIMESTAMP(), '+00:00', '+08:00')
+    );
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -159,7 +256,8 @@ CREATE TABLE `tblcandconsent` (
 
 INSERT INTO `tblcandconsent` (`cons_id`, `cons_candId`, `cons_subscribetoemailupdates`, `cons_dataprivacyconsent`) VALUES
 (1, 8, 1, NULL),
-(2, 9, 1, NULL);
+(2, 9, 1, NULL),
+(3, 11, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -182,11 +280,18 @@ CREATE TABLE `tblcandeducbackground` (
 INSERT INTO `tblcandeducbackground` (`educ_back_id`, `educ_canId`, `educ_coursesId`, `educ_institutionId`, `educ_dategraduate`) VALUES
 (1, 8, 23, 1, '2024-09-02'),
 (2, 7, 46, 1474, '2024-08-09'),
-(22, 7, 57, 1515, '2024-08-10'),
+(22, 7, 57, 1474, '2024-08-10'),
 (23, 7, 47, 1516, '2024-07-10'),
 (24, 9, 46, 1474, '2024-08-08'),
 (25, 10, 23, 1, '2024-09-04'),
-(26, 6, 39, 1474, '2024-08-21');
+(26, 6, 39, 1474, '2024-08-21'),
+(27, 11, 46, 1474, '2024-10-10'),
+(31, 7, 119, 2412, '2024-10-09'),
+(32, 7, 23, 1474, '2024-10-17'),
+(33, 11, 95, 2, '2024-10-25'),
+(34, 7, 24, 2, '2024-11-22'),
+(35, 7, 34, 3, '2024-11-29'),
+(36, 13, 46, 1474, '2024-06-13');
 
 -- --------------------------------------------------------
 
@@ -211,7 +316,8 @@ INSERT INTO `tblcandemploymenthistory` (`empH_id`, `empH_candId`, `empH_position
 (17, 7, 'Project Manager', 'Phinma - Cagayan de Oro College', '2020-10-01', '2024-03-05'),
 (18, 9, 'Coordinator', 'La Kreativ', '2021-09-08', '2024-09-08'),
 (19, 10, 'Janitor', 'Nasa', '2024-08-01', '2024-09-06'),
-(23, 6, 'Programmer', 'GSD', '2022-08-17', '2023-03-15');
+(23, 6, 'Programmer', 'GSD', '2022-08-17', '2023-03-15'),
+(24, 11, 'Assistant Coordinator', 'La kreativ Events', '2022-10-05', '2024-10-09');
 
 -- --------------------------------------------------------
 
@@ -249,11 +355,15 @@ CREATE TABLE `tblcandidates` (
 --
 
 INSERT INTO `tblcandidates` (`cand_id`, `cand_lastname`, `cand_firstname`, `cand_middlename`, `cand_contactNo`, `cand_alternatecontactNo`, `cand_email`, `cand_alternateEmail`, `cand_presentAddress`, `cand_permanentAddress`, `cand_dateofBirth`, `cand_sex`, `cand_sssNo`, `cand_tinNo`, `cand_philhealthNo`, `cand_pagibigNo`, `cand_password`, `cand_createdDatetime`, `cand_updatedDatetime`, `cand_pinCode`, `cand_activeStatus`, `cand_userLevel`) VALUES
-(6, 'macario', 'mel', 'sabido', '096768745321', '096498231232', 'mel@gmail.com', 'mel@gmail.com', 'balay', 'balay', '2024-08-08', 'Male', '031245', '123123', '123123', '123123', 'mel', NULL, NULL, '', 0, 0),
-(7, 'Gallegos', 'Ralph Jan', 'Pelino', '09056548089', '09261853553', 'ralphjangallegos@gmail.com', 'ralp.pelino11@gmail.com', 'Iponan', 'Iponan', '2014-08-08', 'Male', '565656565', '5656565', '56566', '565656', '@ralphjan12', NULL, NULL, '', 0, 1),
+(6, 'macario', 'mel', 'sabido', '096768745321', '096498231232', 'mel@gmail.com', 'mel@gmail.com', 'balay', 'balay', '2024-08-08', 'Male', '031245', '123123', '123123', '123123', 'mel', NULL, NULL, '', 0, 1),
+(7, 'Gallegos', 'Ralph Jan', 'Pelino', '09056548089', '09261853553', 'ralphjangallegos@gmail.com', 'rape.gallegos.coc@phinmaed.com', 'Iponan', 'Iponan', '2014-08-08', 'Male', '56565', '5656565', '56566', '56565123126', '@ralphjan12', NULL, NULL, '', 0, 1),
 (8, 'macario', 'kobid', 'joe', '0945635345345', '09456353434545', 'kobid1212@gmail.com', 'kobid12@gmail.com', 'balay', 'dog house', '2024-09-02', 'Male', '123', '123', '123', '123', 'macario123', '2024-09-05 11:32:10', NULL, '', 0, 0),
-(9, 'Gallegos', 'Ralph Jan', 'Jan P.', '09056548089', '09056548089', 'rape.gallegos.coc@phinmaed.com', 'rape.gallegos.coc@phinmaed.com', 'Ficoville, Iponan', 'Ficoville, Iponan', '2001-11-08', 'Male', '8998', '7878', '8998', '7878', 'gwapo', '2024-09-11 11:24:50', NULL, '', 0, 0),
-(10, 'Roaya', 'Jake', 'Lumaktod', '09675868967857', '09675868967812', 'jake@gmail.com', 'jake12@gmail.com', 'Ficoville, Iponan', 'Ficoville, Iponan', '2002-10-20', 'Other', '8998', '7878', '8998', '7878', 'jake123', '2024-09-12 09:34:22', NULL, '', 0, 0);
+(9, 'Gallegos', 'Ralph Jan', 'Jan P.', '09056548089', '09056548089', 'kobid1212@gmail.com', 'rape.gallegos.coc@phinmaed.com', 'Ficoville, Iponan', 'Ficoville, Iponan', '2001-11-08', 'Male', '8998', '7878', '8998', '7878', 'gwapo', '2024-09-11 11:24:50', NULL, '', 0, 0),
+(10, 'Roaya', 'Jake', 'Lumaktod', '09675868967857', '09675868967812', 'jake@gmail.com', 'jake12@gmail.com', 'Ficoville, Iponan', 'Ficoville, Iponan', '2002-10-20', 'Other', '8998', '7878', '8998', '7878', 'jake123', '2024-09-12 09:34:22', NULL, '', 0, 1),
+(11, 'Gallegos', 'Jecham', 'Macario', '090909', '9090900', 'ralp.pelino11@gmail.com', 'ralp.pelino11@gmail.com', 'Iponan', 'Iponan', '2001-11-08', 'Male', '123-123', '123-123', '123-123', '123-123', '@ralphjan12', '2024-10-19 01:06:30', NULL, '', 0, 1),
+(13, 'Plaza', 'Krystyll', 'Tano', '09090909', '0909099009', 'andreiplaza03@gmail.com', 'ralp.pelino11@gmail.com', 'Iponan', 'Iponan', '2001-11-08', 'Female', '', '123123', NULL, NULL, '@krystyll03', '2024-10-23 06:38:37', NULL, '', 0, 1),
+(14, 'Rogan', 'Joe ', 'Rogan', '09465746352', '094657463345', 'nutsgoddy1@gmail.com', 'nutsgoddy2@gmail.com', 'Ficoville, Iponan', 'Ficoville, Iponan', '2001-03-14', 'Male', NULL, NULL, NULL, NULL, 'Rogan', '2024-11-27 02:03:46', NULL, '', 0, 1),
+(15, 'Pelino', 'Ralph Jann', 'Gallegos', '09090909', '0909090', 'ralphjanpelino@gmail.com', 'ralp.pelino11@gmail.com', 'Iponan', 'Iponan', '2001-11-08', 'Male', NULL, NULL, NULL, NULL, '@pelino12', '2024-11-27 03:20:36', NULL, '', 0, 1);
 
 -- --------------------------------------------------------
 
@@ -273,13 +383,12 @@ CREATE TABLE `tblcandknowledge` (
 
 INSERT INTO `tblcandknowledge` (`canknow_id`, `canknow_canId`, `canknow_knowledgeId`) VALUES
 (1, 8, 1),
-(2, 7, 1),
-(3, 7, 3),
-(4, 7, 4),
 (7, 9, 1),
 (8, 10, 1),
 (9, 6, 3),
-(10, 7, 2);
+(11, 11, 3),
+(16, 7, 1),
+(17, 7, 7);
 
 -- --------------------------------------------------------
 
@@ -302,7 +411,8 @@ INSERT INTO `tblcandlicense` (`license_id`, `license_number`, `license_canId`, `
 (1, 5666264, 7, 9),
 (4, 89989, 9, 9),
 (5, 89989, 10, 1),
-(6, 747546, 7, 6);
+(7, 0, 11, 9),
+(11, 123123, 7, 3);
 
 -- --------------------------------------------------------
 
@@ -321,7 +431,8 @@ CREATE TABLE `tblcandresume` (
 --
 
 INSERT INTO `tblcandresume` (`canres_id`, `canres_candId`, `canres_image`) VALUES
-(16, 7, 'expected6.png');
+(17, 11, 'expected6.png'),
+(19, 7, 'expected6.png');
 
 -- --------------------------------------------------------
 
@@ -343,7 +454,11 @@ INSERT INTO `tblcandskills` (`skills_id`, `skills_candId`, `skills_perSId`) VALU
 (1, 8, 1),
 (16, 9, 1),
 (17, 10, 1),
-(18, 10, 2);
+(18, 10, 2),
+(27, 11, 1),
+(41, 7, 1),
+(42, 7, 25),
+(43, 7, 26);
 
 -- --------------------------------------------------------
 
@@ -373,8 +488,13 @@ INSERT INTO `tblcandtraining` (`training_id`, `training_candId`, `training_perTI
 (20, 6, 3, 'manager.png'),
 (23, 7, 2, 'event.png'),
 (25, 7, 3, 'manager.png'),
-(26, 7, 2, 'assist.png'),
-(27, 7, 3, 'samples.png');
+(26, 7, 15, 'assist.png'),
+(27, 7, 3, 'samples.png'),
+(28, 11, 3, ''),
+(29, 7, 11, 'Screenshot 2024-10-17 200855.png'),
+(30, 7, 12, 'Screenshot 2024-10-17 200855.png'),
+(34, 7, 2, 'event.png'),
+(35, 13, 2, 'event.png');
 
 -- --------------------------------------------------------
 
@@ -459,7 +579,10 @@ INSERT INTO `tblcourses` (`courses_id`, `courses_name`, `courses_coursecategoryI
 (109, 'Bachelor of Science in Agricultural Economics (BSAE)', 21, 2),
 (110, 'Bachelor of Science in Agronomy (BSAgr)', 21, 2),
 (111, 'Bachelor of Science in Animal Science (BSAS)', 21, 2),
-(112, 'Bachelor of Science in Entomology (BSEnt)', 21, 2);
+(112, 'Bachelor of Science in Entomology (BSEnt)', 21, 2),
+(113, 'Bachelor of Science Criminal', 4, 2),
+(118, 'Bachelor of Science Criminal', 22, 4),
+(119, 'Bachelor of Science Programmer', 18, 2);
 
 -- --------------------------------------------------------
 
@@ -497,7 +620,9 @@ INSERT INTO `tblcoursescategory` (`course_categoryId`, `course_categoryName`) VA
 (18, 'Computer Science and Information Technology'),
 (19, 'Math and Sciences'),
 (20, 'Other Programs'),
-(21, 'Agriculture');
+(21, 'Agriculture'),
+(22, 'Crim'),
+(23, 'BSIT');
 
 -- --------------------------------------------------------
 
@@ -517,7 +642,8 @@ CREATE TABLE `tblcoursetype` (
 INSERT INTO `tblcoursetype` (`crs_type_id`, `crs_type_name`) VALUES
 (1, 'Secondary Education'),
 (2, 'Tertiary Education'),
-(3, 'Graduate Education');
+(3, 'Graduate Education'),
+(4, 'No Education');
 
 -- --------------------------------------------------------
 
@@ -530,10 +656,23 @@ CREATE TABLE `tblexam` (
   `exam_name` varchar(50) NOT NULL,
   `exam_typeId` int(11) NOT NULL,
   `exam_jobMId` int(11) DEFAULT NULL,
+  `exam_isGeneral` tinyint(1) NOT NULL DEFAULT 0,
   `exam_duration` int(11) NOT NULL,
   `exam_createdAt` date NOT NULL,
   `exam_updatedAt` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblexam`
+--
+
+INSERT INTO `tblexam` (`exam_id`, `exam_name`, `exam_typeId`, `exam_jobMId`, `exam_isGeneral`, `exam_duration`, `exam_createdAt`, `exam_updatedAt`) VALUES
+(1, 'General Exam mo to', 1, NULL, 0, 50, '2024-10-01', '2024-10-19'),
+(2, 'Software Developer ', 2, 1, 0, 1, '2024-10-02', '2024-10-03'),
+(3, 'Exam mo to', 2, 12, 0, 60, '2024-10-19', '2024-10-19'),
+(4, 'Developing', 2, 10, 0, 30, '2024-10-24', '2024-10-24'),
+(5, 'Analysis', 2, 13, 0, 30, '2024-10-24', '2024-10-24'),
+(6, 'Secretary exam', 2, 14, 0, 1, '2024-10-24', '2024-10-24');
 
 -- --------------------------------------------------------
 
@@ -550,6 +689,53 @@ CREATE TABLE `tblexamcandidateanswer` (
   `examcandA_pointsEarned` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblexamcandidateanswer`
+--
+
+INSERT INTO `tblexamcandidateanswer` (`examcandA_id`, `examcandA_resultId`, `examcandA_questionId`, `examcandA_choiceId`, `examcandA_essay`, `examcandA_pointsEarned`) VALUES
+(8, 2, 1, 7, NULL, 5),
+(9, 2, 2, 10, NULL, 5),
+(10, 2, 5, 23, NULL, 5),
+(11, 2, 7, 29, NULL, 0),
+(12, 3, 1, 7, NULL, 5),
+(13, 3, 2, 10, NULL, 5),
+(14, 3, 5, 23, NULL, 5),
+(15, 3, 7, 30, NULL, 0),
+(16, 3, 11, 41, NULL, 0),
+(17, 3, 12, 46, NULL, 5),
+(18, 3, 13, 52, NULL, 0),
+(19, 3, 14, 54, NULL, 7),
+(204, 44, 1, 7, NULL, 5),
+(205, 44, 2, 10, NULL, 5),
+(206, 44, 5, 22, NULL, 0),
+(207, 44, 7, 30, NULL, 0),
+(208, 44, 19, 76, NULL, 0),
+(209, 44, 20, 79, NULL, 1),
+(210, 44, 21, 84, NULL, 0),
+(241, 49, 1, 5, NULL, 0),
+(242, 49, 3, 14, NULL, 5),
+(243, 49, 8, 4, NULL, 0),
+(244, 50, 1, 5, NULL, 0),
+(245, 50, 2, 12, NULL, 0),
+(246, 50, 5, 23, NULL, 5),
+(247, 50, 7, 32, NULL, 5),
+(248, 50, 19, 73, NULL, 0),
+(249, 50, 20, 79, NULL, 1),
+(250, 50, 21, 84, NULL, 0),
+(251, 51, 1, 8, NULL, 0),
+(252, 51, 2, 10, NULL, 5),
+(253, 51, 5, 23, NULL, 5),
+(254, 51, 7, 29, NULL, 0),
+(255, 52, 1, 7, NULL, 5),
+(256, 52, 2, 10, NULL, 5),
+(257, 52, 5, 23, NULL, 5),
+(258, 52, 7, 32, NULL, 5),
+(259, 52, 11, 41, NULL, 0),
+(260, 52, 12, 46, NULL, 5),
+(261, 52, 13, 52, NULL, 0),
+(262, 52, 14, 54, NULL, 7);
+
 -- --------------------------------------------------------
 
 --
@@ -563,6 +749,93 @@ CREATE TABLE `tblexamchoices` (
   `examC_isCorrect` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblexamchoices`
+--
+
+INSERT INTO `tblexamchoices` (`examC_id`, `examC_questionId`, `examC_text`, `examC_isCorrect`) VALUES
+(1, 8, 'O(n)', 0),
+(2, 8, 'O(log n)', 1),
+(3, 8, 'O(n²)', 0),
+(4, 8, 'O(1)', 0),
+(5, 1, 'Standard Query Language', 0),
+(6, 1, 'Simple Query Language', 0),
+(7, 1, 'Structured Query Language', 1),
+(8, 1, 'System Query Language', 0),
+(9, 2, 'Stack', 0),
+(10, 2, 'Queue', 1),
+(11, 2, 'Linked List', 0),
+(12, 2, 'Binary Tree', 0),
+(13, 3, 'const', 0),
+(14, 3, 'let', 1),
+(15, 3, 'var', 0),
+(16, 3, 'function', 0),
+(17, 4, 'GET', 0),
+(18, 4, 'POST', 1),
+(19, 4, 'DELETE', 0),
+(20, 4, 'PUT', 0),
+(21, 5, 'MySQL', 0),
+(22, 5, 'PostgreSQL', 0),
+(23, 5, 'MongoDB', 1),
+(24, 5, 'SQL Server', 0),
+(25, 6, 'O(log n)', 1),
+(26, 6, 'O(n)', 0),
+(27, 6, 'O(1)', 0),
+(28, 6, 'O(n log n', 0),
+(29, 7, 'git commit', 0),
+(30, 7, 'git checkout', 0),
+(31, 7, 'git merge', 0),
+(32, 7, 'git branch', 1),
+(35, 9, 'SODDDAAA', 1),
+(37, 10, '1', 0),
+(38, 10, '2', 1),
+(39, 10, '3', 0),
+(40, 10, '4', 0),
+(41, 11, 'const', 0),
+(42, 11, 'let', 1),
+(43, 11, 'var', 0),
+(44, 11, 'function', 0),
+(45, 12, 'GET', 0),
+(46, 12, 'POST', 1),
+(47, 12, 'DELETE', 0),
+(48, 12, 'PUT', 0),
+(49, 13, 'O(log n)', 1),
+(50, 13, 'O(n)', 0),
+(51, 13, 'O(1)', 0),
+(52, 13, 'O(n log n', 0),
+(53, 14, 'O(n)', 0),
+(54, 14, 'O(log n)', 1),
+(55, 14, 'O(n²)', 0),
+(56, 14, 'O(1)', 0),
+(57, 15, 'Increase redundancy', 0),
+(58, 15, 'Optimize query performance', 0),
+(59, 15, 'Eliminate duplicate data and ensure data integrity', 1),
+(60, 15, 'Decrease disk storage requirements', 0),
+(61, 16, 'To select all records that match from both tables', 0),
+(62, 16, 'To select only the records that do not match from either table', 0),
+(63, 16, 'To select all records from the left table and only the matched records from the right table', 1),
+(64, 16, 'To select all records from the right table and only the matched records from the left table', 0),
+(65, 17, 'Mean', 0),
+(66, 17, 'Mode', 0),
+(67, 17, 'Median', 1),
+(68, 17, 'Standard deviation', 0),
+(69, 18, 'To sort the data in descending order', 0),
+(70, 18, 'To combine rows that have the same values into summary rows', 1),
+(71, 18, 'To filter the results based on a condition', 0),
+(72, 18, 'To limit the number of rows returned', 0),
+(73, 19, 'Making executive decisions', 0),
+(74, 19, 'Managing office correspondence and scheduling appointments', 1),
+(75, 19, 'Overseeing company finances', 0),
+(76, 19, 'Hiring new employees', 0),
+(77, 20, 'Using all capital letters to emphasize points', 0),
+(78, 20, 'Addressing the recipient by their first name only', 0),
+(79, 20, 'Using a clear and concise subject line', 1),
+(80, 20, 'Avoiding formal salutations and signatures', 0),
+(81, 21, 'Complete the easiest tasks first to reduce workload quickly', 0),
+(82, 21, 'Handle urgent and important tasks first, followed by less urgent tasks', 1),
+(83, 21, 'Delay important tasks in favor of multiple smaller tasks', 0),
+(84, 21, 'Only work on tasks assigned directly by senior management', 0);
+
 -- --------------------------------------------------------
 
 --
@@ -572,12 +845,39 @@ CREATE TABLE `tblexamchoices` (
 CREATE TABLE `tblexamquestion` (
   `examQ_id` int(11) NOT NULL,
   `examQ_examId` int(11) NOT NULL,
-  `examQ_text` varchar(50) NOT NULL,
+  `examQ_text` text NOT NULL,
   `examQ_typeId` int(11) NOT NULL,
   `examQ_createdAt` date NOT NULL,
   `examQ_updatedAt` date NOT NULL,
   `examQ_points` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblexamquestion`
+--
+
+INSERT INTO `tblexamquestion` (`examQ_id`, `examQ_examId`, `examQ_text`, `examQ_typeId`, `examQ_createdAt`, `examQ_updatedAt`, `examQ_points`) VALUES
+(1, 1, 'What does SQL stand for?', 1, '2024-10-14', '0000-00-00', 5),
+(2, 1, 'Which data structure uses a First In First Out (FIFO) method?', 1, '2024-10-14', '0000-00-00', 5),
+(3, 2, 'In JavaScript, which of the following is used to declare a variable that can change over time?', 1, '2024-10-14', '0000-00-00', 5),
+(4, 2, 'What HTTP method is typically used to submit form data to a server?', 1, '2024-10-14', '0000-00-00', 5),
+(5, 1, 'Which of the following is a NoSQL database?', 1, '2024-10-14', '0000-00-00', 5),
+(6, 2, 'What is the time complexity of inserting an element into a max heap?', 1, '2024-10-14', '0000-00-00', 5),
+(7, 1, 'In version control systems like Git, which command is used to create a new branch?', 1, '2024-10-14', '0000-00-00', 5),
+(8, 2, 'What is the time complexity of a binary search algorithm?', 1, '2024-10-14', '0000-00-00', 5),
+(9, 3, 'Joe', 1, '2024-10-19', '2024-10-19', 1),
+(10, 3, 'kunwari questio', 1, '2024-10-19', '2024-10-19', 1),
+(11, 4, 'In JavaScript, which of the following is used to declare a variable that can change over time?', 1, '2024-10-24', '2024-10-24', 5),
+(12, 4, 'What HTTP method is typically used to submit form data to a server?', 1, '2024-10-24', '2024-10-24', 5),
+(13, 4, 'What is the time complexity of inserting an element into a max heap?', 1, '2024-10-24', '2024-10-24', 5),
+(14, 4, 'What is the time complexity of a binary search algorithm?', 1, '2024-10-24', '2024-10-24', 7),
+(15, 5, 'Which of the following is the primary goal of data normalization in a relational database?', 1, '2024-10-24', '2024-10-24', 10),
+(16, 5, 'In which situation would you use a LEFT JOIN in SQL?', 1, '2024-10-24', '2024-10-24', 10),
+(17, 5, 'Which metric would you most likely use to measure the central tendency of a dataset that contains outliers?', 1, '2024-10-24', '2024-10-24', 10),
+(18, 5, 'What is the purpose of the GROUP BY clause in SQL?', 1, '2024-10-24', '2024-10-24', 13),
+(19, 6, 'What is the primary function of a secretary in an organization?', 1, '2024-10-24', '2024-10-24', 1),
+(20, 6, 'Which of the following is considered proper email etiquette in a professional environment?', 1, '2024-10-24', '2024-10-24', 1),
+(21, 6, 'What is the correct way to prioritize tasks when managing a busy office schedule?', 1, '2024-10-24', '2024-10-24', 1);
 
 -- --------------------------------------------------------
 
@@ -608,9 +908,25 @@ CREATE TABLE `tblexamresult` (
   `examR_id` int(11) NOT NULL,
   `examR_candId` int(11) NOT NULL,
   `examR_examId` int(11) NOT NULL,
+  `examR_jobMId` int(11) NOT NULL,
   `examR_score` int(50) NOT NULL,
-  `examR_date` datetime NOT NULL
+  `examR_totalscore` int(11) NOT NULL,
+  `examR_date` datetime NOT NULL,
+  `examR_status` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblexamresult`
+--
+
+INSERT INTO `tblexamresult` (`examR_id`, `examR_candId`, `examR_examId`, `examR_jobMId`, `examR_score`, `examR_totalscore`, `examR_date`, `examR_status`) VALUES
+(2, 7, 1, 11, 15, 20, '2024-10-25 00:58:50', 1),
+(3, 7, 4, 10, 27, 42, '2024-10-27 17:50:11', 1),
+(44, 7, 6, 14, 11, 23, '2024-11-09 11:51:59', 0),
+(49, 7, 2, 1, 5, 40, '2024-11-14 11:54:15', 0),
+(50, 11, 1, 14, 11, 23, '2024-11-27 16:03:48', 0),
+(51, 11, 1, 15, 10, 20, '2024-11-27 16:06:51', 0),
+(52, 11, 4, 10, 32, 42, '2024-11-27 16:10:27', 1);
 
 -- --------------------------------------------------------
 
@@ -3086,7 +3402,9 @@ INSERT INTO `tblinstitution` (`institution_id`, `institution_name`, `institution
 (2406, 'Occidental Mindoro State College-Lubang Campus', 5),
 (2407, 'Pola Community College', 5),
 (2408, 'San Brendan College', 5),
-(2409, 'Colegio de Puerto Galera', 5);
+(2409, 'Colegio de Puerto Galera', 5),
+(2411, 'USTP', 5),
+(2412, 'MOGCHS', 5);
 
 -- --------------------------------------------------------
 
@@ -3101,6 +3419,41 @@ CREATE TABLE `tblinterviewcandpoints` (
   `interviewP_candId` int(11) NOT NULL,
   `interviewP_points` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblinterviewcandpoints`
+--
+
+INSERT INTO `tblinterviewcandpoints` (`interviewP_id`, `interviewP_criteriaId`, `interviewP_jobId`, `interviewP_candId`, `interviewP_points`) VALUES
+(30, 23, 1, 6, 100),
+(31, 23, 1, 9, 50),
+(32, 23, 1, 10, 150),
+(33, 37, 12, 7, 20),
+(34, 38, 12, 7, 30),
+(35, 39, 12, 7, 30),
+(36, 40, 12, 7, 30),
+(37, 41, 10, 7, 30),
+(38, 42, 10, 7, 25),
+(39, 43, 10, 7, 45),
+(40, 44, 14, 7, 100),
+(41, 45, 14, 7, 100),
+(42, 46, 14, 7, 100),
+(43, 47, 14, 7, 100),
+(44, 44, 14, 11, 100),
+(45, 45, 14, 11, 100),
+(46, 46, 14, 11, 100),
+(47, 47, 14, 11, 100),
+(48, 55, 14, 11, 20),
+(49, 53, 15, 11, 100),
+(50, 51, 15, 11, 100),
+(51, 52, 15, 11, 100),
+(52, 54, 15, 11, 150),
+(53, 48, 15, 11, 20),
+(54, 49, 15, 11, 20),
+(55, 50, 15, 11, 20),
+(56, 41, 10, 11, 10),
+(57, 42, 10, 11, 10),
+(58, 43, 10, 11, 20);
 
 -- --------------------------------------------------------
 
@@ -3167,6 +3520,7 @@ CREATE TABLE `tblinterviewcriteriamaster` (
   `inter_criteria_id` int(11) NOT NULL,
   `inter_criteria_jobId` int(11) NOT NULL,
   `inter_criteria_criteriaId` int(11) NOT NULL,
+  `inter_criteria_question` text NOT NULL,
   `inter_criteria_points` int(11) NOT NULL,
   `inter_criteria_status` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -3175,21 +3529,40 @@ CREATE TABLE `tblinterviewcriteriamaster` (
 -- Dumping data for table `tblinterviewcriteriamaster`
 --
 
-INSERT INTO `tblinterviewcriteriamaster` (`inter_criteria_id`, `inter_criteria_jobId`, `inter_criteria_criteriaId`, `inter_criteria_points`, `inter_criteria_status`) VALUES
-(23, 11, 7, 100, 0),
-(24, 11, 8, 200, 0),
-(25, 11, 9, 200, 0),
-(26, 11, 10, 200, 1),
-(27, 11, 7, 200, 0),
-(28, 11, 10, 200, 0),
-(29, 11, 15, 10, 1),
-(30, 11, 11, 200, 1),
-(31, 11, 8, 200, 1),
-(32, 11, 9, 200, 1),
-(33, 11, 13, 200, 0),
-(34, 11, 19, 10000, 1),
-(35, 11, 16, 200, 1),
-(36, 11, 13, 200, 1);
+INSERT INTO `tblinterviewcriteriamaster` (`inter_criteria_id`, `inter_criteria_jobId`, `inter_criteria_criteriaId`, `inter_criteria_question`, `inter_criteria_points`, `inter_criteria_status`) VALUES
+(23, 11, 7, '', 100, 0),
+(24, 11, 8, '', 200, 0),
+(25, 11, 9, '', 200, 0),
+(26, 11, 10, '', 200, 1),
+(27, 11, 7, '', 200, 0),
+(28, 11, 10, '', 200, 0),
+(29, 11, 15, '', 10, 1),
+(30, 11, 11, '', 200, 1),
+(31, 11, 8, '', 200, 1),
+(32, 11, 9, '', 200, 1),
+(33, 11, 13, '', 200, 0),
+(34, 11, 19, '', 10000, 1),
+(35, 11, 16, '', 200, 1),
+(36, 11, 13, '', 200, 1),
+(37, 12, 7, '', 50, 1),
+(38, 12, 10, '', 50, 1),
+(39, 12, 14, '', 50, 1),
+(40, 12, 18, '', 50, 1),
+(41, 10, 11, '', 50, 1),
+(42, 10, 17, '', 50, 1),
+(43, 10, 19, '', 50, 1),
+(44, 14, 7, '', 200, 1),
+(45, 14, 8, '', 200, 1),
+(46, 14, 9, '', 200, 1),
+(47, 14, 10, '', 200, 1),
+(48, 15, 11, '', 50, 1),
+(49, 15, 15, '', 50, 1),
+(50, 15, 19, '', 50, 1),
+(51, 15, 8, 'inter_criteria_question', 200, 1),
+(52, 15, 9, 'inter_criteria_question', 200, 1),
+(53, 15, 7, 'inter_criteria_question', 200, 1),
+(54, 15, 10, 'inter_criteria_question', 200, 1),
+(55, 14, 18, 'How good you are?', 50, 1);
 
 -- --------------------------------------------------------
 
@@ -3218,7 +3591,34 @@ INSERT INTO `tblinterviewpassingpercent` (`passing_id`, `passing_jobId`, `passin
 (8, 8, 50),
 (9, 9, 50),
 (10, 10, 50),
-(11, 11, 50);
+(11, 11, 50),
+(23, 12, 50),
+(24, 13, 50),
+(25, 14, 50),
+(26, 15, 50);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblinterviewschedule`
+--
+
+CREATE TABLE `tblinterviewschedule` (
+  `intsched_id` int(11) NOT NULL,
+  `intsched_jobId` int(11) NOT NULL,
+  `intsched_candId` int(11) NOT NULL,
+  `intsched_date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblinterviewschedule`
+--
+
+INSERT INTO `tblinterviewschedule` (`intsched_id`, `intsched_jobId`, `intsched_candId`, `intsched_date`) VALUES
+(1, 1, 7, '2024-12-25 13:30:23'),
+(3, 14, 11, '2024-12-25 15:51:43'),
+(4, 15, 11, '2024-12-01 00:00:00'),
+(5, 10, 11, '2024-11-30 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -3230,12 +3630,22 @@ CREATE TABLE `tbljoboffer` (
   `joboffer_id` int(11) NOT NULL,
   `joboffer_candId` int(11) NOT NULL,
   `joboffer_jobMId` int(11) NOT NULL,
-  `joboffer_date` date NOT NULL,
   `joboffer_statusId` int(11) NOT NULL,
+  `joboffer_date` date NOT NULL,
   `joboffer_salary` decimal(10,2) NOT NULL,
   `joboffer_document` varchar(255) NOT NULL,
   `joboffer_expiryDate` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbljoboffer`
+--
+
+INSERT INTO `tbljoboffer` (`joboffer_id`, `joboffer_candId`, `joboffer_jobMId`, `joboffer_statusId`, `joboffer_date`, `joboffer_salary`, `joboffer_document`, `joboffer_expiryDate`) VALUES
+(1, 7, 1, 0, '2024-10-24', 25000.00, 'bastaa dawat naka', '2024-10-30'),
+(4, 7, 14, 0, '2024-10-24', 25000.00, 'tig lista naka ', '2024-10-30'),
+(5, 7, 11, 0, '2024-10-26', 45000.00, 'sanaols nadawat', '2024-10-31'),
+(6, 7, 10, 0, '2024-11-08', 30000.00, 'Sanaol', '2024-11-20');
 
 -- --------------------------------------------------------
 
@@ -3247,6 +3657,15 @@ CREATE TABLE `tbljobofferstatus` (
   `jobofferS_id` int(11) NOT NULL,
   `jobofferS_name` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbljobofferstatus`
+--
+
+INSERT INTO `tbljobofferstatus` (`jobofferS_id`, `jobofferS_name`) VALUES
+(1, 'Accept'),
+(2, 'Reject'),
+(3, 'Pending');
 
 -- --------------------------------------------------------
 
@@ -3266,16 +3685,18 @@ CREATE TABLE `tbljobpassing` (
 
 INSERT INTO `tbljobpassing` (`passing_id`, `passing_jobId`, `passing_points`) VALUES
 (1, 1, 50),
-(2, 2, 30),
-(3, 3, 50),
-(4, 4, 70),
-(5, 5, 69),
-(6, 6, 90),
-(7, 7, 30),
-(8, 8, 0),
-(9, 9, 0),
-(10, 10, 0),
-(11, 11, 100);
+(2, 11, 50),
+(3, 4, 50),
+(4, 7, 50),
+(5, 3, 50),
+(6, 5, 50),
+(7, 2, 50),
+(8, 10, 50),
+(9, 6, 50),
+(10, 12, 50),
+(11, 13, 60),
+(12, 14, 50),
+(13, 15, 60);
 
 -- --------------------------------------------------------
 
@@ -3296,16 +3717,11 @@ CREATE TABLE `tbljobseducation` (
 --
 
 INSERT INTO `tbljobseducation` (`jeduc_id`, `jeduc_jobId`, `jeduc_text`, `jeduc_categoryId`, `jeduc_points`) VALUES
-(1, 1, 'While a high school diploma or its equivalent is common, some employers may prefer candidates with an associate’s or bachelor’s degree in animal science, agriculture, or a related field', 2, 100),
-(2, 8, 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', 2, 5),
-(3, 8, 'Etiam dapibus non ante quis fermentum. Aliquam nibh ipsum, tincidunt id nisl posuere, commodo viverra orci. Donec sagittis libero ultrices velit auctor faucibus. Nunc quis congue sapien. Sed iaculis augue vitae tortor dignissim tristique. Nunc vulputate, tortor a iaculis porta, velit augue egestas lacus, sed pellentesque neque tellus eu odio. Morbi vehicula sit amet urna tempus aliquam. Pellentesque id dui at augue lobortis congue quis vel lacus. Quisque ac erat turpis. Donec ligula est, faucibus sed purus sit amet, imperdiet volutpat augue. Proin eget sapien sed metus sodales lobortis quis ut mauris. Fusce rhoncus semper enim, nec venenatis nibh gravida et. Vestibulum tempus eros eu arcu sollicitudin rutrum.', 9, 30),
-(4, 9, 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', 2, 5),
-(5, 9, 'Etiam dapibus non ante quis fermentum. Aliquam nibh ipsum, tincidunt id nisl posuere, commodo viverra orci. Donec sagittis libero ultrices velit auctor faucibus. Nunc quis congue sapien. Sed iaculis augue vitae tortor dignissim tristique. Nunc vulputate, tortor a iaculis porta, velit augue egestas lacus, sed pellentesque neque tellus eu odio. Morbi vehicula sit amet urna tempus aliquam. Pellentesque id dui at augue lobortis congue quis vel lacus. Quisque ac erat turpis. Donec ligula est, faucibus sed purus sit amet, imperdiet volutpat augue. Proin eget sapien sed metus sodales lobortis quis ut mauris. Fusce rhoncus semper enim, nec venenatis nibh gravida et. Vestibulum tempus eros eu arcu sollicitudin rutrum.', 9, 30),
-(6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 2, 10),
-(7, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 3, 5),
-(8, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 2, 50),
-(9, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 3, 300),
-(10, 11, 'arts mo to', 5, 200);
+(1, 1, '', 2, 50),
+(2, 12, '', 1, 50),
+(3, 14, '', 23, 200),
+(4, 14, '', 1, 200),
+(5, 15, '', 19, 100);
 
 -- --------------------------------------------------------
 
@@ -3327,7 +3743,13 @@ CREATE TABLE `tbljobsknowledge` (
 
 INSERT INTO `tbljobsknowledge` (`jknow_id`, `jknow_jobId`, `jknow_text`, `jknow_knowledgeId`, `jknow_points`) VALUES
 (8, 1, 'Knowledge of modern technologies used in livestock farming, such as automated feeding systems, health monitoring devices, and genetic testing.', 3, 0),
-(9, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo. Project Manager', 1, 100);
+(9, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo. Project Manager', 1, 100),
+(10, 1, '', 4, 30),
+(11, 12, '', 1, 50),
+(12, 13, '', 1, 50),
+(13, 14, '', 6, 100),
+(14, 14, '', 1, 100),
+(15, 15, '', 7, 100);
 
 -- --------------------------------------------------------
 
@@ -3360,25 +3782,30 @@ CREATE TABLE `tbljobsmaster` (
   `jobM_title` varchar(250) NOT NULL,
   `jobM_description` text NOT NULL,
   `jobM_createdAt` datetime DEFAULT NULL,
-  `jobM_status` tinyint(1) NOT NULL
+  `jobM_status` tinyint(1) NOT NULL,
+  `jobM_passpercentage` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbljobsmaster`
 --
 
-INSERT INTO `tbljobsmaster` (`jobM_id`, `jobM_title`, `jobM_description`, `jobM_createdAt`, `jobM_status`) VALUES
-(1, 'Livestock Production Supervisor', 'A Livestock Supervisor oversees daily operations on farms that raise animals for consumption or product use. They manage feeding, health care, and humane treatment of livestock, supervise farm workers, and prepare reports on production and management. Additionally, they coordinate breeding, monitor animal health, and ensure compliance with regulations. If you’re interested in related roles, Livestock Production Managers oversee farm operations for milk, meat, wool, and other products, focusing on safety and yield optimization. ', '2024-08-06 08:48:22', 1),
-(2, 'Production Supervisor', '', '2024-08-01 12:48:39', 0),
-(3, 'Marketing Intern', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', '2024-08-08 01:48:52', 0),
-(4, 'Commercial Capability Development Intern', '', '2024-08-12 18:49:03', 0),
-(5, 'Production Shift Supervisor (Tetra Line)', '', '2024-08-15 07:49:19', 0),
-(6, 'Quality Assurance Analyst', '', '2024-08-16 09:49:28', 0),
-(7, 'Human Resources Supervisor', '', '2024-08-10 16:49:40', 0),
-(8, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 08:49:55', 0),
-(9, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 10:50:05', 0),
-(10, 'Programmer', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', '2024-08-24 10:50:15', 1),
-(11, 'Janitor', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vehicula dui gravida ligula fringilla, sed scelerisque mi placerat. Sed in feugiat elit. Donec sed lorem viverra, pharetra risus id, congue tortor. Proin aliquet risus sed neque imperdiet feugiat. Curabitur blandit mattis odio lacinia sollicitudin. Curabitur tempor risus quis sem bibendum aliquet. Integer vel nulla vel risus euismod molestie et sit amet tortor. Sed lacinia, felis id ullamcorper condimentum, odio enim posuere nisi, vitae faucibus nisi libero vel risus. Suspendisse malesuada enim eget nulla mollis, eu tempor quam cursus. Maecenas blandit luctus turpis, et venenatis nulla aliquam eget. In in lectus blandit, eleifend diam in, vehicula nibh.', '2024-09-12 09:30:22', 1);
+INSERT INTO `tbljobsmaster` (`jobM_id`, `jobM_title`, `jobM_description`, `jobM_createdAt`, `jobM_status`, `jobM_passpercentage`) VALUES
+(1, 'Livestock Production Supervisor', 'A Livestock Supervisor oversees daily operations on farms that raise animals for consumption or product use. They manage feeding, health care, and humane treatment of livestock, supervise farm workers, and prepare reports on production and management. Additionally, they coordinate breeding, monitor animal health, and ensure compliance with regulations. If you’re interested in related roles, Livestock Production Managers oversee farm operations for milk, meat, wool, and other products, focusing on safety and yield optimization. ', '2024-08-06 08:48:22', 1, 60),
+(2, 'Production Supervisor', '', '2024-08-01 12:48:39', 0, 75),
+(3, 'Marketing Intern', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', '2024-08-08 01:48:52', 0, 0),
+(4, 'Commercial Capability Development Intern', '', '2024-08-12 18:49:03', 0, 0),
+(5, 'Production Shift Supervisor (Tetra Line)', '', '2024-08-15 07:49:19', 0, 0),
+(6, 'Quality Assurance Analyst', '', '2024-08-16 09:49:28', 0, 0),
+(7, 'Human Resources Supervisor', '', '2024-08-10 16:49:40', 0, 0),
+(8, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 08:49:55', 0, 0),
+(9, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 10:50:05', 0, 0),
+(10, 'Programmer', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', '2024-08-24 10:50:15', 1, 50),
+(11, 'Janitor', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vehicula dui gravida ligula fringilla, sed scelerisque mi placerat. Sed in feugiat elit. Donec sed lorem viverra, pharetra risus id, congue tortor. Proin aliquet risus sed neque imperdiet feugiat. Curabitur blandit mattis odio lacinia sollicitudin. Curabitur tempor risus quis sem bibendum aliquet. Integer vel nulla vel risus euismod molestie et sit amet tortor. Sed lacinia, felis id ullamcorper condimentum, odio enim posuere nisi, vitae faucibus nisi libero vel risus. Suspendisse malesuada enim eget nulla mollis, eu tempor quam cursus. Maecenas blandit luctus turpis, et venenatis nulla aliquam eget. In in lectus blandit, eleifend diam in, vehicula nibh.', '2024-09-12 09:30:22', 0, 60),
+(12, 'Project Manager', 'Information Technology', '2024-10-19 07:20:28', 0, 60),
+(13, 'Data analyst', 'job for data analyst', '2024-10-19 09:03:47', 1, 60),
+(14, 'Secretary', 'tig lista', '2024-10-24 07:35:07', 1, 60),
+(15, 'Cashier', 'cashierr', '2024-10-24 08:25:52', 1, 55);
 
 -- --------------------------------------------------------
 
@@ -3410,7 +3837,11 @@ INSERT INTO `tbljobsmasterduties` (`duties_id`, `duties_jobId`, `duties_text`) V
 (11, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.'),
 (12, 11, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vehicula dui gravida ligula fringilla, sed scelerisque mi placerat. Sed in feugiat elit. Donec sed lorem viverra, pharetra risus id, congue tortor. Proin aliquet risus sed neque imperdiet feugiat. Curabitur blandit mattis odio lacinia sollicitudin. Curabitur tempor risus quis sem bibendum aliquet. Integer vel nulla vel risus euismod molestie et sit amet tortor. Sed lacinia, felis id ullamcorper condimentum, odio enim posuere nisi, vitae faucibus nisi libero vel risus. Suspendisse malesuada enim eget nulla mollis, eu tempor quam cursus. Maecenas blandit luctus turpis, et venenatis nulla aliquam eget. In in lectus blandit, eleifend diam in, vehicula nibh.'),
 (13, 11, 'Ut nec enim et nisl suscipit dignissim. Nulla odio sem, commodo eget dictum ac, consectetur ac neque. Pellentesque fringilla sed neque vitae bibendum. Fusce vel nibh eu arcu iaculis vulputate mattis eleifend nulla. Nullam libero elit, sodales sed enim a, ullamcorper tincidunt urna. Proin ac commodo tortor, sit amet congue nisi. Maecenas bibendum nunc quis feugiat bibendum. Aenean egestas vulputate nisi eget dictum.'),
-(15, 11, 'Hello');
+(15, 11, 'Hello'),
+(16, 12, 'duty mo to\n'),
+(17, 13, 'analyze data'),
+(18, 14, 'can write\n'),
+(19, 15, 'Cashiering system\n');
 
 -- --------------------------------------------------------
 
@@ -3431,14 +3862,9 @@ CREATE TABLE `tbljobsskills` (
 --
 
 INSERT INTO `tbljobsskills` (`jskills_id`, `jskills_jobId`, `jskills_text`, `jskills_skillsId`, `jskills_points`) VALUES
-(1, 1, 'Ability to oversee daily operations, manage farm laborers, and implement animal husbandry protocols.', 0, 0),
-(2, 8, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 30),
-(3, 8, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 9, 30),
-(4, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 2, 30),
-(5, 9, 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 9, 30),
-(6, 10, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 2, 30),
-(7, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 1, 100),
-(8, 11, 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.', 2, 50);
+(1, 12, '', 1, 50),
+(2, 14, '', 24, 200),
+(3, 15, '', 25, 100);
 
 -- --------------------------------------------------------
 
@@ -3460,7 +3886,10 @@ CREATE TABLE `tbljobstrainings` (
 
 INSERT INTO `tbljobstrainings` (`jtrng_id`, `jtrng_jobId`, `jtrng_text`, `jtrng_trainingId`, `jtrng_points`) VALUES
 (10, 1, '', 1, 35),
-(11, 1, '', 7, 35);
+(11, 1, '', 7, 35),
+(12, 12, '', 1, 50),
+(13, 14, '', 14, 200),
+(14, 15, '', 15, 100);
 
 -- --------------------------------------------------------
 
@@ -3485,7 +3914,10 @@ INSERT INTO `tbljobsworkexperience` (`jwork_id`, `jwork_jobId`, `jwork_duration`
 (2, 8, '2', 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 0),
 (3, 9, '2', 'Nunc feugiat quis dolor vel convallis. Phasellus feugiat tempor justo. Maecenas a sodales elit, quis vulputate tortor. Aenean a sodales ligula. Aenean ac arcu hendrerit, vestibulum leo id, tincidunt orci. Nunc sagittis vitae felis non ullamcorper. Donec ante ligula, vestibulum nec sem a, luctus pretium augue. Aliquam imperdiet euismod sapien vel interdum. Quisque nec ex est. Phasellus posuere gravida ex, sed sagittis metus blandit ac. Ut non nisi lacinia, pellentesque ante at, scelerisque nibh. Nullam dui enim, venenatis at risus eleifend, cursus bibendum purus. Morbi et gravida lorem.', 0),
 (4, 10, '10', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur hendrerit congue tellus id interdum. Aliquam id orci vitae velit dictum facilisis. Donec auctor condimentum eros, id dictum leo. Duis eros augue, eleifend id volutpat euismod, pharetra id magna. Nulla facilisi. Phasellus volutpat arcu nec egestas interdum. Morbi aliquet placerat dictum. Maecenas vel ipsum nisi.', 0),
-(5, 11, '1', 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Project Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.\nJanitor manager', 100);
+(5, 11, '1', 'Curabitur tempor pellentesque risus, eu viverra ex suscipit nec. Duis faucibus luctus diam, vitae suscipit est porta ac. In eleifend molestie semper. In ut lacinia sem. Pellentesque in mollis mi. Vivamus vel gravida libero. Nam non quam eu urna varius ultricies nec nec sapien. In hac habitasse platea dictumst. Curabitur varius orci lacus, nec vestibulum nunc viverra sed. Project Etiam id finibus arcu, quis consequat quam. Duis pharetra mi leo, nec venenatis arcu pulvinar quis. Morbi iaculis augue orci, sit amet convallis ligula facilisis nec. Sed luctus non ante ac luctus. Morbi leo orci, porttitor quis iaculis a, lobortis eget velit. Praesent varius cursus commodo.\nJanitor manager', 100),
+(6, 12, '2', 'janitor', 50),
+(7, 14, '2', 'secretary', 200),
+(8, 15, '3', 'Cashier', 100);
 
 -- --------------------------------------------------------
 
@@ -3548,7 +3980,8 @@ INSERT INTO `tbllicensemaster` (`license_master_id`, `license_master_name`, `lic
 (42, 'Sanitary Engineering\r\n', 1),
 (43, 'Social Work\r\n', 1),
 (44, 'Speech-Language Pathology\r\n', 1),
-(45, 'Veterinary Medicine\r\n', 1);
+(45, 'Veterinary Medicine\r\n', 1),
+(46, 'Driving', 2);
 
 -- --------------------------------------------------------
 
@@ -3566,7 +3999,62 @@ CREATE TABLE `tbllicensetype` (
 --
 
 INSERT INTO `tbllicensetype` (`license_type_id`, `license_type_name`) VALUES
-(1, ' Professional Regulation Commission (PRC)');
+(1, ' Professional Regulation Commission (PRC)'),
+(2, 'PRC');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblnotifications`
+--
+
+CREATE TABLE `tblnotifications` (
+  `notification_id` int(11) NOT NULL,
+  `notification_candId` int(11) DEFAULT NULL,
+  `notification_appId` int(50) DEFAULT NULL,
+  `notification_statusId` int(11) DEFAULT NULL,
+  `notification_message` text DEFAULT NULL,
+  `notification_date` datetime DEFAULT NULL,
+  `notification_read` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblnotifications`
+--
+
+INSERT INTO `tblnotifications` (`notification_id`, `notification_candId`, `notification_appId`, `notification_statusId`, `notification_message`, `notification_date`, `notification_read`) VALUES
+(1, 7, 12, 11, 'Your application status has been updated to \"Employed\" as of November 05, 2024 03:58 PM.', '2024-11-05 05:58:38', 1),
+(2, 7, 15, 8, 'Your application status has been updated to \"Job Offer\" as of November 08, 2024 09:38 AM.', '2024-11-08 09:50:23', 1),
+(10, 7, 11, 6, 'You have been scheduled for an interview on December 25, 2024 01:30 PM.', '2024-11-08 14:09:38', 1),
+(11, 7, 17, 5, 'Your application status has been updated to \"Exam\" as of November 08, 2024 10:33 PM.', '2024-11-08 22:33:16', 1),
+(40, 7, 17, 9, 'Your application status has been updated to \"Failed Exam\" as of November 09, 2024 11:51 AM.', '2024-11-09 11:51:59', 1),
+(41, 7, 11, 5, 'Your application status has been updated to \"Exam\" as of November 09, 2024 04:26 PM.', '2024-11-09 16:26:36', 1),
+(48, 7, 11, 9, 'Your application status has been updated to \"Failed Exam\" as of November 14, 2024 11:54 AM.', '2024-11-14 11:54:15', 1),
+(49, 7, 18, 5, 'Your application status has been updated to \"Exam\" as of November 14, 2024 12:01 PM.', '2024-11-14 12:01:50', 1),
+(50, 11, 22, 1, 'Your application status has been updated to \"Pending\" as of November 14, 2024 08:59 PM.', '2024-11-14 20:59:22', 1),
+(51, 11, 22, 12, 'Your application status has been updated to \"Cancelled\" as of November 14, 2024 09:07 PM.', '2024-11-14 21:07:43', 1),
+(53, 11, 24, 1, 'Your application status has been updated to \"Pending\" as of November 14, 2024 11:03 PM.', '2024-11-14 23:03:18', 1),
+(54, 11, 24, 12, 'Your application status has been updated to \"Cancelled\" as of November 14, 2024 11:04 PM.', '2024-11-14 23:04:03', 1),
+(55, 11, 25, 1, 'Your application status has been updated to \"Pending\" as of November 14, 2024 11:05 PM.', '2024-11-14 23:05:02', 1),
+(56, 11, 26, 1, 'Your application status has been updated to \"Pending\" as of November 15, 2024 01:32 PM.', '2024-11-15 13:32:40', 1),
+(57, 11, 26, 12, 'Your application status has been updated to \"Cancelled\" as of November 15, 2024 01:33 PM.', '2024-11-15 13:33:01', 1),
+(58, 11, 27, 1, 'Your application status has been updated to \"Pending\" as of November 15, 2024 01:33 PM.', '2024-11-15 13:33:11', 1),
+(59, 7, 28, 1, 'Your application status has been updated to \"Pending\" as of November 16, 2024 02:32 PM.', '2024-11-16 14:32:55', 1),
+(60, 11, 29, 1, 'Your application status has been updated to \"Pending\" as of November 27, 2024 03:39 PM.', '2024-11-27 15:39:23', 1),
+(61, 11, 29, 2, 'Your application status has been updated to \"Process\" as of November 27, 2024 03:39 PM.', '2024-11-27 15:39:51', 1),
+(63, 11, 29, 6, 'You have been scheduled for an interview on December 25, 2024 03:51 PM.', '2024-11-27 15:53:09', 1),
+(64, 11, 29, 5, 'Your application status has been updated to \"Exam\" as of November 27, 2024 03:56 PM.', '2024-11-27 15:56:01', 1),
+(65, 11, 29, 9, 'Your application status has been updated to \"Failed Exam\" as of November 27, 2024 04:03 PM.', '2024-11-27 16:03:48', 1),
+(66, 11, 19, 2, 'Your application status has been updated to \"Process\" as of November 27, 2024 04:05 PM.', '2024-11-27 16:05:32', 1),
+(67, 11, 19, 6, NULL, '2024-11-27 16:05:41', 1),
+(68, 11, 19, 5, 'Your application status has been updated to \"Exam\" as of November 27, 2024 04:06 PM.', '2024-11-27 16:06:13', 1),
+(69, 11, 19, 9, 'Your application status has been updated to \"Failed Exam\" as of November 27, 2024 04:06 PM.', '2024-11-27 16:06:52', 1),
+(70, 11, 26, 2, 'Your application status has been updated to \"Process\" as of November 27, 2024 04:08 PM.', '2024-11-27 16:08:44', 1),
+(71, 11, 26, 6, NULL, '2024-11-27 16:08:49', 1),
+(72, 11, 26, 5, 'Your application status has been updated to \"Exam\" as of November 27, 2024 04:09 PM.', '2024-11-27 16:09:07', 1),
+(73, 11, 26, 10, 'Your application status has been updated to \"Passed Exam\" as of November 27, 2024 04:10 PM.', '2024-11-27 16:10:27', 1),
+(74, 11, 26, 7, 'Your application status has been updated to \"Background Check\" as of November 27, 2024 04:10 PM.', '2024-11-27 16:10:27', 1),
+(75, 11, 26, 8, 'Your application status has been updated to \"Job Offer\" as of November 27, 2024 04:11 PM.', '2024-11-27 16:11:00', 1);
 
 -- --------------------------------------------------------
 
@@ -3587,7 +4075,10 @@ INSERT INTO `tblpersonalknowledge` (`knowledge_id`, `knowledge_name`) VALUES
 (1, 'Quality Management Practices (QMP)\r\n'),
 (2, 'Hazard Analysis and Critical Control Points (HACCP)\r\n'),
 (3, 'Good Manufacturing Practices (GMP)\r\n'),
-(4, 'Food Safety Management Systems (FSMS)');
+(4, 'Food Safety Management Systems (FSMS)'),
+(5, 'Organizing Events'),
+(6, 'Communication'),
+(7, 'Calculations');
 
 -- --------------------------------------------------------
 
@@ -3614,7 +4105,12 @@ INSERT INTO `tblpersonalskills` (`perS_id`, `perS_name`) VALUES
 (7, 'Leadership '),
 (8, 'Data visualization'),
 (9, 'Presentation competency'),
-(10, 'Research expertise');
+(10, 'Research expertise'),
+(22, 'Communication'),
+(23, 'Communication'),
+(24, 'Programming skills'),
+(25, 'Calculations'),
+(26, 'Observing');
 
 -- --------------------------------------------------------
 
@@ -3641,45 +4137,11 @@ INSERT INTO `tblpersonaltraining` (`perT_id`, `perT_name`) VALUES
 (7, 'Operations Trainer'),
 (8, 'Sales and Marketing Trainer'),
 (9, 'Retail Training Manager'),
-(10, 'IT Trainer');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tblphysicalexam`
---
-
-CREATE TABLE `tblphysicalexam` (
-  `pe_id` int(11) NOT NULL,
-  `pe_candId` int(11) NOT NULL,
-  `pe_image` varchar(255) NOT NULL,
-  `pe_typeId` int(11) NOT NULL,
-  `pe_result` text NOT NULL,
-  `pe_statusId` int(11) NOT NULL,
-  `pe_date` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tblphysicalexamstatus`
---
-
-CREATE TABLE `tblphysicalexamstatus` (
-  `peS_id` int(11) NOT NULL,
-  `peS_name` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tblphysicalexamtype`
---
-
-CREATE TABLE `tblphysicalexamtype` (
-  `peT_id` int(11) NOT NULL,
-  `peT_name` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+(10, 'IT Trainer'),
+(11, 'Stack'),
+(12, 'Queue'),
+(14, 'CRIM Trainer'),
+(15, 'Cashiering Calculations');
 
 -- --------------------------------------------------------
 
@@ -3702,7 +4164,51 @@ INSERT INTO `tblstatus` (`status_id`, `status_name`) VALUES
 (3, 'Accept'),
 (4, 'Decline'),
 (5, 'Exam'),
-(6, 'Interview');
+(6, 'Interview'),
+(7, 'Background Check'),
+(8, 'Job Offer'),
+(9, 'Failed Exam'),
+(10, 'Passed Exam'),
+(11, 'Employed'),
+(12, 'Cancelled'),
+(13, 'Decision Pending');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblstatusjoboffer`
+--
+
+CREATE TABLE `tblstatusjoboffer` (
+  `statusjobO_id` int(11) NOT NULL,
+  `statusjobO_jobofferId` int(11) NOT NULL,
+  `statusjobO_statusId` int(11) NOT NULL,
+  `statusjobO_date` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblstatusjoboffer`
+--
+
+INSERT INTO `tblstatusjoboffer` (`statusjobO_id`, `statusjobO_jobofferId`, `statusjobO_statusId`, `statusjobO_date`) VALUES
+(1, 1, 3, '2024-10-19'),
+(10, 1, 1, '2024-10-24'),
+(11, 1, 1, '2024-10-24'),
+(12, 1, 1, '2024-10-24'),
+(13, 1, 1, '2024-10-24'),
+(14, 1, 1, '2024-10-24'),
+(15, 1, 1, '2024-10-24'),
+(16, 1, 1, '2024-10-24'),
+(17, 1, 1, '2024-10-24'),
+(18, 1, 1, '2024-10-24'),
+(19, 1, 1, '2024-10-24'),
+(20, 4, 3, '2024-10-24'),
+(21, 5, 3, '2024-10-26'),
+(22, 5, 1, '2024-11-05'),
+(23, 5, 1, '2024-11-05'),
+(24, 5, 1, '2024-11-05'),
+(25, 5, 1, '2024-11-05'),
+(26, 6, 3, '2024-11-08');
 
 -- --------------------------------------------------------
 
@@ -3808,7 +4314,7 @@ ALTER TABLE `tblcandeducbackground`
   ADD PRIMARY KEY (`educ_back_id`),
   ADD KEY `personal_info_id` (`educ_canId`),
   ADD KEY `courses_id` (`educ_coursesId`),
-  ADD KEY `institution_id` (`educ_institutionId`);
+  ADD KEY `educ_institutionId` (`educ_institutionId`);
 
 --
 -- Indexes for table `tblcandemploymenthistory`
@@ -3925,7 +4431,8 @@ ALTER TABLE `tblexamquestiontype`
 ALTER TABLE `tblexamresult`
   ADD PRIMARY KEY (`examR_id`),
   ADD KEY `examR_candId` (`examR_candId`),
-  ADD KEY `examR_examId` (`examR_examId`);
+  ADD KEY `examR_examId` (`examR_examId`),
+  ADD KEY `examR_jobMId` (`examR_jobMId`);
 
 --
 -- Indexes for table `tblexamtype`
@@ -3984,12 +4491,19 @@ ALTER TABLE `tblinterviewpassingpercent`
   ADD KEY `passing_jobId` (`passing_jobId`);
 
 --
+-- Indexes for table `tblinterviewschedule`
+--
+ALTER TABLE `tblinterviewschedule`
+  ADD PRIMARY KEY (`intsched_id`),
+  ADD KEY `intsched_jobId` (`intsched_jobId`),
+  ADD KEY `intsched_candId` (`intsched_candId`);
+
+--
 -- Indexes for table `tbljoboffer`
 --
 ALTER TABLE `tbljoboffer`
   ADD PRIMARY KEY (`joboffer_id`),
   ADD KEY `joboffer_candId` (`joboffer_candId`),
-  ADD KEY `joboffer_statusId` (`joboffer_statusId`),
   ADD KEY `joboffer_jobMId` (`joboffer_jobMId`);
 
 --
@@ -4002,14 +4516,16 @@ ALTER TABLE `tbljobofferstatus`
 -- Indexes for table `tbljobpassing`
 --
 ALTER TABLE `tbljobpassing`
-  ADD PRIMARY KEY (`passing_id`);
+  ADD PRIMARY KEY (`passing_id`),
+  ADD KEY `passing_jobId` (`passing_jobId`);
 
 --
 -- Indexes for table `tbljobseducation`
 --
 ALTER TABLE `tbljobseducation`
   ADD PRIMARY KEY (`jeduc_id`),
-  ADD KEY `jeduc_jobId` (`jeduc_jobId`);
+  ADD KEY `jeduc_jobId` (`jeduc_jobId`),
+  ADD KEY `jeduc_categoryId` (`jeduc_categoryId`);
 
 --
 -- Indexes for table `tbljobsknowledge`
@@ -4045,7 +4561,8 @@ ALTER TABLE `tbljobsmasterduties`
 --
 ALTER TABLE `tbljobsskills`
   ADD PRIMARY KEY (`jskills_id`),
-  ADD KEY `jskills_jobId` (`jskills_jobId`);
+  ADD KEY `jskills_jobId` (`jskills_jobId`),
+  ADD KEY `jskills_skillsId` (`jskills_skillsId`);
 
 --
 -- Indexes for table `tbljobstrainings`
@@ -4076,6 +4593,15 @@ ALTER TABLE `tbllicensetype`
   ADD PRIMARY KEY (`license_type_id`);
 
 --
+-- Indexes for table `tblnotifications`
+--
+ALTER TABLE `tblnotifications`
+  ADD PRIMARY KEY (`notification_id`),
+  ADD KEY `notification_candId` (`notification_candId`),
+  ADD KEY `notification_appId` (`notification_appId`),
+  ADD KEY `notification_statusId` (`notification_statusId`);
+
+--
 -- Indexes for table `tblpersonalknowledge`
 --
 ALTER TABLE `tblpersonalknowledge`
@@ -4094,31 +4620,18 @@ ALTER TABLE `tblpersonaltraining`
   ADD PRIMARY KEY (`perT_id`);
 
 --
--- Indexes for table `tblphysicalexam`
---
-ALTER TABLE `tblphysicalexam`
-  ADD PRIMARY KEY (`pe_id`),
-  ADD KEY `pe_candId` (`pe_candId`),
-  ADD KEY `pe_statusId` (`pe_statusId`),
-  ADD KEY `pe_typeId` (`pe_typeId`);
-
---
--- Indexes for table `tblphysicalexamstatus`
---
-ALTER TABLE `tblphysicalexamstatus`
-  ADD PRIMARY KEY (`peS_id`);
-
---
--- Indexes for table `tblphysicalexamtype`
---
-ALTER TABLE `tblphysicalexamtype`
-  ADD PRIMARY KEY (`peT_id`);
-
---
 -- Indexes for table `tblstatus`
 --
 ALTER TABLE `tblstatus`
   ADD PRIMARY KEY (`status_id`);
+
+--
+-- Indexes for table `tblstatusjoboffer`
+--
+ALTER TABLE `tblstatusjoboffer`
+  ADD PRIMARY KEY (`statusjobO_id`),
+  ADD KEY `statusjobO_jobofferId` (`statusjobO_jobofferId`),
+  ADD KEY `statusjobO_statusId` (`statusjobO_statusId`);
 
 --
 -- Indexes for table `tblsupervisor`
@@ -4146,13 +4659,13 @@ ALTER TABLE `tbladmin`
 -- AUTO_INCREMENT for table `tblapplications`
 --
 ALTER TABLE `tblapplications`
-  MODIFY `app_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `app_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `tblapplicationstatus`
 --
 ALTER TABLE `tblapplicationstatus`
-  MODIFY `appS_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `appS_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=234;
 
 --
 -- AUTO_INCREMENT for table `tblbackgroundcheckstatus`
@@ -4170,97 +4683,97 @@ ALTER TABLE `tblbackgroundchecktype`
 -- AUTO_INCREMENT for table `tblcandconsent`
 --
 ALTER TABLE `tblcandconsent`
-  MODIFY `cons_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `cons_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblcandeducbackground`
 --
 ALTER TABLE `tblcandeducbackground`
-  MODIFY `educ_back_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `educ_back_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `tblcandemploymenthistory`
 --
 ALTER TABLE `tblcandemploymenthistory`
-  MODIFY `empH_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `empH_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `tblcandidates`
 --
 ALTER TABLE `tblcandidates`
-  MODIFY `cand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `cand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `tblcandknowledge`
 --
 ALTER TABLE `tblcandknowledge`
-  MODIFY `canknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `canknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `tblcandlicense`
 --
 ALTER TABLE `tblcandlicense`
-  MODIFY `license_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `license_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tblcandresume`
 --
 ALTER TABLE `tblcandresume`
-  MODIFY `canres_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `canres_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `tblcandskills`
 --
 ALTER TABLE `tblcandskills`
-  MODIFY `skills_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `skills_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `tblcandtraining`
 --
 ALTER TABLE `tblcandtraining`
-  MODIFY `training_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `training_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `tblcourses`
 --
 ALTER TABLE `tblcourses`
-  MODIFY `courses_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
+  MODIFY `courses_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
 
 --
 -- AUTO_INCREMENT for table `tblcoursescategory`
 --
 ALTER TABLE `tblcoursescategory`
-  MODIFY `course_categoryId` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `course_categoryId` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `tblcoursetype`
 --
 ALTER TABLE `tblcoursetype`
-  MODIFY `crs_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `crs_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tblexam`
 --
 ALTER TABLE `tblexam`
-  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tblexamcandidateanswer`
 --
 ALTER TABLE `tblexamcandidateanswer`
-  MODIFY `examcandA_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `examcandA_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=263;
 
 --
 -- AUTO_INCREMENT for table `tblexamchoices`
 --
 ALTER TABLE `tblexamchoices`
-  MODIFY `examC_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `examC_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT for table `tblexamquestion`
 --
 ALTER TABLE `tblexamquestion`
-  MODIFY `examQ_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `examQ_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `tblexamquestiontype`
@@ -4272,7 +4785,7 @@ ALTER TABLE `tblexamquestiontype`
 -- AUTO_INCREMENT for table `tblexamresult`
 --
 ALTER TABLE `tblexamresult`
-  MODIFY `examR_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `examR_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
 -- AUTO_INCREMENT for table `tblexamtype`
@@ -4287,10 +4800,16 @@ ALTER TABLE `tblforgotpassword`
   MODIFY `forgotpass_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `tblinstitution`
+--
+ALTER TABLE `tblinstitution`
+  MODIFY `institution_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2413;
+
+--
 -- AUTO_INCREMENT for table `tblinterviewcandpoints`
 --
 ALTER TABLE `tblinterviewcandpoints`
-  MODIFY `interviewP_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `interviewP_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `tblinterviewcategory`
@@ -4308,43 +4827,49 @@ ALTER TABLE `tblinterviewcriteria`
 -- AUTO_INCREMENT for table `tblinterviewcriteriamaster`
 --
 ALTER TABLE `tblinterviewcriteriamaster`
-  MODIFY `inter_criteria_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `inter_criteria_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT for table `tblinterviewpassingpercent`
 --
 ALTER TABLE `tblinterviewpassingpercent`
-  MODIFY `passing_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `passing_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `tblinterviewschedule`
+--
+ALTER TABLE `tblinterviewschedule`
+  MODIFY `intsched_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbljoboffer`
 --
 ALTER TABLE `tbljoboffer`
-  MODIFY `joboffer_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `joboffer_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tbljobofferstatus`
 --
 ALTER TABLE `tbljobofferstatus`
-  MODIFY `jobofferS_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `jobofferS_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tbljobpassing`
 --
 ALTER TABLE `tbljobpassing`
-  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `tbljobseducation`
 --
 ALTER TABLE `tbljobseducation`
-  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbljobsknowledge`
 --
 ALTER TABLE `tbljobsknowledge`
-  MODIFY `jknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `jknow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `tbljobslicense`
@@ -4356,85 +4881,79 @@ ALTER TABLE `tbljobslicense`
 -- AUTO_INCREMENT for table `tbljobsmaster`
 --
 ALTER TABLE `tbljobsmaster`
-  MODIFY `jobM_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `jobM_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `tbljobsmasterduties`
 --
 ALTER TABLE `tbljobsmasterduties`
-  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `tbljobsskills`
 --
 ALTER TABLE `tbljobsskills`
-  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tbljobstrainings`
 --
 ALTER TABLE `tbljobstrainings`
-  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `tbljobsworkexperience`
 --
 ALTER TABLE `tbljobsworkexperience`
-  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `tbllicensemaster`
 --
 ALTER TABLE `tbllicensemaster`
-  MODIFY `license_master_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `license_master_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `tbllicensetype`
 --
 ALTER TABLE `tbllicensetype`
-  MODIFY `license_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `license_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tblnotifications`
+--
+ALTER TABLE `tblnotifications`
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `tblpersonalknowledge`
 --
 ALTER TABLE `tblpersonalknowledge`
-  MODIFY `knowledge_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `knowledge_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `tblpersonalskills`
 --
 ALTER TABLE `tblpersonalskills`
-  MODIFY `perS_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `perS_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `tblpersonaltraining`
 --
 ALTER TABLE `tblpersonaltraining`
-  MODIFY `perT_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `tblphysicalexam`
---
-ALTER TABLE `tblphysicalexam`
-  MODIFY `pe_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `tblphysicalexamstatus`
---
-ALTER TABLE `tblphysicalexamstatus`
-  MODIFY `peS_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `tblphysicalexamtype`
---
-ALTER TABLE `tblphysicalexamtype`
-  MODIFY `peT_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `perT_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `tblstatus`
 --
 ALTER TABLE `tblstatus`
-  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `tblstatusjoboffer`
+--
+ALTER TABLE `tblstatusjoboffer`
+  MODIFY `statusjobO_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `tblsupervisor`
@@ -4492,7 +5011,7 @@ ALTER TABLE `tblcandconsent`
 ALTER TABLE `tblcandeducbackground`
   ADD CONSTRAINT `tblcandeducbackground_ibfk_1` FOREIGN KEY (`educ_canId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `tblcandeducbackground_ibfk_2` FOREIGN KEY (`educ_coursesId`) REFERENCES `tblcourses` (`courses_id`),
-  ADD CONSTRAINT `tblcandeducbackground_ibfk_5` FOREIGN KEY (`educ_institutionId`) REFERENCES `tblinstitution` (`institution_id`);
+  ADD CONSTRAINT `tblcandeducbackground_ibfk_3` FOREIGN KEY (`educ_institutionId`) REFERENCES `tblinstitution` (`institution_id`);
 
 --
 -- Constraints for table `tblcandemploymenthistory`
@@ -4532,7 +5051,8 @@ ALTER TABLE `tblcandtraining`
 -- Constraints for table `tblcourses`
 --
 ALTER TABLE `tblcourses`
-  ADD CONSTRAINT `tblcourses_ibfk_1` FOREIGN KEY (`courses_courseTypeId`) REFERENCES `tblcoursetype` (`crs_type_id`);
+  ADD CONSTRAINT `tblcourses_ibfk_1` FOREIGN KEY (`courses_courseTypeId`) REFERENCES `tblcoursetype` (`crs_type_id`),
+  ADD CONSTRAINT `tblcourses_ibfk_2` FOREIGN KEY (`courses_coursecategoryId`) REFERENCES `tblcoursescategory` (`course_categoryId`);
 
 --
 -- Constraints for table `tblexam`
@@ -4542,11 +5062,33 @@ ALTER TABLE `tblexam`
   ADD CONSTRAINT `tblexam_ibfk_2` FOREIGN KEY (`exam_typeId`) REFERENCES `tblexamtype` (`examT_id`);
 
 --
+-- Constraints for table `tblexamcandidateanswer`
+--
+ALTER TABLE `tblexamcandidateanswer`
+  ADD CONSTRAINT `tblexamcandidateanswer_ibfk_1` FOREIGN KEY (`examcandA_choiceId`) REFERENCES `tblexamchoices` (`examC_id`),
+  ADD CONSTRAINT `tblexamcandidateanswer_ibfk_2` FOREIGN KEY (`examcandA_questionId`) REFERENCES `tblexamquestion` (`examQ_id`),
+  ADD CONSTRAINT `tblexamcandidateanswer_ibfk_3` FOREIGN KEY (`examcandA_resultId`) REFERENCES `tblexamresult` (`examR_id`);
+
+--
+-- Constraints for table `tblexamchoices`
+--
+ALTER TABLE `tblexamchoices`
+  ADD CONSTRAINT `tblexamchoices_ibfk_1` FOREIGN KEY (`examC_questionId`) REFERENCES `tblexamquestion` (`examQ_id`);
+
+--
+-- Constraints for table `tblexamquestion`
+--
+ALTER TABLE `tblexamquestion`
+  ADD CONSTRAINT `tblexamquestion_ibfk_1` FOREIGN KEY (`examQ_examId`) REFERENCES `tblexam` (`exam_id`),
+  ADD CONSTRAINT `tblexamquestion_ibfk_2` FOREIGN KEY (`examQ_typeId`) REFERENCES `tblexamquestiontype` (`questionT_id`);
+
+--
 -- Constraints for table `tblexamresult`
 --
 ALTER TABLE `tblexamresult`
   ADD CONSTRAINT `tblexamresult_ibfk_1` FOREIGN KEY (`examR_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblexamresult_ibfk_2` FOREIGN KEY (`examR_examId`) REFERENCES `tblexam` (`exam_id`);
+  ADD CONSTRAINT `tblexamresult_ibfk_2` FOREIGN KEY (`examR_examId`) REFERENCES `tblexam` (`exam_id`),
+  ADD CONSTRAINT `tblexamresult_ibfk_3` FOREIGN KEY (`examR_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
 
 --
 -- Constraints for table `tblforgotpassword`
@@ -4582,18 +5124,31 @@ ALTER TABLE `tblinterviewpassingpercent`
   ADD CONSTRAINT `tblinterviewpassingpercent_ibfk_1` FOREIGN KEY (`passing_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
 
 --
+-- Constraints for table `tblinterviewschedule`
+--
+ALTER TABLE `tblinterviewschedule`
+  ADD CONSTRAINT `tblinterviewschedule_ibfk_1` FOREIGN KEY (`intsched_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
+  ADD CONSTRAINT `tblinterviewschedule_ibfk_2` FOREIGN KEY (`intsched_candId`) REFERENCES `tblcandidates` (`cand_id`);
+
+--
 -- Constraints for table `tbljoboffer`
 --
 ALTER TABLE `tbljoboffer`
   ADD CONSTRAINT `tbljoboffer_ibfk_1` FOREIGN KEY (`joboffer_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tbljoboffer_ibfk_2` FOREIGN KEY (`joboffer_statusId`) REFERENCES `tbljobofferstatus` (`jobofferS_id`),
   ADD CONSTRAINT `tbljoboffer_ibfk_3` FOREIGN KEY (`joboffer_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
+
+--
+-- Constraints for table `tbljobpassing`
+--
+ALTER TABLE `tbljobpassing`
+  ADD CONSTRAINT `tbljobpassing_ibfk_1` FOREIGN KEY (`passing_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
 
 --
 -- Constraints for table `tbljobseducation`
 --
 ALTER TABLE `tbljobseducation`
-  ADD CONSTRAINT `tbljobseducation_ibfk_1` FOREIGN KEY (`jeduc_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
+  ADD CONSTRAINT `tbljobseducation_ibfk_1` FOREIGN KEY (`jeduc_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
+  ADD CONSTRAINT `tbljobseducation_ibfk_2` FOREIGN KEY (`jeduc_categoryId`) REFERENCES `tblcoursescategory` (`course_categoryId`);
 
 --
 -- Constraints for table `tbljobsknowledge`
@@ -4619,7 +5174,8 @@ ALTER TABLE `tbljobsmasterduties`
 -- Constraints for table `tbljobsskills`
 --
 ALTER TABLE `tbljobsskills`
-  ADD CONSTRAINT `tbljobsskills_ibfk_1` FOREIGN KEY (`jskills_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
+  ADD CONSTRAINT `tbljobsskills_ibfk_1` FOREIGN KEY (`jskills_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
+  ADD CONSTRAINT `tbljobsskills_ibfk_2` FOREIGN KEY (`jskills_skillsId`) REFERENCES `tblpersonalskills` (`perS_id`);
 
 --
 -- Constraints for table `tbljobstrainings`
@@ -4641,12 +5197,19 @@ ALTER TABLE `tbllicensemaster`
   ADD CONSTRAINT `tbllicensemaster_ibfk_1` FOREIGN KEY (`license_master_typeId`) REFERENCES `tbllicensetype` (`license_type_id`);
 
 --
--- Constraints for table `tblphysicalexam`
+-- Constraints for table `tblnotifications`
 --
-ALTER TABLE `tblphysicalexam`
-  ADD CONSTRAINT `tblphysicalexam_ibfk_1` FOREIGN KEY (`pe_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblphysicalexam_ibfk_2` FOREIGN KEY (`pe_statusId`) REFERENCES `tblphysicalexamstatus` (`peS_id`),
-  ADD CONSTRAINT `tblphysicalexam_ibfk_3` FOREIGN KEY (`pe_typeId`) REFERENCES `tblphysicalexamtype` (`peT_id`);
+ALTER TABLE `tblnotifications`
+  ADD CONSTRAINT `tblnotifications_ibfk_1` FOREIGN KEY (`notification_candId`) REFERENCES `tblcandidates` (`cand_id`),
+  ADD CONSTRAINT `tblnotifications_ibfk_2` FOREIGN KEY (`notification_appId`) REFERENCES `tblapplications` (`app_id`),
+  ADD CONSTRAINT `tblnotifications_ibfk_3` FOREIGN KEY (`notification_statusId`) REFERENCES `tblstatus` (`status_id`);
+
+--
+-- Constraints for table `tblstatusjoboffer`
+--
+ALTER TABLE `tblstatusjoboffer`
+  ADD CONSTRAINT `tblstatusjoboffer_ibfk_1` FOREIGN KEY (`statusjobO_jobofferId`) REFERENCES `tbljoboffer` (`joboffer_id`),
+  ADD CONSTRAINT `tblstatusjoboffer_ibfk_2` FOREIGN KEY (`statusjobO_statusId`) REFERENCES `tbljobofferstatus` (`jobofferS_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
