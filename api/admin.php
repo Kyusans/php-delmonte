@@ -2079,6 +2079,7 @@ class Admin
     $stmt->bindParam(':joboffer_document', $data['document']);
     $stmt->bindParam(':joboffer_expiryDate', $data['expiryDate']);
     $stmt->execute();
+ 
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
@@ -2267,11 +2268,16 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
+            f.jobofferS_name as jobOfferStatus, e.joboffer_salary, e.joboffer_document,
+            DATE_FORMAT(e.joboffer_date, '%b %d, %Y') as joboffer_date, 
+            DATE_FORMAT(e.joboffer_expiryDate, '%b %d, %Y') as joboffer_expiryDate
             FROM tblapplicationstatus a 
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+            INNER JOIN tbljoboffer e ON e.joboffer_jobMId = b.app_jobMId
+            INNER JOIN tbljobofferstatus f ON f.jobofferS_id = e.joboffer_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
             AND (a.appS_statusId = 8) 
             AND b.app_jobMId = :jobId";
@@ -2347,6 +2353,24 @@ class Admin
     $stmt->bindParam(":categoryId", $data['interviewCategoryId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function getDecisionPendingCandidates($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+            FROM tblapplicationstatus a 
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+            WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
+            AND (a.appS_statusId = 13) 
+            AND b.app_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 } //admin
 
@@ -2698,6 +2722,9 @@ switch ($operation) {
     break;
   case "updateInterviewCriteria":
     echo $admin->updateInterviewCriteria($json);
+    break;
+  case "getDecisionPendingCandidates":
+    echo json_encode($admin->getDecisionPendingCandidates($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
