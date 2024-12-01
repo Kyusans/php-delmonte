@@ -36,15 +36,13 @@ class Admin
     $todayDate = $this->getCurrentDate();
 
     try {
-      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status, jobM_createdAt, jobM_totalPoints) VALUES (:jobM_title, :jobM_description, :jobM_status, :jobM_createdAt, :jobM_totalPoints)";
+      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status, jobM_createdAt) VALUES (:jobM_title, :jobM_description, :jobM_status, :jobM_createdAt)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobM_title", $jobMaster['title']);
       $stmt->bindParam(":jobM_description", $jobMaster['description']);
       $stmt->bindParam(":jobM_status", $jobMaster['isJobActive']);
       $stmt->bindParam(":jobM_createdAt", $todayDate);
-      $stmt->bindParam(":jobM_totalPoints", $data['totalPoints']);
       $stmt->execute();
-
       $jobMasterId = $conn->lastInsertId();
 
       $sql = "INSERT INTO tbljobpassing (passing_jobId, passing_points) VALUES (:passing_jobId, :passing_points)";
@@ -2079,7 +2077,7 @@ class Admin
     $stmt->bindParam(':joboffer_document', $data['document']);
     $stmt->bindParam(':joboffer_expiryDate', $data['expiryDate']);
     $stmt->execute();
- 
+
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
@@ -2089,7 +2087,7 @@ class Admin
     $data = json_decode($json, true);
 
     $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
-                    c.cand_email, d.status_name, DATE_FORMAT(e.latest_sched_date, '%b %d %Y') AS schedDate,
+                    c.cand_email, d.status_name, DATE_FORMAT(e.latest_sched_date, '%b %d, %Y') AS schedDate,
                     DATE_FORMAT(e.latest_sched_date, '%l:%i %p') AS schedTime
               FROM tblapplicationstatus a
               INNER JOIN tblapplications b ON b.app_id = a.appS_appId
@@ -2199,7 +2197,7 @@ class Admin
                 AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
                 FROM tblapplicationstatus sub_d 
                 WHERE sub_d.appS_appId = d.appS_appId)
-                AND (d.appS_statusId = 1 OR d.appS_statusId = 2) 
+                AND (d.appS_statusId = 1 OR d.appS_statusId = 2 OR d.appS_statusId = 4) 
                 AND a.app_jobMId = :jobId 
                 ORDER BY b.cand_id DESC";
     $stmt = $conn->prepare($sql);
@@ -2279,7 +2277,7 @@ class Admin
             INNER JOIN tbljoboffer e ON e.joboffer_jobMId = b.app_jobMId
             INNER JOIN tbljobofferstatus f ON f.jobofferS_id = e.joboffer_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
-            AND (a.appS_statusId = 8) 
+            AND (a.appS_statusId = 8 OR a.appS_statusId = 12) 
             AND b.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -2366,6 +2364,24 @@ class Admin
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
             AND (a.appS_statusId = 13) 
+            AND b.app_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getEmployedCandidates($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+            FROM tblapplicationstatus a 
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+            WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
+            AND (a.appS_statusId = 11) 
             AND b.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -2725,6 +2741,9 @@ switch ($operation) {
     break;
   case "getDecisionPendingCandidates":
     echo json_encode($admin->getDecisionPendingCandidates($json));
+    break;
+  case "getEmployedCandidates":
+    echo json_encode($admin->getEmployedCandidates($json));
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
