@@ -2275,7 +2275,7 @@ class Admin
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
-            INNER JOIN tbljoboffer e ON e.joboffer_jobMId = b.app_jobMId
+            INNER JOIN tbljoboffer e ON e.joboffer_jobMId = b.app_jobMId AND e.joboffer_candId = c.cand_id
             INNER JOIN tbljobofferstatus f ON f.jobofferS_id = e.joboffer_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
             AND (a.appS_statusId = 8 OR a.appS_statusId = 12) 
