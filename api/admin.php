@@ -2403,6 +2403,25 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+  function deleteJobOffer($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":candId", $data['candId']);
+      $stmt->bindParam(":jobId", $data['jobId']); 
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
 } //admin
 
 function uploadImage()
@@ -2762,6 +2781,9 @@ switch ($operation) {
     break;
   case "updateJobOffer":
     echo $admin->updateJobOffer($json);
+    break;
+  case "deleteJobOffer":
+    echo $admin->deleteJobOffer($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
