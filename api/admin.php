@@ -2269,8 +2269,7 @@ class Admin
     $data = json_decode($json, true);
     $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
             f.jobofferS_name as jobOfferStatus, e.joboffer_salary, e.joboffer_document,
-            DATE_FORMAT(e.joboffer_date, '%b %d, %Y') as joboffer_date, 
-            DATE_FORMAT(e.joboffer_expiryDate, '%b %d, %Y') as joboffer_expiryDate
+            DATE_FORMAT(e.joboffer_date, '%b %d, %Y') as joboffer_date, joboffer_expiryDate
             FROM tblapplicationstatus a 
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
@@ -2389,6 +2388,21 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function updateJobOffer($json){
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljoboffer SET joboffer_salary = :salary, joboffer_document = :document, joboffer_expiryDate = :expiryDate WHERE joboffer_candId = :candidateId AND joboffer_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candidateId", $data['candidateId']);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->bindParam(":salary", $data['salary']);
+    $stmt->bindParam(":document", $data['document']);
+    $stmt->bindParam(":expiryDate", $data['expiryDate']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
 } //admin
 
 function uploadImage()
@@ -2745,6 +2759,9 @@ switch ($operation) {
     break;
   case "getEmployedCandidates":
     echo json_encode($admin->getEmployedCandidates($json));
+    break;
+  case "updateJobOffer":
+    echo $admin->updateJobOffer($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
