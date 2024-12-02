@@ -2168,9 +2168,10 @@ class Admin
         $stmt2->bindParam(':intsched_date', $date);
         $stmt2->execute();
 
+        $formattedDate = date('M d, Y - g:ia', strtotime($date));
         $emailSubject = "You have been selected for an interview";
         $emailBody = "Hello " . $candidate['fullName'] . "! You have been selected for an interview.
-        <br><br> The interview date is: " . $date;
+        <br><br> The interview date is: " . $formattedDate;
         $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
       }
 
@@ -2268,13 +2269,12 @@ class Admin
     $data = json_decode($json, true);
     $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
             f.jobofferS_name as jobOfferStatus, e.joboffer_salary, e.joboffer_document,
-            DATE_FORMAT(e.joboffer_date, '%b %d, %Y') as joboffer_date, 
-            DATE_FORMAT(e.joboffer_expiryDate, '%b %d, %Y') as joboffer_expiryDate
+            DATE_FORMAT(e.joboffer_date, '%b %d, %Y') as joboffer_date, joboffer_expiryDate
             FROM tblapplicationstatus a 
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
-            INNER JOIN tbljoboffer e ON e.joboffer_jobMId = b.app_jobMId
+            INNER JOIN tbljoboffer e ON e.joboffer_jobMId = b.app_jobMId AND e.joboffer_candId = c.cand_id
             INNER JOIN tbljobofferstatus f ON f.jobofferS_id = e.joboffer_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
             AND (a.appS_statusId = 8 OR a.appS_statusId = 12) 
@@ -2388,6 +2388,40 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function updateJobOffer($json){
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljoboffer SET joboffer_salary = :salary, joboffer_document = :document, joboffer_expiryDate = :expiryDate WHERE joboffer_candId = :candidateId AND joboffer_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candidateId", $data['candidateId']);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->bindParam(":salary", $data['salary']);
+    $stmt->bindParam(":document", $data['document']);
+    $stmt->bindParam(":expiryDate", $data['expiryDate']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function deleteJobOffer($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":candId", $data['candId']);
+      $stmt->bindParam(":jobId", $data['jobId']); 
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        return -1;
+      }
+      throw $e;
+    }
+  }
+
 } //admin
 
 function uploadImage()
@@ -2744,6 +2778,12 @@ switch ($operation) {
     break;
   case "getEmployedCandidates":
     echo json_encode($admin->getEmployedCandidates($json));
+    break;
+  case "updateJobOffer":
+    echo $admin->updateJobOffer($json);
+    break;
+  case "deleteJobOffer":
+    echo $admin->deleteJobOffer($json);
     break;
   default:
     echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
