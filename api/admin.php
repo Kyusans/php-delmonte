@@ -2168,9 +2168,10 @@ class Admin
         $stmt2->bindParam(':intsched_date', $date);
         $stmt2->execute();
 
+        $formattedDate = date('M d, Y - g:ia', strtotime($date));
         $emailSubject = "You have been selected for an interview";
         $emailBody = "Hello " . $candidate['fullName'] . "! You have been selected for an interview.
-        <br><br> The interview date is: " . $date;
+        <br><br> The interview date is: " . $formattedDate;
         $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
       }
 
