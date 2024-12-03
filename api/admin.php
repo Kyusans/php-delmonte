@@ -1077,9 +1077,23 @@ class Admin
     $returnValue["skills"] = $this->fetchSkills($cand_id);
     $returnValue["training"] = $this->fetchTraining($cand_id);
     $returnValue["knowledge"] = $this->fetchKnowledge($cand_id);
-
+    $returnValue["licenses"] = $this->fetchLicenses($cand_id);
     // Return results
     return json_encode($returnValue);
+  }
+
+  function fetchLicenses($cand_id)
+  {
+    // {"candId": 1}
+    include "connection.php";
+    $sql = "SELECT a.license_master_name, b.license_type_name, c.license_number FROM tbllicensemaster a
+            INNER JOIN tbllicensetype b ON b.license_type_id = a.license_master_typeId
+            INNER JOIN tblcandlicense c ON c.license_masterId = a.license_master_id
+            WHERE c.license_canId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':candId', $cand_id);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
   function getJobInterviewDetails($json)
