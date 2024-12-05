@@ -112,6 +112,18 @@ class Admin
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":passing_jobId", $jobMasterId);
       $stmt->execute();
+
+      $examName = "Untitled Exam";
+      $examJobMId = $jobMasterId;
+
+      $sql = "INSERT INTO tblexam(exam_name, exam_typeId, exam_duration, exam_jobMId, exam_createdAt, exam_updatedAt)
+              VALUES (:exam_name, 2, 120, :exam_jobMId, :exam_createdAt, :exam_updatedAt)";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":exam_name", $examName);
+      $stmt->bindParam(":exam_jobMId", $examJobMId);
+      $stmt->bindParam(":exam_createdAt", $todayDate);
+      $stmt->bindParam(":exam_updatedAt", $todayDate);
+      $stmt->execute();
       $conn->commit();
       return 1;
     } catch (PDOException $th) {
@@ -1418,7 +1430,7 @@ class Admin
       }
 
       $conn->commit();
-      return 1;
+      return $examId;
     } catch (PDOException $e) {
       $conn->rollBack();
       return $e->getMessage();
@@ -2051,7 +2063,7 @@ class Admin
   function getGeneralExamDetails()
   {
     include "connection.php";
-    $returnValue = [];
+    $returnValue = [];  
     $exam = $this->getGeneralExam();
     if ($exam !== 0) {
       $returnValue['examMaster'] = $exam;
@@ -2064,13 +2076,13 @@ class Admin
 
   function getCandidateExamPoints($json)
   {
-    // {"candidateId": 7, "examId": 1}
+    // {"candidateId": 7, "jobId": 1}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT * FROM tblexamresult WHERE examR_candId = :candidateId AND examR_examId = :examId";
+    $sql = "SELECT * FROM tblexamresult WHERE examR_candId = :candidateId AND examR_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candidateId', $data['candidateId']);
-    $stmt->bindParam(':examId', $data['examId']);
+    $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
@@ -2081,8 +2093,8 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $date = $this->getCurrentDate();
-    $sql = "INSERT INTO tbljoboffer(joboffer_candId, joboffer_jobMId, joboffer_date, joboffer_statusId, joboffer_salary, joboffer_document, joboffer_expiryDate) 
-            VALUES (:joboffer_candId, :joboffer_jobMId, :joboffer_date, 3, :joboffer_salary, :joboffer_document, :joboffer_expiryDate)";
+    $sql = "INSERT INTO tbljoboffer(joboffer_candId, joboffer_jobMId, joboffer_date, joboffer_salary, joboffer_document, joboffer_expiryDate) 
+            VALUES (:joboffer_candId, :joboffer_jobMId, :joboffer_date, :joboffer_salary, :joboffer_document, :joboffer_expiryDate)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':joboffer_candId', $data['candId']);
     $stmt->bindParam(':joboffer_jobMId', $data['jobId']);
@@ -2090,6 +2102,13 @@ class Admin
     $stmt->bindParam(':joboffer_salary', $data['salary']);
     $stmt->bindParam(':joboffer_document', $data['document']);
     $stmt->bindParam(':joboffer_expiryDate', $data['expiryDate']);
+    $stmt->execute();
+
+    $lastId = $conn->lastInsertId();
+    $sql = "INSERT INTO tblstatusjoboffer(statusjobO_jobofferId, statusjobO_statusId, statusjobO_date) VALUES (:joboffer_id, 3, :date)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':joboffer_id', $lastId);
+    $stmt->bindParam(':date', $date);
     $stmt->execute();
 
     return $stmt->rowCount() > 0 ? 1 : 0;
@@ -2132,7 +2151,7 @@ class Admin
             AND (a.appS_statusId = 5 OR a.appS_statusId = 9 OR a.appS_statusId = 10) 
             AND b.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':jobId', $data['jobId']);
+    $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
@@ -2164,19 +2183,15 @@ class Admin
       $jobId = $data['jobId'];
       $sendEmail = new SendEmail();
 
-      $sql = "INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date) 
-      VALUES (:appS_appId, 6, :appS_date)";
+      $sql2 = "INSERT INTO tblinterviewschedule (intsched_jobId, intsched_candId, intsched_date) 
+        VALUES (:intsched_jobId, :intsched_candId, :intsched_date)";
+      $stmt2 = $conn->prepare($sql2);
+      $stmt = $conn->prepare("INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date) 
+      VALUES (:appS_appId, 6, :appS_date)");
       foreach ($candidates as $candidate) {
         $appId = $this->applicationIds($jobId, $candidate['candId']);
         $id = json_encode($appId[0]['app_id']);
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(':appS_appId', $id);
-        $stmt->bindParam(':appS_date', $dateNow);
-        $stmt->execute();
 
-        $sql2 = "INSERT INTO tblinterviewschedule (intsched_jobId, intsched_candId, intsched_date) 
-        VALUES (:intsched_jobId, :intsched_candId, :intsched_date)";
-        $stmt2 = $conn->prepare($sql2);
         $stmt2->bindParam(':intsched_jobId', $jobId);
         $stmt2->bindParam(':intsched_candId', $candidate['candId']);
         $stmt2->bindParam(':intsched_date', $date);
@@ -2187,6 +2202,10 @@ class Admin
         $emailBody = "Hello " . $candidate['fullName'] . "! You have been selected for an interview.
         <br><br> The interview date is: " . $formattedDate;
         $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
+
+        $stmt->bindParam(':appS_appId', $id);
+        $stmt->bindParam(':appS_date', $dateNow);
+        $stmt->execute();
       }
 
       $conn->commit();
@@ -2196,6 +2215,7 @@ class Admin
       return $th;
     }
   }
+
 
   function getPendingCandidates($json)
   {
@@ -2212,7 +2232,7 @@ class Admin
                 AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
                 FROM tblapplicationstatus sub_d 
                 WHERE sub_d.appS_appId = d.appS_appId)
-                AND (d.appS_statusId = 1 OR d.appS_statusId = 2 OR d.appS_statusId = 4) 
+                AND (d.appS_statusId = 1 OR d.appS_statusId = 2 OR d.appS_statusId = 12) 
                 AND a.app_jobMId = :jobId 
                 ORDER BY b.cand_id DESC";
     $stmt = $conn->prepare($sql);
@@ -2282,17 +2302,23 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
-            f.jobofferS_name as jobOfferStatus, e.joboffer_salary, e.joboffer_document,
+            g.jobofferS_name as jobOfferStatus, e.joboffer_salary, e.joboffer_document,
             DATE_FORMAT(e.joboffer_date, '%b %d, %Y') as joboffer_date, joboffer_expiryDate
             FROM tblapplicationstatus a 
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
             INNER JOIN tbljoboffer e ON e.joboffer_jobMId = b.app_jobMId AND e.joboffer_candId = c.cand_id
-            INNER JOIN tbljobofferstatus f ON f.jobofferS_id = e.joboffer_statusId
+            INNER JOIN tblstatusjoboffer f on f.statusjobO_jobofferId = e.joboffer_id
+            INNER JOIN tbljobofferstatus g ON g.jobofferS_id = f.statusjobO_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
-            AND (a.appS_statusId = 8 OR a.appS_statusId = 12) 
-            AND b.app_jobMId = :jobId";
+            AND (a.appS_statusId = 8 OR a.appS_statusId = 4)
+            AND b.app_jobMId = :jobId
+            AND f.statusjobO_id = (
+              SELECT MAX(sub.statusjobO_id) 
+              FROM tblstatusjoboffer sub 
+              WHERE sub.statusjobO_jobofferId = e.joboffer_id
+            )";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
@@ -2403,7 +2429,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function updateJobOffer($json){
+  function updateJobOffer($json)
+  {
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "UPDATE tbljoboffer SET joboffer_salary = :salary, joboffer_document = :document, joboffer_expiryDate = :expiryDate WHERE joboffer_candId = :candidateId AND joboffer_jobMId = :jobId";
@@ -2425,7 +2452,7 @@ class Admin
       $sql = "DELETE FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":candId", $data['candId']);
-      $stmt->bindParam(":jobId", $data['jobId']); 
+      $stmt->bindParam(":jobId", $data['jobId']);
       $stmt->execute();
       return $stmt->rowCount() > 0 ? 1 : 0;
     } catch (PDOException $e) {
@@ -2435,7 +2462,6 @@ class Admin
       throw $e;
     }
   }
-
 } //admin
 
 function uploadImage()
@@ -2475,8 +2501,8 @@ function uploadImage()
   }
 }
 
-$json = isset($_POST["json"]) ? $_POST["json"] : "0";
-$operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
+$json = $_POST["json"] ?? "0";
+$operation = $_POST["operation"] ?? "0";
 
 $admin = new Admin();
 
