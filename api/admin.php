@@ -2076,13 +2076,13 @@ class Admin
 
   function getCandidateExamPoints($json)
   {
-    // {"candidateId": 7, "examId": 1}
+    // {"candidateId": 7, "jobId": 1}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT * FROM tblexamresult WHERE examR_candId = :candidateId AND examR_examId = :examId";
+    $sql = "SELECT * FROM tblexamresult WHERE examR_candId = :candidateId AND examR_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candidateId', $data['candidateId']);
-    $stmt->bindParam(':examId', $data['examId']);
+    $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
@@ -2496,8 +2496,8 @@ function uploadImage()
   }
 }
 
-$json = isset($_POST["json"]) ? $_POST["json"] : "0";
-$operation = isset($_POST["operation"]) ? $_POST["operation"] : "0";
+$json = $_POST["json"] ?? "0";
+$operation = $_POST["operation"] ?? "0";
 
 $admin = new Admin();
 
