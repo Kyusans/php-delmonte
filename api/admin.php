@@ -2063,7 +2063,7 @@ class Admin
   function getGeneralExamDetails()
   {
     include "connection.php";
-    $returnValue = [];
+    $returnValue = [];  
     $exam = $this->getGeneralExam();
     if ($exam !== 0) {
       $returnValue['examMaster'] = $exam;
@@ -2232,7 +2232,7 @@ class Admin
                 AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
                 FROM tblapplicationstatus sub_d 
                 WHERE sub_d.appS_appId = d.appS_appId)
-                AND (d.appS_statusId = 1 OR d.appS_statusId = 2 OR d.appS_statusId = 4) 
+                AND (d.appS_statusId = 1 OR d.appS_statusId = 2 OR d.appS_statusId = 12) 
                 AND a.app_jobMId = :jobId 
                 ORDER BY b.cand_id DESC";
     $stmt = $conn->prepare($sql);
@@ -2312,8 +2312,13 @@ class Admin
             INNER JOIN tblstatusjoboffer f on f.statusjobO_jobofferId = e.joboffer_id
             INNER JOIN tbljobofferstatus g ON g.jobofferS_id = f.statusjobO_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
-            AND (a.appS_statusId = 8 OR a.appS_statusId = 12) 
-            AND b.app_jobMId = :jobId";
+            AND (a.appS_statusId = 8 OR a.appS_statusId = 4)
+            AND b.app_jobMId = :jobId
+            AND f.statusjobO_id = (
+              SELECT MAX(sub.statusjobO_id) 
+              FROM tblstatusjoboffer sub 
+              WHERE sub.statusjobO_jobofferId = e.joboffer_id
+            )";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
