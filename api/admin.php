@@ -135,11 +135,11 @@ class Admin
   function getAllJobs()
   {
     include "connection.php";
-    $sql = "SELECT a.*, COUNT(b.app_id) as Total_Applied 
+    $sql = "SELECT a.*, COUNT(DISTINCT b.app_candId) as Total_Applied 
               FROM tbljobsmaster a  
               LEFT JOIN tblapplications b 
               ON a.jobM_id = b.app_jobMId  
-              GROUP BY a.	jobM_id 
+              GROUP BY a.jobM_id 
               ORDER BY a.jobM_id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -1223,8 +1223,8 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $appId = $this->applicationIds($data['jobId'], $data['candId']);
-    $date = $this->getCurrentDate();
     $id = json_encode($appId[0]['app_id']);
+    $date = $this->getCurrentDate();
     $sql = "INSERT tblapplicationstatus(appS_appId, appS_statusId, appS_date) VALUES(:id, :status, :date)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":status", $data['status']);
@@ -1537,6 +1537,18 @@ class Admin
       $data = json_decode($json, true);
       $currentDate = $this->getCurrentDate();
 
+      // Check if question has any candidate answers
+      $sqlCheck = "SELECT COUNT(*) FROM tblexamcandidateanswer a 
+                  INNER JOIN tblexamchoices b ON a.examcandA_choiceId = b.examC_id
+                  WHERE b.examC_questionId = :questionId";
+      $stmtCheck = $conn->prepare($sqlCheck);
+      $stmtCheck->bindParam(':questionId', $data['questionId']);
+      $stmtCheck->execute();
+      if ($stmtCheck->fetchColumn() > 0) {
+        $conn->rollBack();
+        return -1;
+      }
+
       $sqlUpdateQuestion = "UPDATE tblexamquestion SET examQ_text = :examQ_text, examQ_typeId = :examQ_typeId, 
                             examQ_updatedAt = :examQ_updatedAt, examQ_points = :examQ_points WHERE examQ_id = :examQ_id";
       $stmtUpdateQuestion = $conn->prepare($sqlUpdateQuestion);
@@ -1569,7 +1581,7 @@ class Admin
       return 1;
     } catch (\Throwable $th) {
       $conn->rollBack();
-      return $th;
+      return 0;
     }
   }
 
@@ -1596,7 +1608,7 @@ class Admin
       $stmt->execute();
 
       $conn->commit();
-      return $stmt->rowCount() > 0 ? 1 : 0;
+      return 1;
     } catch (\Throwable $th) {
       $conn->rollBack();
       return -1;
@@ -2063,7 +2075,7 @@ class Admin
   function getGeneralExamDetails()
   {
     include "connection.php";
-    $returnValue = [];  
+    $returnValue = [];
     $exam = $this->getGeneralExam();
     if ($exam !== 0) {
       $returnValue['examMaster'] = $exam;
@@ -2216,14 +2228,16 @@ class Admin
     }
   }
 
-
   function getPendingCandidates($json)
   {
     include "connection.php";
     $data = json_decode($json, true);
+    // DATE_FORMAT(d.appS_date, '%b %d, %Y - %l:%i%p') as Date
+
 
     $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, 
-                b.cand_email, e.status_name
+                b.cand_email, e.status_name, 
+                DATE_FORMAT(d.appS_date, '%b %d, %Y') as Date
                 FROM tblapplications a
                 INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
                 INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
@@ -2446,22 +2460,40 @@ class Admin
 
   function deleteJobOffer($json)
   {
-    include "connection.php";
-    $data = json_decode($json, true);
-    try {
-      $sql = "DELETE FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(":candId", $data['candId']);
-      $stmt->bindParam(":jobId", $data['jobId']);
-      $stmt->execute();
-      return $stmt->rowCount() > 0 ? 1 : 0;
-    } catch (PDOException $e) {
-      if ($e->getCode() == '23000') {
-        return -1;
+      include "connection.php";
+      $data = json_decode($json, true);
+      try {
+          // Start a transaction
+          $conn->beginTransaction();
+  
+          // Delete child records first
+          $sqlChild = "DELETE FROM tblstatusjoboffer WHERE statusjobO_jobofferId = 
+                       (SELECT joboffer_id FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId)";
+          $stmtChild = $conn->prepare($sqlChild);
+          $stmtChild->bindParam(":candId", $data['candId']);
+          $stmtChild->bindParam(":jobId", $data['jobId']);
+          $stmtChild->execute();
+  
+          // Delete parent record
+          $sqlParent = "DELETE FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId";
+          $stmtParent = $conn->prepare($sqlParent);
+          $stmtParent->bindParam(":candId", $data['candId']);
+          $stmtParent->bindParam(":jobId", $data['jobId']);
+          $stmtParent->execute();
+  
+          // Commit the transaction
+          $conn->commit();
+  
+          return $stmtParent->rowCount() > 0 ? 1 : 0;
+      } catch (PDOException $e) {
+          $conn->rollBack(); // Roll back on failure
+          if ($e->getCode() == '23000') {
+              return $e;
+          }
+          throw $e;
       }
-      throw $e;
-    }
   }
+  
 } //admin
 
 function uploadImage()
