@@ -910,6 +910,73 @@ function getAppliedJobs($json) {
 
 
 
+// function applyForJob()
+// {
+//     include "connection.php";
+
+//     $user_id = $_POST['user_id'];
+//     $jobId = $_POST['jobId'];
+
+//     $sqlCheckApplication = "
+//         SELECT e.appS_statusId
+//         FROM tblapplications a
+//         INNER JOIN tblapplicationstatus e ON a.app_id = e.appS_appId
+//         WHERE a.app_candId = :user_id AND a.app_jobMId = :jobId
+//         ORDER BY e.appS_id DESC LIMIT 1"; // Get the latest application status
+//     $stmtCheckApplication = $conn->prepare($sqlCheckApplication);
+//     $stmtCheckApplication->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+//     $stmtCheckApplication->bindParam(':jobId', $jobId, PDO::PARAM_INT);
+//     $stmtCheckApplication->execute();
+
+//     $applicationStatus = $stmtCheckApplication->fetch(PDO::FETCH_ASSOC);
+
+//     if ($applicationStatus && $applicationStatus['appS_statusId'] != 12 && $applicationStatus['appS_statusId'] != 9 &&$applicationStatus['appS_statusId'] != 4) {
+//         echo json_encode(["status" => "duplicate", "message" => "You have already applied for this job"]);
+//         return;
+//     }
+
+//     $sqlGetStatusId = "SELECT status_id FROM tblstatus WHERE status_name = 'Pending'";
+//     $stmtGetStatusId = $conn->prepare($sqlGetStatusId);
+//     $stmtGetStatusId->execute();
+//     $status = $stmtGetStatusId->fetch(PDO::FETCH_ASSOC);
+//     $appSId = $status['status_id'];
+
+//     $conn->beginTransaction();
+
+//     try {
+//         date_default_timezone_set('Asia/Manila');
+//         $currentDateTime = date('Y-m-d H:i:s');
+
+//         $sqlApplication = "
+//             INSERT INTO tblapplications (app_candId, app_jobMId, app_datetime)
+//             VALUES (:user_id, :jobId, :app_datetime)
+//         ";
+//         $stmtApplication = $conn->prepare($sqlApplication);
+//         $stmtApplication->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+//         $stmtApplication->bindParam(':jobId', $jobId, PDO::PARAM_INT);
+//         $stmtApplication->bindParam(':app_datetime', $currentDateTime, PDO::PARAM_STR);
+//         $stmtApplication->execute();
+
+//         $applicationId = $conn->lastInsertId();
+
+//         $sqlApplicationStatus = "
+//             INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date)
+//             VALUES (:appS_appId, :appS_statusId, :appS_date)
+//         ";
+//         $stmtApplicationStatus = $conn->prepare($sqlApplicationStatus);
+//         $stmtApplicationStatus->bindParam(':appS_appId', $applicationId, PDO::PARAM_INT);
+//         $stmtApplicationStatus->bindParam(':appS_statusId', $appSId, PDO::PARAM_INT);
+//         $stmtApplicationStatus->bindParam(':appS_date', $currentDateTime, PDO::PARAM_STR);
+//         $stmtApplicationStatus->execute();
+
+//         $conn->commit();
+//         echo json_encode(["success" => "Job applied successfully"]);
+//     } catch (PDOException $e) {
+//         $conn->rollBack();
+//         echo json_encode(["error" => $e->getMessage()]);
+//     }
+// }
+
 function applyForJob()
 {
     include "connection.php";
@@ -918,9 +985,10 @@ function applyForJob()
     $jobId = $_POST['jobId'];
 
     $sqlCheckApplication = "
-        SELECT e.appS_statusId
+        SELECT e.appS_statusId, s.status_name, a.app_id
         FROM tblapplications a
         INNER JOIN tblapplicationstatus e ON a.app_id = e.appS_appId
+        INNER JOIN tblstatus s ON e.appS_statusId = s.status_id
         WHERE a.app_candId = :user_id AND a.app_jobMId = :jobId
         ORDER BY e.appS_id DESC LIMIT 1"; // Get the latest application status
     $stmtCheckApplication = $conn->prepare($sqlCheckApplication);
@@ -930,11 +998,15 @@ function applyForJob()
 
     $applicationStatus = $stmtCheckApplication->fetch(PDO::FETCH_ASSOC);
 
-    if ($applicationStatus && $applicationStatus['appS_statusId'] != 12 && $applicationStatus['appS_statusId'] != 9 &&$applicationStatus['appS_statusId'] != 4) {
+    // Check if status is not Cancelled and not eligible for reapplication
+    if ($applicationStatus && $applicationStatus['status_name'] != 'Cancelled' && 
+        $applicationStatus['appS_statusId'] != 12 && $applicationStatus['appS_statusId'] != 9 && 
+        $applicationStatus['appS_statusId'] != 4) {
         echo json_encode(["status" => "duplicate", "message" => "You have already applied for this job"]);
         return;
     }
 
+    // Fetch the status_id for "Pending"
     $sqlGetStatusId = "SELECT status_id FROM tblstatus WHERE status_name = 'Pending'";
     $stmtGetStatusId = $conn->prepare($sqlGetStatusId);
     $stmtGetStatusId->execute();
@@ -947,18 +1019,25 @@ function applyForJob()
         date_default_timezone_set('Asia/Manila');
         $currentDateTime = date('Y-m-d H:i:s');
 
-        $sqlApplication = "
-            INSERT INTO tblapplications (app_candId, app_jobMId, app_datetime)
-            VALUES (:user_id, :jobId, :app_datetime)
-        ";
-        $stmtApplication = $conn->prepare($sqlApplication);
-        $stmtApplication->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-        $stmtApplication->bindParam(':jobId', $jobId, PDO::PARAM_INT);
-        $stmtApplication->bindParam(':app_datetime', $currentDateTime, PDO::PARAM_STR);
-        $stmtApplication->execute();
+        if ($applicationStatus && ($applicationStatus['status_name'] == 'Cancelled' || $applicationStatus['status_name'] == 'Decline Offer')) {
 
-        $applicationId = $conn->lastInsertId();
+            $applicationId = $applicationStatus['app_id'];
+        } else {
+            // Insert a new application
+            $sqlApplication = "
+                INSERT INTO tblapplications (app_candId, app_jobMId, app_datetime)
+                VALUES (:user_id, :jobId, :app_datetime)
+            ";
+            $stmtApplication = $conn->prepare($sqlApplication);
+            $stmtApplication->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            $stmtApplication->bindParam(':jobId', $jobId, PDO::PARAM_INT);
+            $stmtApplication->bindParam(':app_datetime', $currentDateTime, PDO::PARAM_STR);
+            $stmtApplication->execute();
 
+            $applicationId = $conn->lastInsertId();
+        }
+
+        // Insert a new status as "Pending"
         $sqlApplicationStatus = "
             INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date)
             VALUES (:appS_appId, :appS_statusId, :appS_date)
@@ -976,6 +1055,7 @@ function applyForJob()
         echo json_encode(["error" => $e->getMessage()]);
     }
 }
+
 
 function cancelJobApplied($json)
 {

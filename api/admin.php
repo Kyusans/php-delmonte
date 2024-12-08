@@ -1320,11 +1320,20 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
 
-    // Fetch all active criteria for the job and left join with the candidate's points
+    // Fetch all active criteria for the job and left join with the candidate's latest points
     $sql = "SELECT COALESCE(a.interviewP_points, 0) AS CandPoints, b.inter_criteria_points AS CriteriaPoint, c.criteria_inter_name 
               FROM tblinterviewcriteriamaster b
               INNER JOIN tblinterviewcriteria c ON c.criteria_inter_id = b.inter_criteria_criteriaId
-              LEFT JOIN tblinterviewcandpoints a ON a.interviewP_criteriaId = b.inter_criteria_id 
+              LEFT JOIN (
+                SELECT interviewP_criteriaId, interviewP_candId, interviewP_points
+                FROM tblinterviewcandpoints p1
+                WHERE interviewP_id = (
+                  SELECT MAX(interviewP_id) 
+                  FROM tblinterviewcandpoints p2 
+                  WHERE p2.interviewP_criteriaId = p1.interviewP_criteriaId
+                  AND p2.interviewP_candId = p1.interviewP_candId
+                )
+              ) a ON a.interviewP_criteriaId = b.inter_criteria_id 
               AND a.interviewP_candId = :candId 
               WHERE b.inter_criteria_status = 1 AND b.inter_criteria_jobId = :jobId";
 
@@ -1334,10 +1343,19 @@ class Admin
     $stmt->execute();
     $returnValue["candCriteriaPoints"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
-    // Calculate the total points
+    // Calculate the total points using the latest points only
     $sql = "SELECT SUM(COALESCE(a.interviewP_points, 0)) as candTotalPoints, SUM(b.inter_criteria_points) as criteriaTotalPoints 
               FROM tblinterviewcriteriamaster b
-              LEFT JOIN tblinterviewcandpoints a ON a.interviewP_criteriaId = b.inter_criteria_id 
+              LEFT JOIN (
+                SELECT interviewP_criteriaId, interviewP_candId, interviewP_points
+                FROM tblinterviewcandpoints p1
+                WHERE interviewP_id = (
+                  SELECT MAX(interviewP_id) 
+                  FROM tblinterviewcandpoints p2 
+                  WHERE p2.interviewP_criteriaId = p1.interviewP_criteriaId
+                  AND p2.interviewP_candId = p1.interviewP_candId
+                )
+              ) a ON a.interviewP_criteriaId = b.inter_criteria_id 
               AND a.interviewP_candId = :candId 
               WHERE b.inter_criteria_status = 1 AND b.inter_criteria_jobId = :jobId";
 
