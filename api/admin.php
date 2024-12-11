@@ -247,8 +247,6 @@ class Admin
     $stmt->execute();
     $returnValue["status"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    // $returnValue["interview"] = $this->getJobInterviewDetails($data);
-
     return json_encode($returnValue);
   }
 
@@ -347,6 +345,7 @@ class Admin
     }
 
     $returnValue['jobTotalPoints'] = $totalPoints;
+    // $returnValue['interviewPassing'] = $this->getInterviewPassingPercent($data['jobId']);
 
     return json_encode($returnValue);
   }
@@ -1249,17 +1248,39 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tblinterviewcandpoints(interviewP_jobId, interviewP_criteriaId, interviewP_candId, interviewP_points) VALUES(:jobId, :criteriaId, :candId, :points)";
-    $stmt = $conn->prepare($sql);
-    foreach ($data as $score) {
+    $masterData = $data['masterData'];
+    $scoreData = $data['scoreData'];
+    $conn->beginTransaction();
+    try {
+      $sql = "INSERT INTO tblinterviewcandpoints(interviewP_jobId, interviewP_criteriaId, interviewP_candId, interviewP_points) 
+              VALUES(:jobId, :criteriaId, :candId, :points)";
+      $stmt = $conn->prepare($sql);
+      foreach ($scoreData as $score) {
+        $stmt->execute([
+          ':jobId' => $score['jobId'],
+          ':criteriaId' => $score['criteriaId'],
+          ':candId' => $score['candId'],
+          ':points' => $score['points']
+        ]);
+      }
+
+      $sql = "INSERT INTO tblinterviewresult(interviewR_jobId, interviewR_candId, interviewR_score, interviewR_totalScore, interviewR_status, interviewR_date) 
+              VALUES(:jobId, :candId, :score, :totalPoints, :status, NOW())";
+      $stmt = $conn->prepare($sql);
       $stmt->execute([
-        ':jobId' => $score['jobId'],
-        ':criteriaId' => $score['criteriaId'],
-        ':candId' => $score['candId'],
-        ':points' => $score['points'],
+        ':jobId' => $masterData['jobId'],
+        ':candId' => $masterData['candId'],
+        ':score' => $masterData['score'],
+        ':totalPoints' => $masterData['totalScore'],
+        ':status' => $masterData['status']
       ]);
+
+      $conn->commit();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      $conn->rollBack();
+      return $e->getMessage();
     }
-    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
   function getCriteriaAndCategory()
@@ -1311,68 +1332,27 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+    $passingPoints = $this->getInterviewPassingPercent($data['jobId']);
+
+    $returnValue = [];
+    $returnValue['criteria'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    $returnValue['passingPoints'] = $passingPoints;
+
+    return $returnValue;
   }
 
   function getCandInterviewResult($json)
   {
-    $returnValue = [];
+    // {"jobId": 16, "candId": 11}
     include "connection.php";
     $data = json_decode($json, true);
-
-    // Fetch all active criteria for the job and left join with the candidate's latest points
-    $sql = "SELECT COALESCE(a.interviewP_points, 0) AS CandPoints, b.inter_criteria_points AS CriteriaPoint, c.criteria_inter_name 
-              FROM tblinterviewcriteriamaster b
-              INNER JOIN tblinterviewcriteria c ON c.criteria_inter_id = b.inter_criteria_criteriaId
-              LEFT JOIN (
-                SELECT interviewP_criteriaId, interviewP_candId, interviewP_points
-                FROM tblinterviewcandpoints p1
-                WHERE interviewP_id = (
-                  SELECT MAX(interviewP_id) 
-                  FROM tblinterviewcandpoints p2 
-                  WHERE p2.interviewP_criteriaId = p1.interviewP_criteriaId
-                  AND p2.interviewP_candId = p1.interviewP_candId
-                )
-              ) a ON a.interviewP_criteriaId = b.inter_criteria_id 
-              AND a.interviewP_candId = :candId 
-              WHERE b.inter_criteria_status = 1 AND b.inter_criteria_jobId = :jobId";
-
+    $sql = "SELECT * FROM tblinterviewresult WHERE interviewR_jobId = :jobId AND interviewR_candId = :candId";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':candId', $data['candId']);
     $stmt->bindParam(':jobId', $data['jobId']);
-    $stmt->execute();
-    $returnValue["candCriteriaPoints"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
-
-    // Calculate the total points using the latest points only
-    $sql = "SELECT SUM(COALESCE(a.interviewP_points, 0)) as candTotalPoints, SUM(b.inter_criteria_points) as criteriaTotalPoints 
-              FROM tblinterviewcriteriamaster b
-              LEFT JOIN (
-                SELECT interviewP_criteriaId, interviewP_candId, interviewP_points
-                FROM tblinterviewcandpoints p1
-                WHERE interviewP_id = (
-                  SELECT MAX(interviewP_id) 
-                  FROM tblinterviewcandpoints p2 
-                  WHERE p2.interviewP_criteriaId = p1.interviewP_criteriaId
-                  AND p2.interviewP_candId = p1.interviewP_candId
-                )
-              ) a ON a.interviewP_criteriaId = b.inter_criteria_id 
-              AND a.interviewP_candId = :candId 
-              WHERE b.inter_criteria_status = 1 AND b.inter_criteria_jobId = :jobId";
-
-    $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candId', $data['candId']);
-    $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
-
-    $totalPoints = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
-
-    if ($totalPoints['criteriaTotalPoints'] === null) {
-      return -1;
-    } else {
-      $returnValue["totalPoints"] = $totalPoints;
-    }
-
-    return json_encode($returnValue);
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
   function updateJobPassingPercent($json)
@@ -2478,40 +2458,39 @@ class Admin
 
   function deleteJobOffer($json)
   {
-      include "connection.php";
-      $data = json_decode($json, true);
-      try {
-          // Start a transaction
-          $conn->beginTransaction();
-  
-          // Delete child records first
-          $sqlChild = "DELETE FROM tblstatusjoboffer WHERE statusjobO_jobofferId = 
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      // Start a transaction
+      $conn->beginTransaction();
+
+      // Delete child records first
+      $sqlChild = "DELETE FROM tblstatusjoboffer WHERE statusjobO_jobofferId = 
                        (SELECT joboffer_id FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId)";
-          $stmtChild = $conn->prepare($sqlChild);
-          $stmtChild->bindParam(":candId", $data['candId']);
-          $stmtChild->bindParam(":jobId", $data['jobId']);
-          $stmtChild->execute();
-  
-          // Delete parent record
-          $sqlParent = "DELETE FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId";
-          $stmtParent = $conn->prepare($sqlParent);
-          $stmtParent->bindParam(":candId", $data['candId']);
-          $stmtParent->bindParam(":jobId", $data['jobId']);
-          $stmtParent->execute();
-  
-          // Commit the transaction
-          $conn->commit();
-  
-          return $stmtParent->rowCount() > 0 ? 1 : 0;
-      } catch (PDOException $e) {
-          $conn->rollBack(); // Roll back on failure
-          if ($e->getCode() == '23000') {
-              return $e;
-          }
-          throw $e;
+      $stmtChild = $conn->prepare($sqlChild);
+      $stmtChild->bindParam(":candId", $data['candId']);
+      $stmtChild->bindParam(":jobId", $data['jobId']);
+      $stmtChild->execute();
+
+      // Delete parent record
+      $sqlParent = "DELETE FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId";
+      $stmtParent = $conn->prepare($sqlParent);
+      $stmtParent->bindParam(":candId", $data['candId']);
+      $stmtParent->bindParam(":jobId", $data['jobId']);
+      $stmtParent->execute();
+
+      // Commit the transaction
+      $conn->commit();
+
+      return $stmtParent->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      $conn->rollBack(); // Roll back on failure
+      if ($e->getCode() == '23000') {
+        return $e;
       }
+      throw $e;
+    }
   }
-  
 } //admin
 
 function uploadImage()
@@ -2687,7 +2666,7 @@ switch ($operation) {
     echo json_encode($admin->getCriteriaForInterview($json));
     break;
   case "getCandInterviewResult":
-    echo $admin->getCandInterviewResult($json);
+    echo json_encode($admin->getCandInterviewResult($json));
     break;
   case "updateJobPassingPercent":
     echo $admin->updateJobPassingPercent($json);
