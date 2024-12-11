@@ -247,8 +247,6 @@ class Admin
     $stmt->execute();
     $returnValue["status"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    // $returnValue["interview"] = $this->getJobInterviewDetails($data);
-
     return json_encode($returnValue);
   }
 
@@ -347,6 +345,7 @@ class Admin
     }
 
     $returnValue['jobTotalPoints'] = $totalPoints;
+    // $returnValue['interviewPassing'] = $this->getInterviewPassingPercent($data['jobId']);
 
     return json_encode($returnValue);
   }
@@ -1249,17 +1248,39 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tblinterviewcandpoints(interviewP_jobId, interviewP_criteriaId, interviewP_candId, interviewP_points) VALUES(:jobId, :criteriaId, :candId, :points)";
-    $stmt = $conn->prepare($sql);
-    foreach ($data as $score) {
+    $masterData = $data['masterData'];
+    $scoreData = $data['scoreData'];
+    $conn->beginTransaction();
+    try {
+      $sql = "INSERT INTO tblinterviewcandpoints(interviewP_jobId, interviewP_criteriaId, interviewP_candId, interviewP_points) 
+              VALUES(:jobId, :criteriaId, :candId, :points)";
+      $stmt = $conn->prepare($sql);
+      foreach ($scoreData as $score) {
+        $stmt->execute([
+          ':jobId' => $score['jobId'],
+          ':criteriaId' => $score['criteriaId'],
+          ':candId' => $score['candId'],
+          ':points' => $score['points']
+        ]);
+      }
+
+      $sql = "INSERT INTO tblinterviewresult(interviewR_jobId, interviewR_candId, interviewR_score, interviewR_totalScore, interviewR_status, interviewR_date) 
+              VALUES(:jobId, :candId, :score, :totalPoints, :status, NOW())";
+      $stmt = $conn->prepare($sql);
       $stmt->execute([
-        ':jobId' => $score['jobId'],
-        ':criteriaId' => $score['criteriaId'],
-        ':candId' => $score['candId'],
-        ':points' => $score['points'],
+        ':jobId' => $masterData['jobId'],
+        ':candId' => $masterData['candId'],
+        ':score' => $masterData['percentageScore'],
+        ':totalPoints' => $masterData['totalScore'],
+        ':status' => $masterData['status']
       ]);
+
+      $conn->commit();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      $conn->rollBack();
+      return $e->getMessage();
     }
-    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
   function getCriteriaAndCategory()
@@ -1311,7 +1332,14 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+    $passingPoints = $this->getInterviewPassingPercent($data['jobId']);
+
+    $returnValue = [];
+    $returnValue['criteria'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    $returnValue['passingPoints'] = $passingPoints;
+
+    return $returnValue;
   }
 
   function getCandInterviewResult($json)
@@ -2478,40 +2506,39 @@ class Admin
 
   function deleteJobOffer($json)
   {
-      include "connection.php";
-      $data = json_decode($json, true);
-      try {
-          // Start a transaction
-          $conn->beginTransaction();
-  
-          // Delete child records first
-          $sqlChild = "DELETE FROM tblstatusjoboffer WHERE statusjobO_jobofferId = 
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      // Start a transaction
+      $conn->beginTransaction();
+
+      // Delete child records first
+      $sqlChild = "DELETE FROM tblstatusjoboffer WHERE statusjobO_jobofferId = 
                        (SELECT joboffer_id FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId)";
-          $stmtChild = $conn->prepare($sqlChild);
-          $stmtChild->bindParam(":candId", $data['candId']);
-          $stmtChild->bindParam(":jobId", $data['jobId']);
-          $stmtChild->execute();
-  
-          // Delete parent record
-          $sqlParent = "DELETE FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId";
-          $stmtParent = $conn->prepare($sqlParent);
-          $stmtParent->bindParam(":candId", $data['candId']);
-          $stmtParent->bindParam(":jobId", $data['jobId']);
-          $stmtParent->execute();
-  
-          // Commit the transaction
-          $conn->commit();
-  
-          return $stmtParent->rowCount() > 0 ? 1 : 0;
-      } catch (PDOException $e) {
-          $conn->rollBack(); // Roll back on failure
-          if ($e->getCode() == '23000') {
-              return $e;
-          }
-          throw $e;
+      $stmtChild = $conn->prepare($sqlChild);
+      $stmtChild->bindParam(":candId", $data['candId']);
+      $stmtChild->bindParam(":jobId", $data['jobId']);
+      $stmtChild->execute();
+
+      // Delete parent record
+      $sqlParent = "DELETE FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId";
+      $stmtParent = $conn->prepare($sqlParent);
+      $stmtParent->bindParam(":candId", $data['candId']);
+      $stmtParent->bindParam(":jobId", $data['jobId']);
+      $stmtParent->execute();
+
+      // Commit the transaction
+      $conn->commit();
+
+      return $stmtParent->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      $conn->rollBack(); // Roll back on failure
+      if ($e->getCode() == '23000') {
+        return $e;
       }
+      throw $e;
+    }
   }
-  
 } //admin
 
 function uploadImage()
