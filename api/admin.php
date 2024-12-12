@@ -2496,7 +2496,15 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = 'SELECT CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", c.cand_middlename) as fullName, b.appS_date FROM tblapplications a
+    $sql = 'SELECT c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", c.cand_middlename) as fullName, 
+            DATE_FORMAT(b.appS_date, "%b %d, %Y %l:%i %p") as appS_date,
+            (SELECT s.status_name 
+             FROM tblapplicationstatus ast
+             INNER JOIN tblstatus s ON s.status_id = ast.appS_statusId
+             WHERE ast.appS_appId = a.app_id
+             ORDER BY ast.appS_id DESC
+             LIMIT 1) as status
+            FROM tblapplications a
             INNER JOIN tblapplicationstatus b ON b.appS_appId = a.app_id
             INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
             WHERE a.app_jobMId = :jobId AND b.appS_statusId = 14';
@@ -2872,6 +2880,6 @@ switch ($operation) {
     echo json_encode($admin->getReappliedCandidates($json));
     break;
   default:
-    echo "WALAY '" . $operation . "' NGA OPERATION SA UBOS HAHAHAHA BOBO";
+    echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
     break;
 }
