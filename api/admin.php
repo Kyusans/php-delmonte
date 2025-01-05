@@ -2523,8 +2523,18 @@ class Admin
     $jobId = $data['jobId'];
     $passingPercentage = $data['passingPercentage'];
     // Fetch candidates where cand_isApplied = 0
-    $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename FROM tblcandidates WHERE cand_isEmployed = 0";
+    $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename
+            FROM tblcandidates c
+            WHERE c.cand_isEmployed = 0
+              AND NOT EXISTS (
+                  SELECT 1 
+                  FROM tblapplications a
+                  WHERE a.app_candId = c.cand_id
+                    AND a.app_jobMId = :jobId
+              );
+            ";
     $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $jobId);
     $stmt->execute();
     $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
