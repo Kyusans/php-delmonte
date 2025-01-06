@@ -2523,7 +2523,7 @@ class Admin
     $jobId = $data['jobId'];
     $passingPercentage = $data['passingPercentage'];
     // Fetch candidates where cand_isApplied = 0
-    $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename
+    $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename, cand_email
             FROM tblcandidates c
             WHERE c.cand_isEmployed = 0
               AND NOT EXISTS (
@@ -2537,27 +2537,47 @@ class Admin
     $stmt->bindParam(":jobId", $jobId);
     $stmt->execute();
     $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
     $fitCandidates = [];
-
     foreach ($candidates as $candidate) {
       $candId = $candidate['cand_id'];
       $fullName = $candidate['cand_lastname'] . ", " . $candidate['cand_firstname'] . " " . $candidate['cand_middlename'];
+      $email = $candidate['cand_email'];
       // Calculate points for each candidate
       $points = $this->calculateCandidatePoints($candId, $jobId);
-
       // Check if candidate fits the job
       if ($points['percentage'] >= $passingPercentage) {
         $fitCandidates[] = [
+          'candId' => $candId,
           'fullName' => $fullName,
+          'email' => $email,
           'maxPoints' => $points['maxPoints'],
           'totalPoints' => $points['totalPoints'],
           'percentage' => $points['percentage'],
         ];
       }
     }
-
     return !empty($fitCandidates) ? $fitCandidates : 0;
+  }
+
+  function sendPotentialCandidateEmail($json)
+  {
+    include "connection.php";
+    include "send_email.php";
+
+    $data = json_decode($json, true);
+    $jobName = $data['jobName'];
+    $sendEmail = new SendEmail();
+    try {
+
+      foreach ($data as $candidate) {
+        $emailSubject = "Delmonte Job Offer: $jobName";
+        $emailBody = "Dear " . $candidate['fullName'] . "! You are qualified for the $jobName position at Delmonte, and we would like to invite you to apply. 
+      Please visit our website for more information.";
+        $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
+      }
+    } catch (\Throwable $th) {
+      return 0;
+    }
   }
 } //admin
 
