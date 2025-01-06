@@ -2513,6 +2513,52 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getPotentialCandidates($json)
+  {
+    // {"jobId": 1, "passingPercentage": 50}
+    include "connection.php";
+    $data = json_decode($json, true);
+
+    $jobId = $data['jobId'];
+    $passingPercentage = $data['passingPercentage'];
+    // Fetch candidates where cand_isApplied = 0
+    $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename
+            FROM tblcandidates c
+            WHERE c.cand_isEmployed = 0
+              AND NOT EXISTS (
+                  SELECT 1 
+                  FROM tblapplications a
+                  WHERE a.app_candId = c.cand_id
+                    AND a.app_jobMId = :jobId
+              );
+            ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $fitCandidates = [];
+
+    foreach ($candidates as $candidate) {
+      $candId = $candidate['cand_id'];
+      $fullName = $candidate['cand_lastname'] . ", " . $candidate['cand_firstname'] . " " . $candidate['cand_middlename'];
+      // Calculate points for each candidate
+      $points = $this->calculateCandidatePoints($candId, $jobId);
+
+      // Check if candidate fits the job
+      if ($points['percentage'] >= $passingPercentage) {
+        $fitCandidates[] = [
+          'fullName' => $fullName,
+          'maxPoints' => $points['maxPoints'],
+          'totalPoints' => $points['totalPoints'],
+          'percentage' => $points['percentage'],
+        ];
+      }
+    }
+
+    return !empty($fitCandidates) ? $fitCandidates : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -2878,6 +2924,9 @@ switch ($operation) {
     break;
   case "getReappliedCandidates":
     echo json_encode($admin->getReappliedCandidates($json));
+    break;
+  case "getPotentialCandidates":
+    echo json_encode($admin->getPotentialCandidates($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
