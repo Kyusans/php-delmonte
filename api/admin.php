@@ -351,14 +351,14 @@ class Admin
   }
 
 
-  function calculateCandidatePoints($candId, $jobId)
+  public function calculateCandidatePoints($candId, $jobId)
   {
     include "connection.php";
     $totalPoints = 0;
     $maxPoints = 0;
 
     // Education Points
-    $sql = "SELECT SUM(DISTINCT c.jeduc_points) as educ_points, 
+    $sql = "SELECT SUM(c.jeduc_points) as educ_points, 
           (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
           FROM tblcourses a
           INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
@@ -376,7 +376,7 @@ class Admin
     $maxPoints += $maxEducationPoints;
 
     // Work Experience Points
-    $sql = "SELECT SUM(DISTINCT a.jwork_points) AS exp_points, 
+    $sql = "SELECT SUM(a.jwork_points) AS exp_points, 
           (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) AS max_exp_points
           FROM tbljobsworkexperience a
           INNER JOIN tblapplications b ON b.app_jobMId = a.jwork_jobId
@@ -395,7 +395,7 @@ class Admin
     $maxPoints += $maxExperiencePoints;
 
     // Skills Points
-    $sql = "SELECT SUM(DISTINCT j.jskills_points) as skills_points, 
+    $sql = "SELECT SUM(j.jskills_points) as skills_points, 
           (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :jobId) as max_skills_points
           FROM tbljobsskills j 
           INNER JOIN tblcandskills c ON j.jskills_skillsId = c.skills_perSId 
@@ -411,7 +411,7 @@ class Admin
     $maxPoints += $maxSkillsPoints;
 
     // Training Points
-    $sql = "SELECT SUM(DISTINCT j.jtrng_points) as training_points, 
+    $sql = "SELECT SUM(j.jtrng_points) as training_points, 
           (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :jobId) as max_training_points
           FROM tbljobstrainings j 
           INNER JOIN tblcandtraining c ON j.jtrng_trainingId = c.training_perTId 
@@ -427,7 +427,7 @@ class Admin
     $maxPoints += $maxTrainingPoints;
 
     // Knowledge Points
-    $sql = "SELECT SUM(DISTINCT j.jknow_points) as knowledge_points, 
+    $sql = "SELECT SUM(j.jknow_points) as knowledge_points, 
           (SELECT SUM(jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :jobId) as max_knowledge_points
           FROM tbljobsknowledge j 
           INNER JOIN tblcandknowledge c ON j.jknow_knowledgeId = c.canknow_knowledgeId 
@@ -895,7 +895,7 @@ class Admin
     return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
   }
 
-  function getCandidateProfile($json)
+  public function getCandidateProfile($json)
   {
     // {"cand_id": 7, "job_id": 11}
     include "connection.php";
@@ -922,10 +922,10 @@ class Admin
     ];
 
     // Education Points
-    $sql = "SELECT SUM(DISTINCT je.jeduc_points) AS educ_points, 
+    $sql = "SELECT SUM(je.jeduc_points) AS educ_points, 
             (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :job_id) AS max_educ_points
             FROM tbljobseducation je
-            LEFT JOIN tblcandeducbackground eb ON je.jeduc_categoryId = (
+            INNER JOIN tblcandeducbackground eb ON je.jeduc_categoryId = (
                 SELECT b.courses_coursecategoryId FROM tblcourses b WHERE b.courses_id = eb.educ_coursesId
             )
             WHERE eb.educ_canId = :cand_id AND je.jeduc_jobId = :job_id";
@@ -938,11 +938,12 @@ class Admin
     $pointsByCategory['education']['maxPoints'] = $result['max_educ_points'] ?? 0;
 
     // Experience Points
-    $sql = "SELECT SUM(DISTINCT jwe.jwork_points) AS exp_points, 
-            (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :job_id) AS max_exp_points
-            FROM tbljobsworkexperience jwe
-            LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
-            WHERE ceh.empH_candId = :cand_id AND jwe.jwork_jobId = :job_id";
+    $sql = "SELECT SUM(jwe.jwork_points) AS exp_points, 
+        (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :job_id) AS max_exp_points
+        FROM tbljobsworkexperience jwe
+        LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
+        WHERE ceh.empH_candId = :cand_id AND jwe.jwork_jobId = :job_id
+        AND TIMESTAMPDIFF(YEAR, ceh.empH_startDate, ceh.empH_endDate) >= jwe.jwork_duration";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
     $stmt->bindParam(':job_id', $job_id);
@@ -952,7 +953,7 @@ class Admin
     $pointsByCategory['experience']['maxPoints'] = $result['max_exp_points'] ?? 0;
 
     // Skills Points
-    $sql = "SELECT SUM(DISTINCT js.jskills_points) AS skills_points, 
+    $sql = "SELECT SUM(js.jskills_points) AS skills_points, 
             (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :job_id) AS max_skills_points
             FROM tbljobsskills js
             LEFT JOIN tblcandskills cs ON js.jskills_skillsId = cs.skills_perSId
@@ -966,7 +967,7 @@ class Admin
     $pointsByCategory['skills']['maxPoints'] = $result['max_skills_points'] ?? 0;
 
     // Training Points
-    $sql = "SELECT SUM(DISTINCT jt.jtrng_points) AS training_points, 
+    $sql = "SELECT SUM(jt.jtrng_points) AS training_points, 
             (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :job_id) AS max_training_points
             FROM tbljobstrainings jt
             LEFT JOIN tblcandtraining ct ON jt.jtrng_trainingId = ct.training_perTId
@@ -980,7 +981,7 @@ class Admin
     $pointsByCategory['training']['maxPoints'] = $result['max_training_points'] ?? 0;
 
     // Knowledge Points
-    $sql = "SELECT SUM(DISTINCT jk.jknow_points) AS knowledge_points, 
+    $sql = "SELECT SUM(jk.jknow_points) AS knowledge_points, 
             (SELECT SUM(jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :job_id) AS max_knowledge_points
             FROM tbljobsknowledge jk
             LEFT JOIN tblcandknowledge ck ON jk.jknow_knowledgeId = ck.canknow_knowledgeId
@@ -1019,11 +1020,11 @@ class Admin
 
     // Experience: Check if the candidate's experience meets the job criteria
     $sql = "SELECT DISTINCT jwe.jwork_responsibilities, 
-              (CASE WHEN ceh.empH_positionName IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
-              FROM tbljobsworkexperience jwe
-              LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
-                  AND ceh.empH_candId = :cand_id
-              WHERE jwe.jwork_jobId = :job_id";
+          (CASE WHEN ceh.empH_positionName IS NOT NULL AND TIMESTAMPDIFF(YEAR, ceh.empH_startDate, ceh.empH_endDate) >= jwe.jwork_duration THEN 1 ELSE 0 END) AS meets_criteria
+          FROM tbljobsworkexperience jwe
+          LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
+            AND ceh.empH_candId = :cand_id
+          WHERE jwe.jwork_jobId = :job_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
     $stmt->bindParam(':job_id', $job_id);
