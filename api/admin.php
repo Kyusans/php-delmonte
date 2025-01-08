@@ -2565,16 +2565,16 @@ class Admin
     include "send_email.php";
 
     $data = json_decode($json, true);
-    $jobName = $data['jobName'];
+    $jobName = $data['master']['jobTitle'];
     $sendEmail = new SendEmail();
     try {
-
-      foreach ($data as $candidate) {
+      foreach ($data['candidates'] as $candidate) {
         $emailSubject = "Delmonte Job Offer: $jobName";
-        $emailBody = "Dear " . $candidate['fullName'] . "! You are qualified for the $jobName position at Delmonte, and we would like to invite you to apply. 
+        $emailBody = "Dear " . $candidate['fullName'] . "! You are qualified for the '$jobName' at Delmonte, and we would like to invite you to apply. 
       Please visit our website for more information.";
         $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
       }
+      return 1;
     } catch (\Throwable $th) {
       return 0;
     }
@@ -2745,10 +2745,10 @@ switch ($operation) {
     echo json_encode($admin->getInterviewCriteriaMaster($json));
     break;
   case "getInterviewCriteria":
-    echo json_encode($admin->getInterviewCriteria($json));
+    echo json_encode($admin->getInterviewCriteria());
     break;
   case "getCriteriaAndCategory":
-    echo $admin->getCriteriaAndCategory($json);
+    echo $admin->getCriteriaAndCategory();
     break;
   case "getCriteriaForInterview":
     echo json_encode($admin->getCriteriaForInterview($json));
@@ -2947,6 +2947,9 @@ switch ($operation) {
     break;
   case "getPotentialCandidates":
     echo json_encode($admin->getPotentialCandidates($json));
+    break;
+  case "sendPotentialCandidateEmail":
+    echo $admin->sendPotentialCandidateEmail($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
