@@ -377,13 +377,17 @@ class Admin
 
     // Work Experience Points
     $sql = "SELECT SUM(a.jwork_points) AS exp_points, 
-          (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) AS max_exp_points
-          FROM tbljobsworkexperience a
-          INNER JOIN tblapplications b ON b.app_jobMId = a.jwork_jobId
-          INNER JOIN tblcandemploymenthistory c ON c.empH_candId = b.app_candId
-          WHERE INSTR(a.jwork_responsibilities, c.empH_positionName) > 0
-          AND c.empH_candId = :candId AND a.jwork_jobId = :jobId
-          AND TIMESTAMPDIFF(YEAR, c.empH_startDate, c.empH_endDate) >= a.jwork_duration";
+    (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) AS max_exp_points
+      FROM tbljobsworkexperience a
+      INNER JOIN tblcandemploymenthistory c 
+        ON a.jwork_jobId = :jobId 
+        AND (
+          a.jwork_responsibilities LIKE CONCAT('%', c.empH_positionName, '%')
+          OR a.jwork_responsibilities IS NULL
+        )
+      WHERE c.empH_candId = :candId
+        AND TIMESTAMPDIFF(YEAR, c.empH_startDate, IFNULL(c.empH_endDate, CURDATE())) >= a.jwork_duration";
+
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":candId", $candId);
     $stmt->bindParam(":jobId", $jobId);
@@ -393,6 +397,9 @@ class Admin
     $maxExperiencePoints = $result['max_exp_points'] ?? 0;
     $totalPoints += $experiencePoints;
     $maxPoints += $maxExperiencePoints;
+
+    // echo "experience points" . $experiencePoints;
+    // die();
 
     // Skills Points
     $sql = "SELECT SUM(j.jskills_points) as skills_points, 
@@ -441,6 +448,15 @@ class Admin
     $maxKnowledgePoints = $result['max_knowledge_points'] ?? 0;
     $totalPoints += $knowledgePoints;
     $maxPoints += $maxKnowledgePoints;
+
+    // echo "Candidate ID: $candId, Job ID: $jobId\n";
+    // echo "Education Points: $educationPoints, Max: $maxEducationPoints\n";
+    // echo "Experience Points: $experiencePoints, Max: $maxExperiencePoints\n";
+    // echo "Skills Points: $skillsPoints, Max: $maxSkillsPoints\n";
+    // echo "Training Points: $trainingPoints, Max: $maxTrainingPoints\n";
+    // echo "Knowledge Points: $knowledgePoints, Max: $maxKnowledgePoints\n";
+    // die();
+
 
     // Calculate percentage
     $percentage = ($maxPoints > 0) ? round(($totalPoints / $maxPoints) * 100, 2) : 0;
@@ -2951,6 +2967,9 @@ switch ($operation) {
     break;
   case "sendPotentialCandidateEmail":
     echo $admin->sendPotentialCandidateEmail($json);
+    break;
+  case "calculateCandidatePoints":
+    echo json_encode($admin->calculateCandidatePoints(18, 10));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
