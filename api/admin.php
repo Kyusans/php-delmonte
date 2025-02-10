@@ -135,11 +135,11 @@ class Admin
   function getAllJobs()
   {
     include "connection.php";
-    $sql = "SELECT a.*, COUNT(DISTINCT b.app_candId) as Total_Applied 
-              FROM tbljobsmaster a  
-              LEFT JOIN tblapplications b 
-              ON a.jobM_id = b.app_jobMId  
-              GROUP BY a.jobM_id 
+    $sql = "SELECT a.*, COUNT(DISTINCT b.app_candId) as Total_Applied
+              FROM tbljobsmaster a
+              LEFT JOIN tblapplications b
+              ON a.jobM_id = b.app_jobMId
+              GROUP BY a.jobM_id
               ORDER BY a.jobM_id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -198,7 +198,7 @@ class Admin
     $stmt->execute();
     $returnValue["jobDuties"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT a.*, b.course_categoryName  FROM tbljobseducation a 
+    $sql = "SELECT a.*, b.course_categoryName  FROM tbljobseducation a
             INNER JOIN tblcoursescategory b ON b.course_categoryId = a.jeduc_categoryId
             WHERE jeduc_jobId  = :jobId";
     $stmt = $conn->prepare($sql);
@@ -330,8 +330,8 @@ class Admin
               INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
               INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
               WHERE a.app_jobMId = :jobId
-              AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
-              FROM tblapplicationstatus sub_d 
+              AND d.appS_id = (SELECT MAX(sub_d.appS_id)
+              FROM tblapplicationstatus sub_d
               WHERE sub_d.appS_appId = d.appS_appId)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -358,7 +358,7 @@ class Admin
     $maxPoints = 0;
 
     // Education Points
-    $sql = "SELECT SUM(c.jeduc_points) as educ_points, 
+    $sql = "SELECT SUM(c.jeduc_points) as educ_points,
           (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
           FROM tblcourses a
           INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
@@ -376,11 +376,11 @@ class Admin
     $maxPoints += $maxEducationPoints;
 
     // Work Experience Points
-    $sql = "SELECT SUM(a.jwork_points) AS exp_points, 
+    $sql = "SELECT SUM(a.jwork_points) AS exp_points,
     (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :jobId) AS max_exp_points
       FROM tbljobsworkexperience a
-      INNER JOIN tblcandemploymenthistory c 
-        ON a.jwork_jobId = :jobId 
+      INNER JOIN tblcandemploymenthistory c
+        ON a.jwork_jobId = :jobId
         AND (
           a.jwork_responsibilities LIKE CONCAT('%', c.empH_positionName, '%')
           OR a.jwork_responsibilities IS NULL
@@ -402,10 +402,10 @@ class Admin
     // die();
 
     // Skills Points
-    $sql = "SELECT SUM(j.jskills_points) as skills_points, 
+    $sql = "SELECT SUM(j.jskills_points) as skills_points,
           (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :jobId) as max_skills_points
-          FROM tbljobsskills j 
-          INNER JOIN tblcandskills c ON j.jskills_skillsId = c.skills_perSId 
+          FROM tbljobsskills j
+          INNER JOIN tblcandskills c ON j.jskills_skillsId = c.skills_perSId
           WHERE c.skills_candId = :candId AND j.jskills_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":candId", $candId);
@@ -418,10 +418,10 @@ class Admin
     $maxPoints += $maxSkillsPoints;
 
     // Training Points
-    $sql = "SELECT SUM(j.jtrng_points) as training_points, 
+    $sql = "SELECT SUM(j.jtrng_points) as training_points,
           (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :jobId) as max_training_points
-          FROM tbljobstrainings j 
-          INNER JOIN tblcandtraining c ON j.jtrng_trainingId = c.training_perTId 
+          FROM tbljobstrainings j
+          INNER JOIN tblcandtraining c ON j.jtrng_trainingId = c.training_perTId
           WHERE c.training_candId = :candId AND j.jtrng_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":candId", $candId);
@@ -434,10 +434,10 @@ class Admin
     $maxPoints += $maxTrainingPoints;
 
     // Knowledge Points
-    $sql = "SELECT SUM(j.jknow_points) as knowledge_points, 
+    $sql = "SELECT SUM(j.jknow_points) as knowledge_points,
           (SELECT SUM(jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :jobId) as max_knowledge_points
-          FROM tbljobsknowledge j 
-          INNER JOIN tblcandknowledge c ON j.jknow_knowledgeId = c.canknow_knowledgeId 
+          FROM tbljobsknowledge j
+          INNER JOIN tblcandknowledge c ON j.jknow_knowledgeId = c.canknow_knowledgeId
           WHERE c.canknow_canId = :candId AND j.jknow_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":candId", $candId);
@@ -664,7 +664,7 @@ class Admin
     // {"jobId": 11, "skillId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_skillsId, jskills_points) 
+    $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_skillsId, jskills_points)
             VALUES (:jobId, :skillId, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -703,7 +703,7 @@ class Admin
     // {"jobId": 11, "trainingId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_trainingId, jtrng_points) 
+    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_trainingId, jtrng_points)
             VALUES (:jobId, :trainingId, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -756,7 +756,7 @@ class Admin
     // {"jobId": 11, "experienceText": "experience", "yearsOfExperience": 2, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobsworkexperience(jwork_jobId, jwork_responsibilities, jwork_duration, jwork_points) 
+    $sql = "INSERT INTO tbljobsworkexperience(jwork_jobId, jwork_responsibilities, jwork_duration, jwork_points)
             VALUES (:jobId, :experienceText, :yearsOfExperience, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -849,7 +849,7 @@ class Admin
   function fetchEducationalBackground($cand_id)
   {
     include "connection.php";
-    $sql = "SELECT b.courses_name, c.institution_name, a.educ_dategraduate, d.course_categoryName, e.crs_type_name, a.educ_back_id, b.courses_id, c.institution_id 
+    $sql = "SELECT b.courses_name, c.institution_name, a.educ_dategraduate, d.course_categoryName, e.crs_type_name, a.educ_back_id, b.courses_id, c.institution_id
     FROM tblcandeducbackground a
     INNER JOIN tblcourses b ON a.educ_coursesId = b.courses_id
     INNER JOIN tblinstitution c ON a.educ_institutionId = c.institution_id
@@ -875,7 +875,7 @@ class Admin
   function fetchSkills($cand_id)
   {
     include "connection.php";
-    $sql = "SELECT b.perS_name, b.perS_id, a.skills_id, a.skills_perSId 
+    $sql = "SELECT b.perS_name, b.perS_id, a.skills_id, a.skills_perSId
     FROM tblcandskills a
     INNER JOIN tblpersonalskills b ON a.skills_perSId = b.perS_id
     WHERE a.skills_candId = :cand_id";
@@ -888,7 +888,7 @@ class Admin
   function fetchTraining($cand_id)
   {
     include "connection.php";
-    $sql = "SELECT b.perT_name, a.training_id, b.perT_id, a.training_perTId 
+    $sql = "SELECT b.perT_name, a.training_id, b.perT_id, a.training_perTId
     FROM tblcandtraining a
     INNER JOIN tblpersonaltraining b ON a.training_perTId = b.perT_id
     WHERE a.training_candId = :cand_id";
@@ -901,7 +901,7 @@ class Admin
   function fetchKnowledge($cand_id)
   {
     include "connection.php";
-    $sql = "SELECT b.knowledge_name, a.canknow_id, a.canknow_knowledgeId 
+    $sql = "SELECT b.knowledge_name, a.canknow_id, a.canknow_knowledgeId
     FROM tblcandknowledge a
     INNER JOIN tblpersonalknowledge b ON a.canknow_knowledgeId = b.knowledge_id
     WHERE a.canknow_canId = :cand_id";
@@ -938,7 +938,7 @@ class Admin
     ];
 
     // Education Points
-    $sql = "SELECT SUM(je.jeduc_points) AS educ_points, 
+    $sql = "SELECT SUM(je.jeduc_points) AS educ_points,
             (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :job_id) AS max_educ_points
             FROM tbljobseducation je
             INNER JOIN tblcandeducbackground eb ON je.jeduc_categoryId = (
@@ -954,7 +954,7 @@ class Admin
     $pointsByCategory['education']['maxPoints'] = $result['max_educ_points'] ?? 0;
 
     // Experience Points
-    $sql = "SELECT SUM(jwe.jwork_points) AS exp_points, 
+    $sql = "SELECT SUM(jwe.jwork_points) AS exp_points,
         (SELECT SUM(jwork_points) FROM tbljobsworkexperience WHERE jwork_jobId = :job_id) AS max_exp_points
         FROM tbljobsworkexperience jwe
         LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
@@ -969,7 +969,7 @@ class Admin
     $pointsByCategory['experience']['maxPoints'] = $result['max_exp_points'] ?? 0;
 
     // Skills Points
-    $sql = "SELECT SUM(js.jskills_points) AS skills_points, 
+    $sql = "SELECT SUM(js.jskills_points) AS skills_points,
             (SELECT SUM(jskills_points) FROM tbljobsskills WHERE jskills_jobId = :job_id) AS max_skills_points
             FROM tbljobsskills js
             LEFT JOIN tblcandskills cs ON js.jskills_skillsId = cs.skills_perSId
@@ -983,7 +983,7 @@ class Admin
     $pointsByCategory['skills']['maxPoints'] = $result['max_skills_points'] ?? 0;
 
     // Training Points
-    $sql = "SELECT SUM(jt.jtrng_points) AS training_points, 
+    $sql = "SELECT SUM(jt.jtrng_points) AS training_points,
             (SELECT SUM(jtrng_points) FROM tbljobstrainings WHERE jtrng_jobId = :job_id) AS max_training_points
             FROM tbljobstrainings jt
             LEFT JOIN tblcandtraining ct ON jt.jtrng_trainingId = ct.training_perTId
@@ -997,7 +997,7 @@ class Admin
     $pointsByCategory['training']['maxPoints'] = $result['max_training_points'] ?? 0;
 
     // Knowledge Points
-    $sql = "SELECT SUM(jk.jknow_points) AS knowledge_points, 
+    $sql = "SELECT SUM(jk.jknow_points) AS knowledge_points,
             (SELECT SUM(jknow_points) FROM tbljobsknowledge WHERE jknow_jobId = :job_id) AS max_knowledge_points
             FROM tbljobsknowledge jk
             LEFT JOIN tblcandknowledge ck ON jk.jknow_knowledgeId = ck.canknow_knowledgeId
@@ -1035,7 +1035,7 @@ class Admin
     $criteria["education"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     // Experience: Check if the candidate's experience meets the job criteria
-    $sql = "SELECT DISTINCT jwe.jwork_responsibilities, 
+    $sql = "SELECT DISTINCT jwe.jwork_responsibilities,
           (CASE WHEN ceh.empH_positionName IS NOT NULL AND TIMESTAMPDIFF(YEAR, ceh.empH_startDate, ceh.empH_endDate) >= jwe.jwork_duration THEN 1 ELSE 0 END) AS meets_criteria
           FROM tbljobsworkexperience jwe
           LEFT JOIN tblcandemploymenthistory ceh ON jwe.jwork_responsibilities LIKE CONCAT('%', ceh.empH_positionName, '%')
@@ -1048,7 +1048,7 @@ class Admin
     $criteria["experience"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     // Skills: Check if the candidate's skills meet the job criteria
-    $sql = "SELECT DISTINCT ps.perS_name, 
+    $sql = "SELECT DISTINCT ps.perS_name,
               (CASE WHEN cs.skills_perSId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobsskills js
               INNER JOIN tblpersonalskills ps ON js.jskills_skillsId = ps.perS_id
@@ -1062,7 +1062,7 @@ class Admin
     $criteria["skills"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     // Training: Check if the candidate's training meets the job criteria
-    $sql = "SELECT DISTINCT pt.perT_name, 
+    $sql = "SELECT DISTINCT pt.perT_name,
               (CASE WHEN ct.training_perTId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobstrainings jt
               INNER JOIN tblpersonaltraining pt ON jt.jtrng_trainingId = pt.perT_id
@@ -1076,7 +1076,7 @@ class Admin
     $criteria["training"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
     // Knowledge: Check if the candidate's knowledge meets the job criteria
-    $sql = "SELECT DISTINCT pk.knowledge_name, 
+    $sql = "SELECT DISTINCT pk.knowledge_name,
               (CASE WHEN ck.canknow_knowledgeId IS NOT NULL THEN 1 ELSE 0 END) AS meets_criteria
               FROM tbljobsknowledge jk
               INNER JOIN tblpersonalknowledge pk ON jk.jknow_knowledgeId = pk.knowledge_id
@@ -1269,7 +1269,7 @@ class Admin
     $scoreData = $data['scoreData'];
     $conn->beginTransaction();
     try {
-      $sql = "INSERT INTO tblinterviewcandpoints(interviewP_jobId, interviewP_criteriaId, interviewP_candId, interviewP_points) 
+      $sql = "INSERT INTO tblinterviewcandpoints(interviewP_jobId, interviewP_criteriaId, interviewP_candId, interviewP_points)
               VALUES(:jobId, :criteriaId, :candId, :points)";
       $stmt = $conn->prepare($sql);
       foreach ($scoreData as $score) {
@@ -1281,7 +1281,7 @@ class Admin
         ]);
       }
 
-      $sql = "INSERT INTO tblinterviewresult(interviewR_jobId, interviewR_candId, interviewR_score, interviewR_totalScore, interviewR_status, interviewR_date) 
+      $sql = "INSERT INTO tblinterviewresult(interviewR_jobId, interviewR_candId, interviewR_score, interviewR_totalScore, interviewR_status, interviewR_date)
               VALUES(:jobId, :candId, :score, :totalPoints, :status, NOW())";
       $stmt = $conn->prepare($sql);
       $stmt->execute([
@@ -1327,7 +1327,7 @@ class Admin
   {
     // {"jobId": 11}
     include "connection.php";
-    $sql = "SELECT a.inter_criteria_id, a.inter_criteria_question, b.criteria_inter_name, c.interview_categ_name, a.inter_criteria_points, b.criteria_inter_id FROM tblinterviewcriteriamaster a 
+    $sql = "SELECT a.inter_criteria_id, a.inter_criteria_question, b.criteria_inter_name, c.interview_categ_name, a.inter_criteria_points, b.criteria_inter_id FROM tblinterviewcriteriamaster a
             INNER JOIN tblinterviewcriteria b ON b.criteria_inter_id = a.inter_criteria_criteriaId
             INNER JOIN tblinterviewcategory c ON c.interview_categ_id = b.criteria_inter_categId
             WHERE inter_criteria_jobId = :jobId AND a.inter_criteria_status = 1";
@@ -1400,7 +1400,7 @@ class Admin
 
   function addExam($json)
   {
-    // {"master":{"name":"Sample Exam","typeId":2,"jobId":11,"duration":60},    
+    // {"master":{"name":"Sample Exam","typeId":2,"jobId":11,"duration":60},
     // "questions":{"questionMaster":[{"text":"What is the capital of France?","typeId":1,"points":10,"options":[{"text":"Paris","isCorrect":1},{"text":"London","isCorrect":0},{"text":"Berlin","isCorrect":0},{"text":"Madrid","isCorrect":0}]},{"text":"What is 2 + 2?","typeId":1,"points":5,"options":[{"text":"3","isCorrect":0},{"text":"4","isCorrect":1},{"text":"5","isCorrect":0}]}]}}
 
     include "connection.php";
@@ -1553,7 +1553,7 @@ class Admin
       $currentDate = $this->getCurrentDate();
 
       // Check if question has any candidate answers
-      $sqlCheck = "SELECT COUNT(*) FROM tblexamcandidateanswer a 
+      $sqlCheck = "SELECT COUNT(*) FROM tblexamcandidateanswer a
                   INNER JOIN tblexamchoices b ON a.examcandA_choiceId = b.examC_id
                   WHERE b.examC_questionId = :questionId";
       $stmtCheck = $conn->prepare($sqlCheck);
@@ -1564,7 +1564,7 @@ class Admin
         return -1;
       }
 
-      $sqlUpdateQuestion = "UPDATE tblexamquestion SET examQ_text = :examQ_text, examQ_typeId = :examQ_typeId, 
+      $sqlUpdateQuestion = "UPDATE tblexamquestion SET examQ_text = :examQ_text, examQ_typeId = :examQ_typeId,
                             examQ_updatedAt = :examQ_updatedAt, examQ_points = :examQ_points WHERE examQ_id = :examQ_id";
       $stmtUpdateQuestion = $conn->prepare($sqlUpdateQuestion);
       $stmtUpdateQuestion->bindParam(':examQ_text', $data['text']);
@@ -2116,11 +2116,12 @@ class Admin
 
   function sendJobOffer($json)
   {
-    // {"candId": 7, "jobId": 11, "statusId": 1, "salary": 10000, "document": "document", "expiryDate": "2024-01-01"}  
+    // {"candId": 7, "jobId": 11, "statusId": 1, "salary": 10000, "document": "document", "expiryDate": "2024-01-01"}
     include "connection.php";
+    include "send_email.php";
     $data = json_decode($json, true);
     $date = $this->getCurrentDate();
-    $sql = "INSERT INTO tbljoboffer(joboffer_candId, joboffer_jobMId, joboffer_date, joboffer_salary, joboffer_document, joboffer_expiryDate) 
+    $sql = "INSERT INTO tbljoboffer(joboffer_candId, joboffer_jobMId, joboffer_date, joboffer_salary, joboffer_document, joboffer_expiryDate)
             VALUES (:joboffer_candId, :joboffer_jobMId, :joboffer_date, :joboffer_salary, :joboffer_document, :joboffer_expiryDate)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':joboffer_candId', $data['candId']);
@@ -2138,6 +2139,11 @@ class Admin
     $stmt->bindParam(':date', $date);
     $stmt->execute();
 
+    $sendEmail = new SendEmail();
+    $emailSubject = "Job Offer";
+    $emailBody = "Hello, <br><br>We are pleased to offer you a position at our company. The offer is valid until " . $data['expiryDate'];
+    $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
+
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
@@ -2146,16 +2152,16 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
 
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName,
                     c.cand_email, d.status_name, DATE_FORMAT(e.latest_sched_date, '%b %d, %Y') AS schedDate,
                     DATE_FORMAT(e.latest_sched_date, '%l:%i %p') AS schedTime
               FROM tblapplicationstatus a
               INNER JOIN tblapplications b ON b.app_id = a.appS_appId
               INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
               INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
-              INNER JOIN (SELECT intsched_jobId, intsched_candId, MAX(intsched_date) AS latest_sched_date FROM tblinterviewschedule GROUP BY intsched_jobId, intsched_candId) e 
+              INNER JOIN (SELECT intsched_jobId, intsched_candId, MAX(intsched_date) AS latest_sched_date FROM tblinterviewschedule GROUP BY intsched_jobId, intsched_candId) e
                     ON e.intsched_jobId = b.app_jobMId AND e.intsched_candId = c.cand_id
-              INNER JOIN (SELECT appS_appId, MAX(appS_id) AS latest_appS_id FROM tblapplicationstatus GROUP BY appS_appId) latest_status 
+              INNER JOIN (SELECT appS_appId, MAX(appS_id) AS latest_appS_id FROM tblapplicationstatus GROUP BY appS_appId) latest_status
                     ON latest_status.latest_appS_id = a.appS_id
               WHERE a.appS_statusId = 6 AND b.app_jobMId = :jobId ORDER BY e.latest_sched_date";
 
@@ -2170,12 +2176,12 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
-            FROM tblapplicationstatus a 
-            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
-            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            FROM tblapplicationstatus a
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
-            AND (a.appS_statusId = 5 OR a.appS_statusId = 9 OR a.appS_statusId = 10) 
+            AND (a.appS_statusId = 5 OR a.appS_statusId = 9 OR a.appS_statusId = 10)
             AND b.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -2210,10 +2216,10 @@ class Admin
       $jobId = $data['jobId'];
       $sendEmail = new SendEmail();
 
-      $sql2 = "INSERT INTO tblinterviewschedule (intsched_jobId, intsched_candId, intsched_date) 
+      $sql2 = "INSERT INTO tblinterviewschedule (intsched_jobId, intsched_candId, intsched_date)
         VALUES (:intsched_jobId, :intsched_candId, :intsched_date)";
       $stmt2 = $conn->prepare($sql2);
-      $stmt = $conn->prepare("INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date) 
+      $stmt = $conn->prepare("INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date)
       VALUES (:appS_appId, 6, :appS_date)");
       foreach ($candidates as $candidate) {
         $appId = $this->applicationIds($jobId, $candidate['candId']);
@@ -2250,19 +2256,19 @@ class Admin
     // DATE_FORMAT(d.appS_date, '%b %d, %Y - %l:%i%p') as Date
 
 
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, 
-                b.cand_email, e.status_name, 
+    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName,
+                b.cand_email, e.status_name,
                 DATE_FORMAT(d.appS_date, '%b %d, %Y') as Date
                 FROM tblapplications a
                 INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
                 INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
                 INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
                 WHERE a.app_jobMId = :jobId
-                AND d.appS_id = (SELECT MAX(sub_d.appS_id) 
-                FROM tblapplicationstatus sub_d 
+                AND d.appS_id = (SELECT MAX(sub_d.appS_id)
+                FROM tblapplicationstatus sub_d
                 WHERE sub_d.appS_appId = d.appS_appId)
-                AND (d.appS_statusId = 1 OR d.appS_statusId = 2 OR d.appS_statusId = 12) 
-                AND a.app_jobMId = :jobId 
+                AND (d.appS_statusId = 1 OR d.appS_statusId = 2 OR d.appS_statusId = 12)
+                AND a.app_jobMId = :jobId
                 ORDER BY b.cand_id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -2313,9 +2319,9 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
-            FROM tblapplicationstatus a 
-            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
-            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            FROM tblapplicationstatus a
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
             AND (a.appS_statusId = 7) AND b.app_jobMId = :jobId
@@ -2330,12 +2336,12 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, 
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName,
             g.jobofferS_name as jobOfferStatus, e.joboffer_salary, e.joboffer_document,
             DATE_FORMAT(e.joboffer_date, '%b %d, %Y') as joboffer_date, joboffer_expiryDate
-            FROM tblapplicationstatus a 
-            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
-            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            FROM tblapplicationstatus a
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
             INNER JOIN tbljoboffer e ON e.joboffer_jobMId = b.app_jobMId AND e.joboffer_candId = c.cand_id
             INNER JOIN tblstatusjoboffer f on f.statusjobO_jobofferId = e.joboffer_id
@@ -2344,8 +2350,8 @@ class Admin
             AND (a.appS_statusId = 8 OR a.appS_statusId = 4)
             AND b.app_jobMId = :jobId
             AND f.statusjobO_id = (
-              SELECT MAX(sub.statusjobO_id) 
-              FROM tblstatusjoboffer sub 
+              SELECT MAX(sub.statusjobO_id)
+              FROM tblstatusjoboffer sub
               WHERE sub.statusjobO_jobofferId = e.joboffer_id
             )";
     $stmt = $conn->prepare($sql);
@@ -2381,7 +2387,7 @@ class Admin
   function getInterviewCriteriaMasterFiles()
   {
     include "connection.php";
-    $sql = "SELECT a.criteria_inter_id, a.criteria_inter_name, b.interview_categ_id, b.interview_categ_name FROM tblinterviewcriteria a 
+    $sql = "SELECT a.criteria_inter_id, a.criteria_inter_name, b.interview_categ_id, b.interview_categ_name FROM tblinterviewcriteria a
             INNER JOIN tblinterviewcategory b ON a.criteria_inter_categId = b.interview_categ_id";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -2427,12 +2433,12 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
-            FROM tblapplicationstatus a 
-            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
-            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            FROM tblapplicationstatus a
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
-            AND (a.appS_statusId = 13) 
+            AND (a.appS_statusId = 13)
             AND b.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -2445,12 +2451,12 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
-            FROM tblapplicationstatus a 
-            INNER JOIN tblapplications b ON b.app_id = a.appS_appId 
-            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId 
+            FROM tblapplicationstatus a
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
             INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
-            AND (a.appS_statusId = 11) 
+            AND (a.appS_statusId = 11)
             AND b.app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -2482,7 +2488,7 @@ class Admin
       $conn->beginTransaction();
 
       // Delete child records first
-      $sqlChild = "DELETE FROM tblstatusjoboffer WHERE statusjobO_jobofferId = 
+      $sqlChild = "DELETE FROM tblstatusjoboffer WHERE statusjobO_jobofferId =
                        (SELECT joboffer_id FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId)";
       $stmtChild = $conn->prepare($sqlChild);
       $stmtChild->bindParam(":candId", $data['candId']);
@@ -2513,9 +2519,9 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = 'SELECT c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", c.cand_middlename) as fullName, 
+    $sql = 'SELECT c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", c.cand_middlename) as fullName,
             DATE_FORMAT(b.appS_date, "%b %d, %Y %l:%i %p") as appS_date,
-            (SELECT s.status_name 
+            (SELECT s.status_name
              FROM tblapplicationstatus ast
              INNER JOIN tblstatus s ON s.status_id = ast.appS_statusId
              WHERE ast.appS_appId = a.app_id
@@ -2544,7 +2550,7 @@ class Admin
             FROM tblcandidates c
             WHERE c.cand_isEmployed = 0
               AND NOT EXISTS (
-                  SELECT 1 
+                  SELECT 1
                   FROM tblapplications a
                   WHERE a.app_candId = c.cand_id
                     AND a.app_jobMId = :jobId
@@ -2587,7 +2593,7 @@ class Admin
     try {
       foreach ($data['candidates'] as $candidate) {
         $emailSubject = "Delmonte Job Offer: $jobName";
-        $emailBody = "Dear " . $candidate['fullName'] . "! You are qualified for the '$jobName' at Delmonte, and we would like to invite you to apply. 
+        $emailBody = "Dear " . $candidate['fullName'] . "! You are qualified for the '$jobName' at Delmonte, and we would like to invite you to apply.
       Please visit our website for more information.";
         $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
       }
