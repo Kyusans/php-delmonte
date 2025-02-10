@@ -24,60 +24,63 @@ class User
 
     $json = json_decode($json, true);
 
-
+    // Check in tbladmin
     $sql = "SELECT a.adm_id, a.adm_name, a.adm_email, a.adm_password, b.userL_level AS adm_userLevel FROM tbladmin a
             INNER JOIN tbluserlevel b ON a.adm_userLevel = b.userL_id
-            WHERE BINARY adm_email = :username AND BINARY adm_password = :password";
+            WHERE BINARY adm_email = :username";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':username', $json['username']);
-    $stmt->bindParam(':password', $json['password']);
     $stmt->execute();
 
     if ($stmt->rowCount() > 0) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return json_encode([
-            'adm_id' => $user['adm_id'],
-            'adm_userLevel' => $user['adm_userLevel'],
-            'adm_name' => $user['adm_name'],
-            'adm_email' => $user['adm_email']
-        ]);
+        if (password_verify($json['password'], $user['adm_password'])) {
+            return json_encode([
+                'adm_id' => $user['adm_id'],
+                'adm_userLevel' => $user['adm_userLevel'],
+                'adm_name' => $user['adm_name'],
+                'adm_email' => $user['adm_email']
+            ]);
+        }
     }
 
-
-    $sql = "SELECT * FROM tblsupervisor WHERE BINARY sup_email = :username AND BINARY sup_password = :password";
+    // Check in tblsupervisor
+    $sql = "SELECT * FROM tblsupervisor WHERE BINARY sup_email = :username";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':username', $json['username']);
-    $stmt->bindParam(':password', $json['password']);
     $stmt->execute();
 
     if ($stmt->rowCount() > 0) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return json_encode([
-            'sup_id' => $user['sup_id'],
-            'sup_user_level' => $user['sup_user_level'],
-            'sup_name' => $user['sup_name'],
-            'sup_email' => $user['sup_email']
-        ]);
+        if (password_verify($json['password'], $user['sup_password'])) {
+            return json_encode([
+                'sup_id' => $user['sup_id'],
+                'sup_user_level' => $user['sup_user_level'],
+                'sup_name' => $user['sup_name'],
+                'sup_email' => $user['sup_email']
+            ]);
+        }
     }
 
-
-    $sql = "SELECT a.cand_id, a.cand_firstname, a.cand_lastname, a.cand_email, b.userL_level AS cand_userLevel FROM tblcandidates a
-    INNER JOIN tbluserlevel b ON a.cand_userLevel = b.userL_id
-    WHERE BINARY a.cand_email = :username AND BINARY a.cand_password = :password";
+    // Check in tblcandidates
+    $sql = "SELECT a.cand_id, a.cand_firstname, a.cand_lastname, a.cand_email, a.cand_password, b.userL_level AS cand_userLevel FROM tblcandidates a
+            INNER JOIN tbluserlevel b ON a.cand_userLevel = b.userL_id
+            WHERE BINARY a.cand_email = :username";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':username', $json['username']);
-    $stmt->bindParam(':password', $json['password']);
     $stmt->execute();
 
     if ($stmt->rowCount() > 0) {
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        return json_encode([
-            'cand_id' => $user['cand_id'],
-            'cand_firstname' => $user['cand_firstname'],
-            'cand_lastname' => $user['cand_lastname'],
-            'cand_email' => $user['cand_email'],
-            'cand_userLevel' => $user['cand_userLevel']
-        ]);
+        if (password_verify($json['password'], $user['cand_password'])) {
+            return json_encode([
+                'cand_id' => $user['cand_id'],
+                'cand_firstname' => $user['cand_firstname'],
+                'cand_lastname' => $user['cand_lastname'],
+                'cand_email' => $user['cand_email'],
+                'cand_userLevel' => $user['cand_userLevel']
+            ]);
+        }
     }
 
     return json_encode(null);
@@ -193,155 +196,16 @@ class User
 //     return json_encode(['success' => false, 'message' => 'Invalid credentials']);
 // }
 
-// function signup($json)
-// {
-//   include "connection.php";
-//   $conn->beginTransaction();
-//   try {
-//     $json = json_decode($json, true);
-//     $personalInformation = $json['personalInfo'];
-//     $educationalBackground = $json['educationalBackground'] ?? [];
-//     $employmentHistory = $json['employmentHistory'] ?? [];
-//     $skills = $json['skills'] ?? [];
-//     $trainings = $json['trainings'] ?? [];
-//     $knowledge = $json['knowledge'] ?? [];
-//     $licenses = $json['licenses'] ?? [];
-//     $createdDateTime = getCurrentDate();
-//     $isSubscribeToEmail = $json['isSubscribeToEmail'] ?? 0;
-//     // return json_encode($json);
-//     // die();
-//     $sql = "INSERT INTO tblcandidates(cand_lastname, cand_firstname, cand_middlename, cand_contactNo,
-//               cand_alternateContactNo, cand_email, cand_alternateEmail, cand_presentAddress,
-//               cand_permanentAddress, cand_dateofBirth, cand_sex, cand_sssNo, cand_tinNo,
-//               cand_philhealthNo, cand_pagibigNo, cand_password, cand_createdDatetime)
-//               VALUES(:last_name, :first_name, :middle_name, :contact_number, :alternate_contact_number,
-//               :email, :alternate_email, :present_address, :permanent_address, :date_of_birth,
-//               :sex, :sss_number, :tin_number, :philhealth_number, :pagibig_number,
-//               :personal_password, :created_datetime)";
-//     $stmt = $conn->prepare($sql);
-
-//     $stmt->bindParam(':last_name', $personalInformation['lastName']);
-//     $stmt->bindParam(':first_name', $personalInformation['firstName']);
-//     $stmt->bindParam(':middle_name', $personalInformation['middleName']);
-//     $stmt->bindParam(':contact_number', $personalInformation['contact']);
-//     $stmt->bindParam(':alternate_contact_number', $personalInformation['alternateContact']);
-//     $stmt->bindParam(':email', $personalInformation['email']);
-//     $stmt->bindParam(':alternate_email', $personalInformation['alternateEmail']);
-//     $stmt->bindParam(':present_address', $personalInformation['presentAddress']);
-//     $stmt->bindParam(':permanent_address', $personalInformation['permanentAddress']);
-//     $stmt->bindParam(':date_of_birth', $personalInformation['dob']);
-//     $stmt->bindParam(':sex', $personalInformation['gender']);
-//     $stmt->bindParam(':sss_number', $personalInformation['sss']);
-//     $stmt->bindParam(':tin_number', $personalInformation['tin']);
-//     $stmt->bindParam(':philhealth_number', $personalInformation['philhealth']);
-//     $stmt->bindParam(':pagibig_number', $personalInformation['pagibig']);
-//     $stmt->bindParam(':personal_password', $personalInformation['password']);
-//     $stmt->bindParam(':created_datetime', $createdDateTime);
-//     $stmt->execute();
-//     $newId = $conn->lastInsertId();
-
-//     if ($stmt->rowCount() > 0) {
-//       if (!empty($educationalBackground)) {
-//         $sql = "INSERT INTO tblcandeducbackground (educ_canId, educ_coursesId, educ_institutionId, educ_dateGraduate)
-//         VALUES (:personal_info_id, :educational_courses_id, :educational_institution_id, :educational_date_graduate)";
-
-//         foreach ($educationalBackground as $item) {
-//           $stmt = $conn->prepare($sql);
-//           $stmt->bindParam(':personal_info_id', $newId);
-//           $stmt->bindParam(':educational_courses_id', $item['course']);
-//           $stmt->bindParam(':educational_institution_id', $item['institution']);
-//           $stmt->bindParam(':educational_date_graduate', $item['courseDateGraduated']);
-//           $stmt->execute();
-//         }
-//       }
-
-//       if ($stmt->rowCount() > 0 && !empty($employmentHistory)) {
-//         $sql = "INSERT INTO tblcandemploymenthistory(empH_candId , empH_positionName, empH_companyName,
-//                       empH_startDate, empH_endDate) VALUES (:personal_info_id, :employment_position_name,
-//                       :employment_company_name, :employment_start_date, :employment_end_date)";
-//         foreach ($employmentHistory as $item) {
-//           $stmt = $conn->prepare($sql);
-//           $stmt->bindParam(':personal_info_id', $newId);
-//           $stmt->bindParam(':employment_position_name', $item['position']);
-//           $stmt->bindParam(':employment_company_name', $item['company']);
-//           $stmt->bindParam(':employment_start_date', $item['startDate']);
-//           $stmt->bindParam(':employment_end_date', $item['endDate']);
-//           $stmt->execute();
-//         }
-//       }
-
-//       if ($stmt->rowCount() > 0 && !empty($trainings)) {
-//         $sql = "INSERT INTO tblcandtraining (training_candId , training_perTId )
-//                       VALUES (:personal_info_id, :personal_training_id)";
-//         foreach ($trainings as $item) {
-//           $stmt = $conn->prepare($sql);
-//           $stmt->bindParam(':personal_info_id', $newId);
-//           $stmt->bindParam(':personal_training_id', $item['training']);
-//           $stmt->execute();
-//         }
-//       }
-
-//       if ($stmt->rowCount() > 0 && !empty($skills)) {
-//         $sql = "INSERT INTO tblcandskills(skills_candId , skills_perSId)
-//                       VALUES (:personal_info_id, :personal_skill_id)";
-//         foreach ($skills as $item) {
-//           $stmt = $conn->prepare($sql);
-//           $stmt->bindParam(':personal_info_id', $newId);
-//           $stmt->bindParam(':personal_skill_id', $item['skills']);
-//           $stmt->execute();
-//         }
-//       }
-
-//       if ($stmt->rowCount() > 0 && !empty($knowledge)) {
-//         $sql = "INSERT INTO tblcandknowledge(canknow_canId , canknow_knowledgeId)
-//                       VALUES (:personal_info_id, :personal_knowledge_id)";
-//         foreach ($knowledge as $item) {
-//           $stmt = $conn->prepare($sql);
-//           $stmt->bindParam(':personal_info_id', $newId);
-//           $stmt->bindParam(':personal_knowledge_id', $item['knowledge']);
-//           $stmt->execute();
-//         }
-//       }
-
-//       if ($stmt->rowCount() > 0 && !empty($licenses)) {
-//         $sql = "INSERT INTO tblcandlicense(license_number, license_canId, license_masterId)
-//                 VALUES (:license_number, :license_canId, :license_masterId)";
-//         foreach ($licenses as $item) {
-//           $stmt = $conn->prepare($sql);
-//           $stmt->bindParam(':license_number', $item['licenseNumber']);
-//           $stmt->bindParam(':license_canId', $newId);
-//           $stmt->bindParam(':license_masterId', $item['license']);
-//           $stmt->execute();
-//         }
-//       }
-
-//       if ($stmt->rowCount() > 0 && !empty($isSubscribeToEmail)) {
-//         $sql = "INSERT INTO tblcandconsent(cons_candId , cons_subscribetoemailupdates)
-//         VALUES (:personal_info_id, :personal_subscribe_to_email)";
-//         $stmt = $conn->prepare($sql);
-//         $stmt->bindParam(':personal_info_id', $newId);
-//         $stmt->bindParam(':personal_subscribe_to_email', $isSubscribeToEmail);
-//         $stmt->execute();
-//       }
-
-//       if ($stmt->rowCount() > 0) {
-//         $conn->commit();
-//         return 1;
-//       }
-//     }
-//   } catch (PDOException $th) {
-//     $conn->rollBack();
-//     return $th;
-//   }
-// }
-
-
 function signup($json)
-  {
+{
     // {"lastName":"Bautista","firstName":"John","middleName":"Dela","contact":"09123456789","alternateContact":"09123456789","email":"johnbautista@gmail.com","alternateEmail":"johnbautista@gmail.com","presentAddress":"Manila","permanentAddress":"Manila","dob":"1990-01-01","gender":"Male","password":"password"}
     include "connection.php";
     $data = json_decode($json, true);
     $createdDateTime = getCurrentDate();
+
+    // Hash the password
+    $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
+
     $sql = "INSERT INTO tblcandidates(cand_lastname, cand_firstname, cand_middlename, cand_contactNo,
                 cand_alternateContactNo, cand_email, cand_alternateEmail, cand_presentAddress,
                 cand_permanentAddress, cand_dateofBirth, cand_sex, cand_password, cand_createdDatetime, cand_userLevel)
@@ -360,12 +224,43 @@ function signup($json)
     $stmt->bindParam(':permanent_address', $data['permanentAddress']);
     $stmt->bindParam(':date_of_birth', $data['dob']);
     $stmt->bindParam(':sex', $data['gender']);
-    $stmt->bindParam(':personal_password', $data['password']);
+    $stmt->bindParam(':personal_password', $hashedPassword);
     $stmt->bindParam(':created_datetime', $createdDateTime);
     $stmt->execute();
 
     return $stmt->rowCount() > 0 ? 1 : 0;
-  }
+}
+
+function getCandidateInformation($json)
+{
+    include "connection.php";
+    $data = json_decode($json, true);
+    $cand_id = $data['cand_id'];
+    $input_password = $data['password'];
+
+    $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $candidate = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $returnValue = ["candidateInformation" => []];
+
+    if ($candidate) {
+        // Verify the input password against the hashed password in the database
+        if (password_verify($input_password, $candidate['cand_password'])) {
+            $returnValue["candidateInformation"] = $candidate;
+        } else {
+            // Password does not match
+            $returnValue["error"] = "Invalid password.";
+        }
+    } else {
+        // Candidate not found
+        $returnValue["error"] = "Candidate not found.";
+    }
+
+    return json_encode($returnValue);
+}
 
 function getInstitution()
 {
@@ -514,12 +409,14 @@ function getPinCodeEmailUpdate($json) {
 
   $data = json_decode($json, true);
 
-
   $newEmail = $data['newEmail'];
-
 
   if (empty($newEmail)) {
       return json_encode(["error" => "New email not provided"]);
+  }
+
+  if (recordExists($newEmail, "tblcandidates", "cand_email, cand_alternateEmail")) {
+      return json_encode(["error" => "Email already exists in the system."]);
   }
 
   $firstLetter = strtoupper(substr($newEmail, 0, 1)); // Change to newEmail
@@ -850,7 +747,7 @@ function isEmailExist($json)
 
 
 
-function getAppliedJobs($json) {
+  function getAppliedJobs($json) {
     include "connection.php";
 
     try {
@@ -862,29 +759,56 @@ function getAppliedJobs($json) {
 
         $cand_id = (int) $data['cand_id'];
 
-        $sql = "SELECT
-                    a.jobM_title,
-                    a.jobM_id,
-                    d.status_name,
-                    b.app_id,
-                    b.app_datetime,
-                    e.appS_id,
-                    a.jobM_passpercentage,
-                    o.passing_points,
-                    DATE(e.appS_date) as appS_date
-                FROM tbljobsmaster a
-                INNER JOIN tblapplications b ON a.jobM_id = b.app_jobMId
-                INNER JOIN (
-                    SELECT appS_appId, MAX(appS_id) as max_appS_id
-                    FROM tblapplicationstatus
-                    GROUP BY appS_appId
-                ) c ON b.app_id = c.appS_appId
-                INNER JOIN tblapplicationstatus e ON c.max_appS_id = e.appS_id
-                INNER JOIN tblstatus d ON e.appS_statusId = d.status_id
-                INNER JOIN tbljobpassing o ON a.jobM_id = o.passing_jobId
+        $sql = "
+                SELECT * FROM (
+                    SELECT
+                        a.jobM_title,
+                        a.jobM_id,
+                        'Reapply' AS status_name,
+                        b.app_id,
+                        b.app_datetime,
+                        e.appS_id,
+                        a.jobM_passpercentage,
+                        o.passing_points,
+                        e.appS_date AS raw_date,
+                        DATE_FORMAT(e.appS_date, '%b %d, %Y') as appS_date
+                    FROM tbljobsmaster a
+                    INNER JOIN tblapplications b ON a.jobM_id = b.app_jobMId
+                    INNER JOIN tblapplicationstatus e ON b.app_id = e.appS_appId
+                    INNER JOIN tblstatus d ON e.appS_statusId = d.status_id
+                    INNER JOIN tbljobpassing o ON a.jobM_id = o.passing_jobId
+                    WHERE b.app_candId = :cand_id AND d.status_name = 'Reapply'
 
-                WHERE b.app_candId = :cand_id
-                ORDER BY e.appS_date DESC";
+                    UNION ALL
+
+                    SELECT
+                        a.jobM_title,
+                        a.jobM_id,
+                        d.status_name,
+                        b.app_id,
+                        b.app_datetime,
+                        e.appS_id,
+                        a.jobM_passpercentage,
+                        o.passing_points,
+                        e.appS_date AS raw_date,
+                        DATE_FORMAT(e.appS_date, '%b %d, %Y') as appS_date
+                    FROM tbljobsmaster a
+                    INNER JOIN tblapplications b ON a.jobM_id = b.app_jobMId
+                    INNER JOIN (
+                        SELECT
+                            appS_appId,
+                            MAX(appS_id) as max_appS_id
+                        FROM tblapplicationstatus
+                        GROUP BY appS_appId
+                    ) c ON b.app_id = c.appS_appId
+                    INNER JOIN tblapplicationstatus e ON c.max_appS_id = e.appS_id
+                    INNER JOIN tblstatus d ON e.appS_statusId = d.status_id
+                    INNER JOIN tbljobpassing o ON a.jobM_id = o.passing_jobId
+                    WHERE b.app_candId = :cand_id
+                ) AS combined
+                ORDER BY raw_date DESC
+              ";
+
 
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
@@ -906,6 +830,58 @@ function getAppliedJobs($json) {
 
 
 
+
+
+
+function getReappliedJobs($json) {
+    include "connection.php";
+
+    try {
+        $data = json_decode($json, true);
+        if (!isset($data['cand_id'])) {
+            echo json_encode(["error" => "Missing candidate ID"]);
+            return;
+        }
+
+        $cand_id = (int) $data['cand_id'];
+
+        $sql = "SELECT
+                    a.jobM_title,
+                    a.jobM_id,
+                    d.status_name,
+                    b.app_id,
+                    b.app_datetime,
+                    c.appS_id,
+                    a.jobM_passpercentage,
+                    o.passing_points,
+                    DATE(c.appS_date) as appS_date
+                FROM tbljobsmaster a
+                INNER JOIN tblapplications b ON a.jobM_id = b.app_jobMId
+                INNER JOIN tblapplicationstatus c ON b.app_id = c.appS_appId
+                -- INNER JOIN tblapplicationstatus e ON c.max_appS_id = e.appS_id
+                INNER JOIN tblstatus d ON c.appS_statusId = d.status_id
+                INNER JOIN tbljobpassing o ON a.jobM_id = o.passing_jobId
+
+                WHERE b.app_candId = :cand_id AND c.appS_statusId = 14
+                ORDER BY c.appS_date DESC";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($result)) {
+            echo json_encode(["message" => "No reapplied jobs found"]);
+            return;
+        }
+
+        echo json_encode($result);
+
+    } catch (PDOException $e) {
+        echo json_encode(["error" => "Database error: " . $e->getMessage()]);
+    }
+}
 
 
 
@@ -979,82 +955,106 @@ function getAppliedJobs($json) {
 
 function applyForJob()
 {
-    include "connection.php";
+  include "connection.php";
 
-    $user_id = $_POST['user_id'];
-    $jobId = $_POST['jobId'];
+  $user_id = $_POST['user_id'];
+  $jobId = $_POST['jobId'];
 
-    $sqlCheckApplication = "
-        SELECT e.appS_statusId, s.status_name, a.app_id
-        FROM tblapplications a
-        INNER JOIN tblapplicationstatus e ON a.app_id = e.appS_appId
-        INNER JOIN tblstatus s ON e.appS_statusId = s.status_id
-        WHERE a.app_candId = :user_id AND a.app_jobMId = :jobId
-        ORDER BY e.appS_id DESC LIMIT 1"; // Get the latest application status
-    $stmtCheckApplication = $conn->prepare($sqlCheckApplication);
-    $stmtCheckApplication->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-    $stmtCheckApplication->bindParam(':jobId', $jobId, PDO::PARAM_INT);
-    $stmtCheckApplication->execute();
+  $sqlCheckApplication = "
+      SELECT e.appS_statusId, s.status_name, a.app_id
+      FROM tblapplications a
+      INNER JOIN tblapplicationstatus e ON a.app_id = e.appS_appId
+      INNER JOIN tblstatus s ON e.appS_statusId = s.status_id
+      WHERE a.app_candId = :user_id AND a.app_jobMId = :jobId
+      ORDER BY e.appS_id DESC LIMIT 1"; // Get the latest application status
+  $stmtCheckApplication = $conn->prepare($sqlCheckApplication);
+  $stmtCheckApplication->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+  $stmtCheckApplication->bindParam(':jobId', $jobId, PDO::PARAM_INT);
+  $stmtCheckApplication->execute();
 
-    $applicationStatus = $stmtCheckApplication->fetch(PDO::FETCH_ASSOC);
+  $applicationStatus = $stmtCheckApplication->fetch(PDO::FETCH_ASSOC);
 
-    // Check if status is not Cancelled and not eligible for reapplication
-    if ($applicationStatus && $applicationStatus['status_name'] != 'Cancelled' && 
-        $applicationStatus['appS_statusId'] != 12 && $applicationStatus['appS_statusId'] != 9 && 
-        $applicationStatus['appS_statusId'] != 4) {
-        echo json_encode(["status" => "duplicate", "message" => "You have already applied for this job"]);
-        return;
-    }
+  // Check if status is not eligible for reapplication
+  if ($applicationStatus && $applicationStatus['status_name'] != 'Cancelled' &&
+      $applicationStatus['status_name'] != 'Decline Offer' &&
+      $applicationStatus['appS_statusId'] != 12 && $applicationStatus['appS_statusId'] != 9 &&
+      $applicationStatus['appS_statusId'] != 4) {
+      echo json_encode(["status" => "duplicate", "message" => "You have already applied for this job"]);
+      return;
+  }
 
-    // Fetch the status_id for "Pending"
-    $sqlGetStatusId = "SELECT status_id FROM tblstatus WHERE status_name = 'Pending'";
-    $stmtGetStatusId = $conn->prepare($sqlGetStatusId);
-    $stmtGetStatusId->execute();
-    $status = $stmtGetStatusId->fetch(PDO::FETCH_ASSOC);
-    $appSId = $status['status_id'];
+  // Fetch the status_ids for "Reapply" and "Pending"
+  $sqlGetStatusIds = "SELECT status_id, status_name FROM tblstatus WHERE status_name IN ('Reapply', 'Pending')";
+  $stmtGetStatusIds = $conn->prepare($sqlGetStatusIds);
+  $stmtGetStatusIds->execute();
+  $statuses = $stmtGetStatusIds->fetchAll(PDO::FETCH_ASSOC);
 
-    $conn->beginTransaction();
+  $reapplyId = null;
+  $pendingId = null;
 
-    try {
-        date_default_timezone_set('Asia/Manila');
-        $currentDateTime = date('Y-m-d H:i:s');
+  foreach ($statuses as $status) {
+      if ($status['status_name'] == 'Reapply') {
+          $reapplyId = $status['status_id'];
+      }
+      if ($status['status_name'] == 'Pending') {
+          $pendingId = $status['status_id'];
+      }
+  }
 
-        if ($applicationStatus && ($applicationStatus['status_name'] == 'Cancelled' || $applicationStatus['status_name'] == 'Decline Offer')) {
+  $conn->beginTransaction();
 
-            $applicationId = $applicationStatus['app_id'];
-        } else {
-            // Insert a new application
-            $sqlApplication = "
-                INSERT INTO tblapplications (app_candId, app_jobMId, app_datetime)
-                VALUES (:user_id, :jobId, :app_datetime)
-            ";
-            $stmtApplication = $conn->prepare($sqlApplication);
-            $stmtApplication->bindParam(':user_id', $user_id, PDO::PARAM_INT);
-            $stmtApplication->bindParam(':jobId', $jobId, PDO::PARAM_INT);
-            $stmtApplication->bindParam(':app_datetime', $currentDateTime, PDO::PARAM_STR);
-            $stmtApplication->execute();
+  try {
+      date_default_timezone_set('Asia/Manila');
+      $currentDateTime = date('Y-m-d H:i:s');
 
-            $applicationId = $conn->lastInsertId();
-        }
+      if ($applicationStatus && ($applicationStatus['status_name'] == 'Cancelled' || $applicationStatus['status_name'] == 'Decline Offer')) {
+          // Use existing application ID
+          $applicationId = $applicationStatus['app_id'];
 
-        // Insert a new status as "Pending"
-        $sqlApplicationStatus = "
-            INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date)
-            VALUES (:appS_appId, :appS_statusId, :appS_date)
-        ";
-        $stmtApplicationStatus = $conn->prepare($sqlApplicationStatus);
-        $stmtApplicationStatus->bindParam(':appS_appId', $applicationId, PDO::PARAM_INT);
-        $stmtApplicationStatus->bindParam(':appS_statusId', $appSId, PDO::PARAM_INT);
-        $stmtApplicationStatus->bindParam(':appS_date', $currentDateTime, PDO::PARAM_STR);
-        $stmtApplicationStatus->execute();
+          // Insert "Reapply" status
+          $sqlReapplyStatus = "
+              INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date)
+              VALUES (:appS_appId, :appS_statusId, :appS_date)
+          ";
+          $stmtReapplyStatus = $conn->prepare($sqlReapplyStatus);
+          $stmtReapplyStatus->bindParam(':appS_appId', $applicationId, PDO::PARAM_INT);
+          $stmtReapplyStatus->bindParam(':appS_statusId', $reapplyId, PDO::PARAM_INT);
+          $stmtReapplyStatus->bindParam(':appS_date', $currentDateTime, PDO::PARAM_STR);
+          $stmtReapplyStatus->execute();
+      } else {
+          // Insert a new application
+          $sqlApplication = "
+              INSERT INTO tblapplications (app_candId, app_jobMId, app_datetime)
+              VALUES (:user_id, :jobId, :app_datetime)
+          ";
+          $stmtApplication = $conn->prepare($sqlApplication);
+          $stmtApplication->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+          $stmtApplication->bindParam(':jobId', $jobId, PDO::PARAM_INT);
+          $stmtApplication->bindParam(':app_datetime', $currentDateTime, PDO::PARAM_STR);
+          $stmtApplication->execute();
 
-        $conn->commit();
-        echo json_encode(["success" => "Job applied successfully"]);
-    } catch (PDOException $e) {
-        $conn->rollBack();
-        echo json_encode(["error" => $e->getMessage()]);
-    }
+          $applicationId = $conn->lastInsertId();
+      }
+
+      // Insert "Pending" status
+      $sqlPendingStatus = "
+          INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date)
+          VALUES (:appS_appId, :appS_statusId, :appS_date)
+      ";
+      $stmtPendingStatus = $conn->prepare($sqlPendingStatus);
+      $stmtPendingStatus->bindParam(':appS_appId', $applicationId, PDO::PARAM_INT);
+      $stmtPendingStatus->bindParam(':appS_statusId', $pendingId, PDO::PARAM_INT);
+      $stmtPendingStatus->bindParam(':appS_date', $currentDateTime, PDO::PARAM_STR);
+      $stmtPendingStatus->execute();
+
+      $conn->commit();
+      echo json_encode(["success" => "Job applied successfully"]);
+  } catch (PDOException $e) {
+      $conn->rollBack();
+      echo json_encode(["error" => $e->getMessage()]);
+  }
 }
+
 
 
 function cancelJobApplied($json)
@@ -1129,7 +1129,7 @@ function getCandidateProfile($json) {
     $returnValue["candidateInformation"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
 
-    $sql = "SELECT b.courses_name, c.institution_name, a.educ_dategraduate, d.course_categoryName, e.crs_type_name, a.educ_back_id, b.courses_id, c.institution_id, d.course_categoryId, e.crs_type_id FROM tblcandeducbackground a
+    $sql = "SELECT b.courses_name, c.institution_name, DATE_FORMAT(a.educ_dategraduate, '%b %d, %Y') as educ_dategraduate, d.course_categoryName, e.crs_type_name, a.educ_back_id, b.courses_id, c.institution_id, d.course_categoryId, e.crs_type_id FROM tblcandeducbackground a
      INNER JOIN tblcourses b ON a.educ_coursesId = b.courses_id
      INNER JOIN tblinstitution c ON a.educ_institutionId = c.institution_id
      INNER JOIN tblcoursescategory d ON b.courses_coursecategoryId = d.course_categoryId
@@ -1142,9 +1142,12 @@ function getCandidateProfile($json) {
     $returnValue["educationalBackground"] = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
 
-    $sql = "SELECT * FROM tblcandemploymenthistory
-     WHERE empH_candId = :cand_id
-     ORDER BY empH_id DESC";
+    $sql = "SELECT empH_positionName, empH_companyName, empH_id,
+                   DATE_FORMAT(empH_startdate, '%b %d, %Y') as empH_startdate,
+                   DATE_FORMAT(empH_enddate, '%b %d, %Y') as empH_enddate
+            FROM tblcandemploymenthistory
+            WHERE empH_candId = :cand_id
+            ORDER BY empH_id DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
     $stmt->execute();
@@ -1277,60 +1280,66 @@ function updateCandidatePersonalInfo($json) {
   include "connection.php";
   $data = json_decode($json, true);
 
-  // Extract candidate ID from the data
-  $cand_id = isset($data['cand_id']) ? (int) $data['cand_id'] : 0;
+  $cand_id = isset($data['userId']) ? (int)$data['userId'] : 0;
+  $candidateInfo = $data['candidateInformation'];
+  $imageFileName = $_FILES['profile_picture']['name'] ?? $candidateInfo['cand_profPic'];
 
   if ($cand_id === 0) {
       return json_encode(["error" => "Invalid candidate ID"]);
   }
 
   try {
-      // Update candidate information
-      if (isset($data['candidateInformation'])) {
-        $candidateInfo = $data['candidateInformation'];
-        $sql = "UPDATE tblcandidates SET
-                cand_firstname = :first_name,
-                cand_lastname = :last_name,
-                cand_email = :email,
-                cand_contactNo = :contact_no,
-                cand_alternatecontactNo = :alternate_contact_no,
-                cand_presentAddress = :present_address,
-                cand_permanentAddress = :permanent_address,
-                cand_dateofBirth = :date_of_birth,
-                cand_sex = :sex,
-                cand_sssNo = :sss_no,
-                cand_tinNo = :tin_no,
-                cand_philhealthNo = :philhealth_no,
-                cand_pagibigNo = :pagibig_no
-                WHERE cand_id = :cand_id";
+      $sql = "UPDATE tblcandidates SET
+              cand_firstname = :first_name,
+              cand_lastname = :last_name,
+              cand_email = :email,
+              cand_contactNo = :contact_no,
+              cand_alternatecontactNo = :alternate_contact_no,
+              cand_presentAddress = :present_address,
+              cand_permanentAddress = :permanent_address,
+              cand_dateofBirth = :date_of_birth,
+              cand_sex = :sex,
+              cand_sssNo = :sss_no,
+              cand_tinNo = :tin_no,
+              cand_philhealthNo = :philhealth_no,
+              cand_pagibigNo = :pagibig_no,
+              cand_profPic = :prof_pic
+              WHERE cand_id = :cand_id";
 
-        $stmt = $conn->prepare($sql);
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':first_name', $candidateInfo['cand_firstname'], PDO::PARAM_STR);
+      $stmt->bindParam(':last_name', $candidateInfo['cand_lastname'], PDO::PARAM_STR);
+      $stmt->bindParam(':email', $candidateInfo['cand_email'], PDO::PARAM_STR);
+      $stmt->bindParam(':contact_no', $candidateInfo['cand_contactNo'], PDO::PARAM_STR);
+      $stmt->bindParam(':alternate_contact_no', $candidateInfo['cand_alternatecontactNo'], PDO::PARAM_STR);
+      $stmt->bindParam(':present_address', $candidateInfo['cand_presentAddress'], PDO::PARAM_STR);
+      $stmt->bindParam(':permanent_address', $candidateInfo['cand_permanentAddress'], PDO::PARAM_STR);
+      $stmt->bindParam(':date_of_birth', $candidateInfo['cand_dateofBirth'], PDO::PARAM_STR);
+      $stmt->bindParam(':sex', $candidateInfo['cand_sex'], PDO::PARAM_STR);
+      $stmt->bindParam(':sss_no', $candidateInfo['cand_sssNo'], PDO::PARAM_STR);
+      $stmt->bindParam(':tin_no', $candidateInfo['cand_tinNo'], PDO::PARAM_STR);
+      $stmt->bindParam(':philhealth_no', $candidateInfo['cand_philhealthNo'], PDO::PARAM_STR);
+      $stmt->bindParam(':pagibig_no', $candidateInfo['cand_pagibigNo'], PDO::PARAM_STR);
+      $stmt->bindParam(':prof_pic', $imageFileName, PDO::PARAM_STR);
+      $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
 
-        $stmt->bindParam(':first_name', $candidateInfo['cand_firstname'], PDO::PARAM_STR);
-        $stmt->bindParam(':last_name', $candidateInfo['cand_lastname'], PDO::PARAM_STR);
-        $stmt->bindParam(':email', $candidateInfo['cand_email'], PDO::PARAM_STR);
-        $stmt->bindParam(':contact_no', $candidateInfo['cand_contactNo'], PDO::PARAM_STR);
-        $stmt->bindParam(':alternate_contact_no', $candidateInfo['cand_alternatecontactNo'], PDO::PARAM_STR);
-        $stmt->bindParam(':present_address', $candidateInfo['cand_presentAddress'], PDO::PARAM_STR);
-        $stmt->bindParam(':permanent_address', $candidateInfo['cand_permanentAddress'], PDO::PARAM_STR);
-        $stmt->bindParam(':date_of_birth', $candidateInfo['cand_dateofBirth'], PDO::PARAM_STR);
-        $stmt->bindParam(':sex', $candidateInfo['cand_sex'], PDO::PARAM_STR);
-        $stmt->bindParam(':sss_no', $candidateInfo['cand_sssNo'], PDO::PARAM_STR);
-        $stmt->bindParam(':tin_no', $candidateInfo['cand_tinNo'], PDO::PARAM_STR);
-        $stmt->bindParam(':philhealth_no', $candidateInfo['cand_philhealthNo'], PDO::PARAM_STR);
-        $stmt->bindParam(':pagibig_no', $candidateInfo['cand_pagibigNo'], PDO::PARAM_STR);
-        $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
+      $stmt->execute();
 
-        $stmt->execute();
-    }
-
+      if (!empty($_FILES['profile_picture']['name'])) {
+          $targetDir = "uploads/";
+          $targetFile = $targetDir . basename($imageFileName);
+          if (!move_uploaded_file($_FILES['profile_picture']['tmp_name'], $targetFile)) {
+              return json_encode(["error" => "Failed to upload profile picture"]);
+          }
+      }
 
       return json_encode(["success" => "Profile updated successfully"]);
-
   } catch (PDOException $e) {
       return json_encode(["error" => $e->getMessage()]);
   }
 }
+
+
 
 // function updateEducationalBackground($json)
 // {
@@ -2013,6 +2022,29 @@ function updateCandidateResume($json) {
 }
 
 
+function verifyCurrentPassword($json) {
+  include "connection.php";
+
+  // Decode the JSON string to a PHP associative array
+  $data = json_decode($json, true);
+
+  // Access the elements from the associative array
+  $cand_id = $data['cand_id'];
+  $currentPassword = $data['currentPassword'];
+
+  $sql = "SELECT cand_password FROM tblcandidates WHERE cand_id = :cand_id";
+  $stmt = $conn->prepare($sql);
+  $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
+  $stmt->execute();
+  $candidate = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if ($candidate && password_verify($currentPassword, $candidate['cand_password'])) {
+      echo json_encode(["success" => true]);
+  } else {
+      echo json_encode(["success" => false]);
+  }
+}
+
 function updateEmailPassword($json)
 {
     include "connection.php";
@@ -2025,10 +2057,12 @@ function updateEmailPassword($json)
     }
 
     try {
-
         if (isset($data['email']) && isset($data['password'])) {
             $email = $data['email'];
             $password = $data['password'];
+
+            // Hash the password before storing it in the database
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
             $sql = "UPDATE tblcandidates SET
                     cand_email = :email,
@@ -2038,7 +2072,7 @@ function updateEmailPassword($json)
             $stmt = $conn->prepare($sql);
 
             $stmt->bindParam(':email', $email, PDO::PARAM_STR);
-            $stmt->bindParam(':password', $password, PDO::PARAM_STR);
+            $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
             $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
 
             $stmt->execute();
@@ -2048,6 +2082,28 @@ function updateEmailPassword($json)
     } catch (PDOException $e) {
         return json_encode(["error" => $e->getMessage()]);
     }
+}
+
+function checkPasswordExists($json) {
+  include "connection.php";
+
+  // Decode the JSON string to a PHP associative array
+  $data = json_decode($json, true);
+
+  // Access the elements from the associative array
+  $cand_id = $data['userId'];
+
+  $sql = "SELECT cand_password FROM tblcandidates WHERE cand_id = :cand_id";
+  $stmt = $conn->prepare($sql);
+  $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
+  $stmt->execute();
+  $candidate = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if ($candidate && !empty($candidate['cand_password'])) {
+      echo json_encode(["passwordExists" => true]);
+  } else {
+      echo json_encode(["passwordExists" => false]);
+  }
 }
 
 function updatePassword($json)
@@ -2065,13 +2121,15 @@ function updatePassword($json)
         if (isset($data['password'])) {
             $password = $data['password'];
 
+            $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
             // Update only the password
             $sql = "UPDATE tblcandidates SET
                     cand_password = :password
                     WHERE cand_id = :cand_id";
 
             $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':password', $password, PDO::PARAM_STR);
+            $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
             $stmt->bindParam(':cand_id', $cand_id, PDO::PARAM_INT);
 
             $stmt->execute();
@@ -2277,7 +2335,7 @@ function fetchExamResult($json){
               c.jobM_title,
               c.jobM_id,
               a.examR_status,
-              DATE(a.examR_date) AS examR_date
+              DATE_FORMAT(a.examR_date, '%b %d, %Y') AS examR_date
           FROM tblexamresult a
           INNER JOIN tblexam b ON a.examR_examId = b.exam_id
           LEFT JOIN tbljobsmaster c ON a.examR_jobMId = c.jobM_id
@@ -2368,27 +2426,20 @@ function insertCandidateJobOfferResponse($json) {
           return;
       }
 
-
       $jobOfferId = (int) $data['job_offer_id'];
       $status = $data['status']; // Expected values: 'accept' or 'decline'
       $appId = isset($data['app_id']) ? (int) $data['app_id'] : 0;
 
-
-
       $statusId = ($status === 'accept') ? 1 : 2;
-
 
       $sql = "INSERT INTO tblstatusjoboffer (statusjobO_jobofferId, statusjobO_statusId, statusjobO_date)
               VALUES (:job_offer_id, :statusjobO_statusId, NOW())";
 
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(':job_offer_id', $jobOfferId, PDO::PARAM_INT);
-
       $stmt->bindParam(':statusjobO_statusId', $statusId, PDO::PARAM_INT);
 
-
       if ($stmt->execute()) {
-
           $appStatusId = ($status === 'accept') ? 11 : 4;
           $sqlStatus = "INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date)
                         VALUES (:appS_appId, :appS_statusId, NOW())";
@@ -2396,6 +2447,14 @@ function insertCandidateJobOfferResponse($json) {
           $stmtStatus->bindParam(':appS_appId', $appId, PDO::PARAM_INT);
           $stmtStatus->bindParam(':appS_statusId', $appStatusId, PDO::PARAM_INT);
           $stmtStatus->execute();
+
+          // Update cand_isEmployed to 1 if status is 'accept'
+          if ($status === 'accept') {
+              $sqlUpdate = "UPDATE tblcandidates SET cand_isEmployed = 1 WHERE cand_id = :cand_id";
+              $stmtUpdate = $conn->prepare($sqlUpdate);
+              $stmtUpdate->bindParam(':cand_id', $data['cand_id'], PDO::PARAM_INT); // Assuming cand_id is passed in the JSON
+              $stmtUpdate->execute();
+          }
 
           echo json_encode(["success" => "Response recorded successfully"]);
       } else {
@@ -2427,18 +2486,21 @@ function getNotification($json)
                    IFNULL(f.intsched_date, '') AS intsched_date,
                    a.notification_read,
                    IF(a.notification_read = 0, 1, 0) AS is_new,
-                   MONTHNAME(a.notification_date) AS month_name 
-                   FROM tblnotifications a
-                   INNER JOIN tblapplications b ON a.notification_appId = b.app_id
-                   INNER JOIN tblstatus c ON a.notification_statusId = c. status_id
-                   INNER JOIN tblcandidates d ON a.notification_candId = d.cand_id
-                   INNER JOIN tbljobsmaster e ON b.app_jobMId = e.jobM_id
-                   LEFT JOIN tblinterviewschedule f ON e.jobM_id = f.intsched_jobId
-                   WHERE b.app_candId = :cand_id
-                   AND MONTH(a.notification_date) = MONTH(CURDATE()) 
-                   ORDER BY a.notification_date DESC;              
-                  ";
-
+                   MONTHNAME(a.notification_date) AS month_name
+            FROM tblnotifications a
+            INNER JOIN tblapplications b ON a.notification_appId = b.app_id
+            INNER JOIN tblstatus c ON a.notification_statusId = c.status_id
+            INNER JOIN tblcandidates d ON a.notification_candId = d.cand_id
+            INNER JOIN tbljobsmaster e ON b.app_jobMId = e.jobM_id
+            LEFT JOIN (
+                SELECT intsched_jobId, MIN(intsched_date) AS intsched_date
+                FROM tblinterviewschedule
+                GROUP BY intsched_jobId
+            ) f ON e.jobM_id = f.intsched_jobId
+            WHERE b.app_candId = :cand_id
+            AND MONTH(a.notification_date) = MONTH(CURDATE())
+            GROUP BY a.notification_id
+            ORDER BY a.notification_date DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $candId, PDO::PARAM_INT);
     $stmt->execute();
@@ -2602,6 +2664,9 @@ switch ($operation) {
   case "applyForJob":
     echo $user->applyForJob();
     break;
+  case "getReappliedJobs":
+    echo $user->getReappliedJobs($json);
+    break;
   case "cancelJobApplied":
     echo $user->cancelJobApplied($json);
     break;
@@ -2705,6 +2770,15 @@ switch ($operation) {
     break;
   case "timeAgo":
     echo timeAgo($timestamp);
+    break;
+  case "checkPasswordExists":
+    echo $user->checkPasswordExists($json);
+    break;
+  case "verifyCurrentPassword":
+    echo $user->verifyCurrentPassword($json);
+    break;
+  case "getCandidateInformation":
+    echo $user->getCandidateInformation($json);
     break;
   default:
     echo json_encode("WALA KA NAGBUTANG OG OPERATION SA UBOS HAHAHHA BOBO");
