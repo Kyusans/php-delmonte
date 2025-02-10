@@ -1,9 +1,6 @@
 <?php
 // Import PHPMailer classes into the global namespace
 // These must be at the top of your script, not inside a function
-
-// composer require phpmailer/phpmailer
-
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
@@ -30,14 +27,14 @@ class SendEmail
             $mail->Port       = 465;                                // TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
             // Recipients
-            $mail->setFrom('qkyusans@gmail.com', 'Delmonte Philippines');
+            $mail->setFrom('qkyusans@gmail.com', 'Del Monte Philippines');
             $mail->addAddress($emailToSent, 'user');                 // Add a recipient
 
             // Content
             $mail->isHTML(true);                                  // Set email format to HTML
             $mail->Subject = $emailSubject;
             $mail->Body    = $emailBody;
-            // $mail->AltBody = 'Kunwari alt body diri hehe';
+            $mail->AltBody = 'Kunwari alt body diri hehe';
 
             $mail->send();
             return 1; // Success
