@@ -2596,6 +2596,20 @@ class Admin
       return 0;
     }
   }
+
+  function getAllJobWithCandidates()
+  {
+    include "connection.php";
+    $sql = "SELECT a.jobM_title, a.jobM_id, COUNT(DISTINCT b.app_candId) as Total_Applied
+              FROM tbljobsmaster a
+              LEFT JOIN tblapplications b
+              ON a.jobM_id = b.app_jobMId
+              GROUP BY a.jobM_id
+              ORDER BY Total_Applied DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -2970,6 +2984,9 @@ switch ($operation) {
     break;
   case "calculateCandidatePoints":
     echo json_encode($admin->calculateCandidatePoints(18, 10));
+    break;
+  case "getAllJobWithCandidates":
+    echo $admin->getAllJobWithCandidates();
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
