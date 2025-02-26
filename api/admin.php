@@ -2118,7 +2118,6 @@ class Admin
   {
     // {"candId": 7, "jobId": 11, "statusId": 1, "salary": 10000, "document": "document", "expiryDate": "2024-01-01"}
     include "connection.php";
-    include "send_email.php";
     $data = json_decode($json, true);
     $date = $this->getCurrentDate();
     $sql = "INSERT INTO tbljoboffer(joboffer_candId, joboffer_jobMId, joboffer_date, joboffer_salary, joboffer_document, joboffer_expiryDate)
@@ -2138,11 +2137,6 @@ class Admin
     $stmt->bindParam(':joboffer_id', $lastId);
     $stmt->bindParam(':date', $date);
     $stmt->execute();
-
-    $sendEmail = new SendEmail();
-    $emailSubject = "Job Offer";
-    $emailBody = "Hello, <br><br>We are pleased to offer you a position at our company. The offer is valid until " . $data['expiryDate'];
-    $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
 
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
