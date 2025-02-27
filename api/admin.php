@@ -2600,7 +2600,7 @@ class Admin
   function getAllJobWithCandidates()
   {
     include "connection.php";
-    $sql = "SELECT a.jobM_title, a.jobM_id, COUNT(DISTINCT b.app_candId) as Total_Applied
+    $sql = "SELECT a.jobM_title, a.jobM_id, a.jobM_createdAt, COUNT(DISTINCT b.app_candId) as Total_Applied
               FROM tbljobsmaster a
               LEFT JOIN tblapplications b
               ON a.jobM_id = b.app_jobMId
