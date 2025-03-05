@@ -2610,6 +2610,32 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : 0;
   }
+
+  function getMedicalCandidate($json)
+  {
+    // {"jobId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+
+    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName,
+                    c.cand_email, d.status_name, DATE_FORMAT(e.latest_sched_date, '%b %d, %Y') AS schedDate,
+                    DATE_FORMAT(e.latest_sched_date, '%l:%i %p') AS schedTime
+              FROM tblapplicationstatus a
+              INNER JOIN tblapplications b ON b.app_id = a.appS_appId
+              INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
+              INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+              INNER JOIN (SELECT intsched_jobId, intsched_candId, MAX(intsched_date) AS latest_sched_date FROM tblinterviewschedule GROUP BY intsched_jobId, intsched_candId) e
+                    ON e.intsched_jobId = b.app_jobMId AND e.intsched_candId = c.cand_id
+              INNER JOIN (SELECT appS_appId, MAX(appS_id) AS latest_appS_id FROM tblapplicationstatus GROUP BY appS_appId) latest_status
+                    ON latest_status.latest_appS_id = a.appS_id
+              WHERE a.appS_statusId = 17 AND b.app_jobMId = :jobId ORDER BY e.latest_sched_date";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $data['jobId']);
+
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -2987,6 +3013,9 @@ switch ($operation) {
     break;
   case "getAllJobWithCandidates":
     echo $admin->getAllJobWithCandidates();
+    break;
+  case "getMedicalCandidate":
+    echo json_encode($admin->getMedicalCandidate($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
