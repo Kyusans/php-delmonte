@@ -2636,6 +2636,15 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getMedicalClassification()
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblmedicalclassification";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -3016,6 +3025,9 @@ switch ($operation) {
     break;
   case "getMedicalCandidate":
     echo json_encode($admin->getMedicalCandidate($json));
+    break;
+  case "getMedicalClassification":
+    echo json_encode($admin->getMedicalClassification());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
