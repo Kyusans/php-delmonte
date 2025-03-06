@@ -1096,6 +1096,12 @@ class Admin
     $stmt->execute();
     $returnValue["jobOffered"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
+    $sql = "SELECT COUNT(medicalM_id) as isMedicalChecked FROM tblmedicalmaster WHERE `medicalM_candId` = 18";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->execute();
+    $returnValue["medicalChecked"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+    
     // Add job criteria to returnValue
     $returnValue["criteria"] = $criteria;
 
