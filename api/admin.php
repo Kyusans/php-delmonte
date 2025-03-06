@@ -2645,6 +2645,23 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function addMedicalMaster($json)
+  {
+    // {"candId": 1, "medicalCId": 1, "hrId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $date = $this->getCurrentDate();
+    $sql = "INSERT INTO tblmedicalmaster(medicalM_candId, medicalM_medicalCId, medicalM_dateTime, medicalM_hrId)
+            VALUES (:candId, :medicalCId, :dateTime, :hrId)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':candId', $data['candId']);
+    $stmt->bindParam(':medicalCId', $data['medicalCId']);
+    $stmt->bindParam(':dateTime', $date);
+    $stmt->bindParam(':hrId', $data['hrId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -3028,6 +3045,9 @@ switch ($operation) {
     break;
   case "getMedicalClassification":
     echo json_encode($admin->getMedicalClassification());
+    break;
+  case "addMedicalMaster":
+    echo json_encode($admin->addMedicalMaster($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
