@@ -1096,12 +1096,12 @@ class Admin
     $stmt->execute();
     $returnValue["jobOffered"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    $sql = "SELECT COUNT(medicalM_id) as isMedicalChecked FROM tblmedicalmaster WHERE `medicalM_candId` = 18";
+    $sql = "SELECT COUNT(medicalM_id) as isMedicalChecked FROM tblmedicalmaster WHERE `medicalM_candId` = :cand_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
     $stmt->execute();
     $returnValue["medicalChecked"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-    
+
     // Add job criteria to returnValue
     $returnValue["criteria"] = $criteria;
 
@@ -1241,17 +1241,18 @@ class Admin
 
   function changeApplicantStatus($json)
   {
-    // {"jobId": 12, "candId": 12, "status": 4}
+    // {"jobId": 12, "candId": 12, "status": 4, "hrId": 1}
     include "connection.php";
     $data = json_decode($json, true);
     $appId = $this->applicationIds($data['jobId'], $data['candId']);
     $id = json_encode($appId[0]['app_id']);
     $date = $this->getCurrentDate();
-    $sql = "INSERT tblapplicationstatus(appS_appId, appS_statusId, appS_date) VALUES(:id, :status, :date)";
+    $sql = "INSERT tblapplicationstatus(appS_appId, appS_statusId, appS_date, appS_hrId) VALUES(:id, :status, :date, :hrId)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":status", $data['status']);
     $stmt->bindParam(":id", $id);
     $stmt->bindParam(":date", $date);
+    $stmt->bindParam(":hrId", $data["hrId"]);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -2219,8 +2220,8 @@ class Admin
       $sql2 = "INSERT INTO tblinterviewschedule (intsched_jobId, intsched_candId, intsched_date)
         VALUES (:intsched_jobId, :intsched_candId, :intsched_date)";
       $stmt2 = $conn->prepare($sql2);
-      $stmt = $conn->prepare("INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date)
-      VALUES (:appS_appId, 6, :appS_date)");
+      $stmt = $conn->prepare("INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date, appS_hrId)
+      VALUES (:appS_appId, 6, :appS_date, :appS_hrId)");
       foreach ($candidates as $candidate) {
         $appId = $this->applicationIds($jobId, $candidate['candId']);
         $id = json_encode($appId[0]['app_id']);
@@ -2238,6 +2239,7 @@ class Admin
 
         $stmt->bindParam(':appS_appId', $id);
         $stmt->bindParam(':appS_date', $dateNow);
+        $stmt->bindParam(':appS_hrId', $data["hrId"]);
         $stmt->execute();
       }
 
@@ -2668,6 +2670,21 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getAdminActivityLogs($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = 'SELECT CONCAT(b.hr_lastname, ", ", b.hr_firstname, " ", b.hr_middlename) AS HRName, c.status_name, e.jobM_title,  CONCAT(f.cand_lastname, ", ", f.cand_firstname, " ", f.cand_middlename) AS CandName, a.appS_date FROM tblapplicationstatus a
+            INNER JOIN tblhr b ON a.appS_hrId = b.hr_id
+            INNER JOIN tblstatus c ON a.appS_statusId = c.status_id
+            INNER JOIN tblapplications d ON d.app_id = a.appS_appId
+            INNER JOIN tbljobsmaster e ON e.jobM_id = d.app_jobMId
+            INNER JOIN tblcandidates f ON f.cand_id = d.app_candId';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -3054,6 +3071,9 @@ switch ($operation) {
     break;
   case "addMedicalMaster":
     echo json_encode($admin->addMedicalMaster($json));
+    break;
+  case "getAdminActivityLogs":
+    echo json_encode($admin->getAdminActivityLogs($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
