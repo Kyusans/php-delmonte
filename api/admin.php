@@ -2239,7 +2239,7 @@ class Admin
 
         $stmt->bindParam(':appS_appId', $id);
         $stmt->bindParam(':appS_date', $dateNow);
-        $stmt->bindParam(':appS_hrId', $data["hrId"]); 
+        $stmt->bindParam(':appS_hrId', $data["hrId"]);
         $stmt->execute();
       }
 
@@ -2670,6 +2670,21 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getAdminActivityLogs($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = 'SELECT CONCAT(b.hr_lastname, ", ", b.hr_firstname, " ", b.hr_middlename) AS HRName, c.status_name, e.jobM_title,  CONCAT(f.cand_lastname, ", ", f.cand_firstname, " ", f.cand_middlename) AS CandName, a.appS_date FROM tblapplicationstatus a
+            INNER JOIN tblhr b ON a.appS_hrId = b.hr_id
+            INNER JOIN tblstatus c ON a.appS_statusId = c.status_id
+            INNER JOIN tblapplications d ON d.app_id = a.appS_appId
+            INNER JOIN tbljobsmaster e ON e.jobM_id = d.app_jobMId
+            INNER JOIN tblcandidates f ON f.cand_id = d.app_candId';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -3056,6 +3071,9 @@ switch ($operation) {
     break;
   case "addMedicalMaster":
     echo json_encode($admin->addMedicalMaster($json));
+    break;
+  case "getAdminActivityLogs":
+    echo json_encode($admin->getAdminActivityLogs($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
