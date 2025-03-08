@@ -1096,12 +1096,12 @@ class Admin
     $stmt->execute();
     $returnValue["jobOffered"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    $sql = "SELECT COUNT(medicalM_id) as isMedicalChecked FROM tblmedicalmaster WHERE `medicalM_candId` = 18";
+    $sql = "SELECT COUNT(medicalM_id) as isMedicalChecked FROM tblmedicalmaster WHERE `medicalM_candId` = :cand_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $cand_id);
     $stmt->execute();
     $returnValue["medicalChecked"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-    
+
     // Add job criteria to returnValue
     $returnValue["criteria"] = $criteria;
 
@@ -1241,17 +1241,18 @@ class Admin
 
   function changeApplicantStatus($json)
   {
-    // {"jobId": 12, "candId": 12, "status": 4}
+    // {"jobId": 12, "candId": 12, "status": 4, "hrId": 1}
     include "connection.php";
     $data = json_decode($json, true);
     $appId = $this->applicationIds($data['jobId'], $data['candId']);
     $id = json_encode($appId[0]['app_id']);
     $date = $this->getCurrentDate();
-    $sql = "INSERT tblapplicationstatus(appS_appId, appS_statusId, appS_date) VALUES(:id, :status, :date)";
+    $sql = "INSERT tblapplicationstatus(appS_appId, appS_statusId, appS_date, appS_hrId) VALUES(:id, :status, :date, :hrId)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":status", $data['status']);
     $stmt->bindParam(":id", $id);
     $stmt->bindParam(":date", $date);
+    $stmt->bindParam(":hrId", $data["hrId"]);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -2219,8 +2220,8 @@ class Admin
       $sql2 = "INSERT INTO tblinterviewschedule (intsched_jobId, intsched_candId, intsched_date)
         VALUES (:intsched_jobId, :intsched_candId, :intsched_date)";
       $stmt2 = $conn->prepare($sql2);
-      $stmt = $conn->prepare("INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date)
-      VALUES (:appS_appId, 6, :appS_date)");
+      $stmt = $conn->prepare("INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date, appS_hrId)
+      VALUES (:appS_appId, 6, :appS_date, :appS_hrId)");
       foreach ($candidates as $candidate) {
         $appId = $this->applicationIds($jobId, $candidate['candId']);
         $id = json_encode($appId[0]['app_id']);
@@ -2238,6 +2239,7 @@ class Admin
 
         $stmt->bindParam(':appS_appId', $id);
         $stmt->bindParam(':appS_date', $dateNow);
+        $stmt->bindParam(':appS_hrId', $data["hrId"]); 
         $stmt->execute();
       }
 
