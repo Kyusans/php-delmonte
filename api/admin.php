@@ -2692,7 +2692,9 @@ class Admin
     $sql = 'SELECT a.intsched_date, b.jobM_title, b.jobM_id, c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", c.cand_middlename) FullName 
             FROM tblinterviewschedule a
             INNER JOIN tbljobsmaster b ON b.jobM_id = a.intsched_jobId
-            INNER JOIN tblcandidates c ON c.cand_id = a.intsched_candId';
+            INNER JOIN tblcandidates c ON c.cand_id = a.intsched_candId
+            WHERE a.intsched_date >= CURDATE()
+            ORDER BY a.intsched_date'; 
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
