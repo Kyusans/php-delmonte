@@ -2685,6 +2685,18 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getInterviewSchedule()
+  {
+    include "connection.php";
+    $sql = 'SELECT a.intsched_date, b.jobM_title, b.jobM_id, c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", c.cand_middlename) FullName 
+            FROM tblinterviewschedule a
+            INNER JOIN tbljobsmaster b ON b.jobM_id = a.intsched_jobId
+            INNER JOIN tblcandidates c ON c.cand_id = a.intsched_candId';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -3074,6 +3086,9 @@ switch ($operation) {
     break;
   case "getAdminActivityLogs":
     echo json_encode($admin->getAdminActivityLogs($json));
+    break;
+  case "getInterviewSchedule":
+    echo json_encode($admin->getInterviewSchedule());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
