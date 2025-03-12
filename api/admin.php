@@ -921,6 +921,9 @@ class Admin
     $cand_id = $data['cand_id'];
     $job_id = $data['job_id'];
 
+    // echo $this->getCandMedClassification($cand_id);
+    // die();
+
     // Fetch candidate's basic information
     $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
     $stmt = $conn->prepare($sql);
@@ -1101,6 +1104,8 @@ class Admin
     $stmt->bindParam(':cand_id', $cand_id);
     $stmt->execute();
     $returnValue["medicalChecked"] = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+    $returnValue["medicalClassification"] = $this->getCandMedClassification($cand_id);
 
     // Add job criteria to returnValue
     $returnValue["criteria"] = $criteria;
@@ -2694,10 +2699,24 @@ class Admin
             INNER JOIN tbljobsmaster b ON b.jobM_id = a.intsched_jobId
             INNER JOIN tblcandidates c ON c.cand_id = a.intsched_candId
             WHERE a.intsched_date >= CURDATE()
-            ORDER BY a.intsched_date'; 
+            ORDER BY a.intsched_date';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getCandMedClassification($id)
+  {
+    include "connection.php";
+    // echo $id;
+    $sql = 'SELECT b.medicalC_id, b.medicalC_name, CONCAT(c.cand_lastname, ", ", c.cand_firstname," ", c.cand_middlename) CandName FROM tblmedicalmaster a 
+            INNER JOIN tblmedicalclassification b ON b.medicalC_id = a.medicalM_medicalCId 
+            INNER JOIN tblcandidates c ON c.cand_id = a.medicalM_candId
+            WHERE c.cand_id = :candId';
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $id);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
   }
 } //admin
 
