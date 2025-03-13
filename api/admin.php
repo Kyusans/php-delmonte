@@ -2709,7 +2709,7 @@ class Admin
   {
     include "connection.php";
     // echo $id;
-    $sql = 'SELECT b.medicalC_id, b.medicalC_name, CONCAT(c.cand_lastname, ", ", c.cand_firstname," ", c.cand_middlename) CandName FROM tblmedicalmaster a 
+    $sql = 'SELECT a.medicalM_id, b.medicalC_id, b.medicalC_name, CONCAT(c.cand_lastname, ", ", c.cand_firstname," ", c.cand_middlename) CandName FROM tblmedicalmaster a 
             INNER JOIN tblmedicalclassification b ON b.medicalC_id = a.medicalM_medicalCId 
             INNER JOIN tblcandidates c ON c.cand_id = a.medicalM_candId
             WHERE c.cand_id = :candId';
@@ -2717,6 +2717,23 @@ class Admin
     $stmt->bindParam(":candId", $id);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function updateMedicalMaster($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $date = $this->getCurrentDate();
+    $sql = "UPDATE tblmedicalmaster SET medicalM_candId = :candId, medicalM_medicalCId = :medicalCId, 
+            medicalM_dateTime = :dateTime, medicalM_hrId = :hrId WHERE medicalM_id = :medicalMId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':candId', $data['candId']);
+    $stmt->bindParam(':medicalCId', $data['medicalCId']);
+    $stmt->bindParam(':dateTime', $date);
+    $stmt->bindParam(':hrId', $data['hrId']);
+    $stmt->bindParam(':medicalMId', $data['medicalMId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } //admin
 
@@ -3110,6 +3127,9 @@ switch ($operation) {
     break;
   case "getInterviewSchedule":
     echo json_encode($admin->getInterviewSchedule());
+    break;
+  case "updateMedicalMaster":
+    echo json_encode($admin->updateMedicalMaster($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
