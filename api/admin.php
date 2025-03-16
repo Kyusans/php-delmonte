@@ -1921,10 +1921,11 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tblpersonaltraining SET perT_name = :perT_name WHERE perT_id = :perT_id";
+    $sql = "UPDATE tblpersonaltraining SET perT_name = :perT_name, perT_percentage = :perT_percentage WHERE perT_id = :perT_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':perT_name', $data['trainingName']);
     $stmt->bindParam(':perT_id', $data['trainingId']);
+    $stmt->bindParam(':perT_percentage', $data['percentage']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
