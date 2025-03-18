@@ -2261,46 +2261,98 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    // DATE_FORMAT(d.appS_date, '%b %d, %Y - %l:%i%p') as Date
+    $candidates = [];
 
-
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName,
-                b.cand_email, e.status_name,
+    // Fetch candidates
+    $sql = "SELECT 
+                b.cand_id, 
+                CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName,
+                b.cand_email, 
+                e.status_name,
                 DATE_FORMAT(d.appS_date, '%b %d, %Y') as Date
-                FROM tblapplications a
-                INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
-                INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
-                INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
-                WHERE a.app_jobMId = :jobId
-                AND d.appS_id = (SELECT MAX(sub_d.appS_id)
-                FROM tblapplicationstatus sub_d
-                WHERE sub_d.appS_appId = d.appS_appId)
-                AND (d.appS_statusId = 1 OR d.appS_statusId = 2 OR d.appS_statusId = 12)
-                AND a.app_jobMId = :jobId
-                ORDER BY b.cand_id DESC";
+            FROM tblapplications a
+            INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
+            INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
+            INNER JOIN tblstatus e ON e.status_id = d.appS_statusId
+            WHERE a.app_jobMId = :jobId
+            AND d.appS_id = (
+                SELECT MAX(sub_d.appS_id) 
+                FROM tblapplicationstatus sub_d 
+                WHERE sub_d.appS_appId = d.appS_appId
+            )
+            AND d.appS_statusId IN (1, 2, 12)
+            ORDER BY b.cand_id DESC";
+
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
+    $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if ($stmt->rowCount() > 0) {
-      $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } else {
+    if (empty($candidates)) {
       return [];
     }
 
     foreach ($candidates as &$candidate) {
-      $points = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
-      $candidate['maxPoints'] = $points['maxPoints'];
-      $candidate['totalPoints'] = $points['totalPoints'];
-      $candidate['percentage'] = $points['percentage'];
+      $sql = "SELECT b.course_categoryName FROM tblcourses a
+              INNER JOIN tblcoursescategory b ON a.courses_coursecategoryId = b.course_categoryId
+              INNER JOIN tblcandeducbackground c ON c.educ_coursesId = a.courses_id
+              WHERE c.educ_canId = :candId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":candId", $candidate['cand_id']);
+      $stmt->execute();
+      $candidate['courses'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT a.perS_name 
+                FROM tblpersonalskills a
+                INNER JOIN tblcandskills b ON b.skills_perSId = a.perS_id
+                WHERE b.skills_candId = :candId";
+
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":candId", $candidate['cand_id']);
+      $stmt->execute();
+
+      $candidate['skills'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT a.perT_name 
+                FROM tblpersonaltraining a
+                INNER JOIN tblcandtraining b ON b.training_perTId = a.perT_id
+                WHERE b.training_candId = :candId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":candId", $candidate['cand_id']);
+      $stmt->execute();
+      $candidate['trainings'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT a.knowledge_name
+                FROM tblpersonalknowledge a
+                INNER JOIN tblcandknowledge b ON b.canknow_knowledgeId = a.knowledge_id
+                WHERE b.canknow_canId = :candId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":candId", $candidate['cand_id']);
+      $stmt->execute();
+      $candidate['knowledge'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+      $sql = "SELECT a.empH_positionName FROM tblcandemploymenthistory a
+              WHERE a.empH_candId = :candId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":candId", $candidate['cand_id']);
+      $stmt->execute();
+      $candidate['employmentHistory'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    usort($candidates, function ($a, $b) {
-      return $b['percentage'] <=> $a['percentage'];
-    });
+    // foreach ($candidates as &$candidate) {
+    //   $points = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
+    //   $candidate['maxPoints'] = $points['maxPoints'];
+    //   $candidate['totalPoints'] = $points['totalPoints'];
+    //   $candidate['percentage'] = $points['percentage'];
+    // }
+
+    // usort($candidates, function ($a, $b) {
+    //   return $b['percentage'] <=> $a['percentage'];
+    // });
 
     return $candidates;
   }
+
 
 
   function getJobPassingPercentage($json)
@@ -2316,6 +2368,7 @@ class Admin
 
   function getPendingDetails($json)
   {
+    // {"jobId": 1}
     $returnValue = [];
     $returnValue['candidates'] = $this->getPendingCandidates($json);
     $returnValue['passingPercentage'] = $this->getJobPassingPercentage($json);
@@ -2736,6 +2789,51 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getJobQualification($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT a.jeduc_points, b.course_categoryName  FROM tbljobseducation a
+    INNER JOIN tblcoursescategory b ON b.course_categoryId = a.jeduc_categoryId
+    WHERE jeduc_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobEducation"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT a.jtrng_points, b.perT_name FROM tbljobstrainings a
+    INNER JOIN tblpersonaltraining b ON b.perT_id = a.jtrng_trainingId
+    WHERE jtrng_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobTrainings"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT a.jknow_points, b.knowledge_name FROM tbljobsknowledge a
+    INNER JOIN tblpersonalknowledge b ON b.knowledge_id = a.jknow_knowledgeId
+    WHERE jknow_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobKnowledge"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT a.jskills_points, b.perS_name FROM tbljobsskills a
+    INNER JOIN tblpersonalskills b ON b.perS_id = a.jskills_skillsId
+    WHERE jskills_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobSkills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT jwork_points, jwork_responsibilities FROM tbljobsworkexperience WHERE jwork_jobId  = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobExperience"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    return $returnValue;
+  }
 } //admin
 
 function uploadImage()
@@ -3131,6 +3229,9 @@ switch ($operation) {
     break;
   case "updateMedicalMaster":
     echo json_encode($admin->updateMedicalMaster($json));
+    break;
+  case "getJobQualification":
+    echo json_encode($admin->getJobQualification($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
