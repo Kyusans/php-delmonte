@@ -2843,6 +2843,66 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function addHR($json)
+  {
+    // {"lastName": "Macario", "firstName": "Mel", "middleName": "Sabido", "contactNo": "0925467856", "email": "mel@gmail.com", "alternateEmail": "", "password": "Mel!123", "userLevel": 2}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblhr (hr_lastname, hr_firstname, hr_middlename, hr_contactNo, hr_email, hr_alternateEmail, hr_password, hr_userLevel, hr_createdAt) 
+            VALUES (:lastName, :firstName, :middleName, :contactNo, :email, :alternateEmail, :password, :userLevel, NOW())";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":lastName", $data['lastName']);
+    $stmt->bindParam(":firstName", $data['firstName']);
+    $stmt->bindParam(":middleName", $data['middleName']);
+    $stmt->bindParam(":contactNo", $data['contactNo']);
+    $stmt->bindParam(":email", $data['email']);
+    $stmt->bindParam(":alternateEmail", $data['alternateEmail']);
+    $stmt->bindParam(":password", $data['password']);
+    $stmt->bindParam(":userLevel", $data['userLevel']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function updateHR($json)
+  {
+    // {"lastName": "Macarios", "firstName": "Mel", "middleName": "Sabido", "contactNo": "0925467856", "email": "mel@gmail.com", "alternateEmail": "", "password": "Mel!123", "userLevel": 2}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblhr SET hr_lastname = :lastName, hr_firstname = :firstName, hr_middlename = :middleName, hr_contactNo = :contactNo, hr_email = :email, hr_alternateEmail = :alternateEmail, hr_password = :password, hr_userLevel = :userLevel WHERE hr_id = :hrId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":lastName", $data['lastName']);
+    $stmt->bindParam(":firstName", $data['firstName']);
+    $stmt->bindParam(":middleName", $data['middleName']);
+    $stmt->bindParam(":contactNo", $data['contactNo']);
+    $stmt->bindParam(":email", $data['email']);
+    $stmt->bindParam(":alternateEmail", $data['alternateEmail']);
+    $stmt->bindParam(":password", $data['password']);
+    $stmt->bindParam(":userLevel", $data['userLevel']);
+    $stmt->bindParam(":hrId", $data['hrId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function deleteHR($json)
+  {
+    // {"hrId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblhr WHERE hr_id = :hrId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':hrId', $data['hrId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
+  }
 } //admin
 
 function uploadImage()
@@ -3244,6 +3304,15 @@ switch ($operation) {
     break;
   case "getHR":
     echo json_encode($admin->getHR());
+    break;
+  case "addHR":
+    echo json_encode($admin->addHR($json));
+    break;
+  case "updateHR":
+    echo json_encode($admin->updateHR($json));
+    break;
+  case "deleteHR":
+    echo json_encode($admin->deleteHR($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
