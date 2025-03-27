@@ -2863,6 +2863,25 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function updateHR($json){
+    // {"lastName": "Macarios", "firstName": "Mel", "middleName": "Sabido", "contactNo": "0925467856", "email": "mel@gmail.com", "alternateEmail": "", "password": "Mel!123", "userLevel": 2}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblhr SET hr_lastname = :lastName, hr_firstname = :firstName, hr_middlename = :middleName, hr_contactNo = :contactNo, hr_email = :email, hr_alternateEmail = :alternateEmail, hr_password = :password, hr_userLevel = :userLevel WHERE hr_id = :hrId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":lastName", $data['lastName']);
+    $stmt->bindParam(":firstName", $data['firstName']);
+    $stmt->bindParam(":middleName", $data['middleName']);
+    $stmt->bindParam(":contactNo", $data['contactNo']);
+    $stmt->bindParam(":email", $data['email']);
+    $stmt->bindParam(":alternateEmail", $data['alternateEmail']);
+    $stmt->bindParam(":password", $data['password']);
+    $stmt->bindParam(":userLevel", $data['userLevel']);
+    $stmt->bindParam(":hrId", $data['hrId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -3267,6 +3286,9 @@ switch ($operation) {
     break;
   case "addHR":
     echo json_encode($admin->addHR($json));
+    break;
+  case "updateHR":
+    echo json_encode($admin->updateHR($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
