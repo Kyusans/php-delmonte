@@ -2864,7 +2864,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function updateHR($json){
+  function updateHR($json)
+  {
     // {"lastName": "Macarios", "firstName": "Mel", "middleName": "Sabido", "contactNo": "0925467856", "email": "mel@gmail.com", "alternateEmail": "", "password": "Mel!123", "userLevel": 2}
     include "connection.php";
     $data = json_decode($json, true);
@@ -2881,6 +2882,26 @@ class Admin
     $stmt->bindParam(":hrId", $data['hrId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function deleteHR($json)
+  {
+    // {"hrId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    try {
+      $sql = "DELETE FROM tblhr WHERE hr_id = :hrId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(':hrId', $data['hrId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
   }
 } //admin
 
@@ -3289,6 +3310,9 @@ switch ($operation) {
     break;
   case "updateHR":
     echo json_encode($admin->updateHR($json));
+    break;
+  case "deleteHR":
+    echo json_encode($admin->deleteHR($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
