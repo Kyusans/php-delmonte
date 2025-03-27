@@ -2834,6 +2834,15 @@ class Admin
 
     return $returnValue;
   }
+
+  function getHR()
+  {
+    include "connection.php";
+    $sql = 'SELECT hr_id, CONCAT(hr_lastname, ", ", hr_firstname, " ", hr_middlename) AS fullName, hr_contactNo, hr_email, hr_alternateEmail, hr_password, hr_userLevel, hr_createdAt FROM tblhr';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -3232,6 +3241,9 @@ switch ($operation) {
     break;
   case "getJobQualification":
     echo json_encode($admin->getJobQualification($json));
+    break;
+  case "getHR":
+    echo json_encode($admin->getHR());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
