@@ -2843,6 +2843,15 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getHRUserLevel()
+  {
+    include "connection.php";
+    $sql = 'SELECT * FROM `tbluserlevel` WHERE userL_level < 100 AND userL_level != 1';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -3244,6 +3253,9 @@ switch ($operation) {
     break;
   case "getHR":
     echo json_encode($admin->getHR());
+    break;
+  case "getHRUserLevel":
+    echo json_encode($admin->getHRUserLevel());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
