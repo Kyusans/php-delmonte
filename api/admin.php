@@ -2838,9 +2838,9 @@ class Admin
   function getHR()
   {
     include "connection.php";
-    $sql = 'SELECT a.hr_id, CONCAT(a.hr_lastname, ", ", a.hr_firstname, " ", a.hr_middlename) AS fullName, a.hr_contactNo, a.hr_email, a.hr_alternateEmail, 
-            a.hr_password, b.UserL_description, a.hr_createdAt FROM tblhr a
-            INNER JOIN tbluserlevel b ON a.hr_userLevel = b.userL_id';
+    $sql = 'SELECT a.hr_id, CONCAT(a.hr_lastname, ", ", a.hr_firstname, " ", a.hr_middlename) AS fullName, a.*, b.UserL_description, b.userL_id FROM tblhr a
+            INNER JOIN tbluserlevel b ON a.hr_userLevel = b.userL_id
+            ORDER BY a.hr_createdAt DESC';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
@@ -2854,7 +2854,7 @@ class Admin
     $sql = "INSERT INTO tblhr (hr_lastname, hr_firstname, hr_middlename, hr_contactNo, hr_email, hr_alternateEmail, hr_password, hr_userLevel, hr_createdAt) 
             VALUES (:lastName, :firstName, :middleName, :contactNo, :email, :alternateEmail, :password, :userLevel, NOW())";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":lastName", $data['lastName']);
+    $stmt->bindParam(":lastName", $data['lastname']);
     $stmt->bindParam(":firstName", $data['firstName']);
     $stmt->bindParam(":middleName", $data['middleName']);
     $stmt->bindParam(":contactNo", $data['contactNo']);
@@ -2863,7 +2863,8 @@ class Admin
     $stmt->bindParam(":password", $data['password']);
     $stmt->bindParam(":userLevel", $data['userLevel']);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? 1 : 0;
+    $lastId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $lastId : 0;
   }
 
   function updateHR($json)
@@ -2909,7 +2910,7 @@ class Admin
   function getHRUserLevel()
   {
     include "connection.php";
-    $sql = 'SELECT * FROM `tbluserlevel` WHERE userL_level < 100 AND userL_level != 1';
+    $sql = 'SELECT * FROM `tbluserlevel` WHERE userL_level <= 100 AND userL_level != 1';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
