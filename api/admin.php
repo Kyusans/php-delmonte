@@ -2915,6 +2915,8 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  
 } //admin
 
 function uploadImage()
