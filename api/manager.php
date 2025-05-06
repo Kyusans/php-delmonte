@@ -6,7 +6,7 @@ class Manager
 {
   function getUnfitMedicalCandidates(){
     include "connection.php";
-    $sql = 'SELECT a.medicalM_id, CONCAT(c.cand_lastname, ", ", c.cand_middlename, " ",c.cand_firstname) as cand_fullName, CONCAT(d.hr_lastname, ", ", d.hr_firstname, " ",d.hr_middlename) as hr_fullName,  b.medicalC_type, b.medicalC_name FROM tblmedicalmaster a
+    $sql = 'SELECT a.medicalM_id, a.medicalM_jobMId, a.medicalM_candId, CONCAT(c.cand_lastname, ", ", c.cand_middlename, " ",c.cand_firstname) as cand_fullName, CONCAT(d.hr_lastname, ", ", d.hr_firstname, " ",d.hr_middlename) as hr_fullName,  b.medicalC_type, b.medicalC_name FROM tblmedicalmaster a
             INNER JOIN tblmedicalclassification b ON b.medicalC_id = a.medicalM_medicalCId
             INNER JOIN tblcandidates c ON c.cand_id = a.medicalM_candId
             INNER JOIN tblhr d ON d.hr_id = a.medicalM_hrId
