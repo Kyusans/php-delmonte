@@ -2719,13 +2719,14 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $date = $this->getCurrentDate();
-    $sql = "INSERT INTO tblmedicalmaster(medicalM_candId, medicalM_medicalCId, medicalM_dateTime, medicalM_hrId)
-            VALUES (:candId, :medicalCId, :dateTime, :hrId)";
+    $sql = "INSERT INTO tblmedicalmaster(medicalM_candId, medicalM_medicalCId, medicalM_dateTime, medicalM_hrId, medicalM_jobMid)
+            VALUES (:candId, :medicalCId, :dateTime, :hrId, :jobMid)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':candId', $data['candId']);
     $stmt->bindParam(':medicalCId', $data['medicalCId']);
     $stmt->bindParam(':dateTime', $date);
     $stmt->bindParam(':hrId', $data['hrId']);
+    $stmt->bindParam(':jobMid', $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -2915,6 +2916,8 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  
 } //admin
 
 function uploadImage()
