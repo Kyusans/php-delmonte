@@ -2917,8 +2917,23 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
+  function updateInterviewCriteriaMaster($json){
+    // {"criteriaId": 8, "question": "question", "points": 1, "interCriteriaId": 23}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblinterviewcriteriamaster SET inter_criteria_criteriaId = :criteriaId, inter_criteria_question = :question,
+            inter_criteria_points = :points WHERE inter_criteria_id = :interCriteriaId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":criteriaId", $data['criteriaId']);
+    $stmt->bindParam(":question", $data['question']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->bindParam(":interCriteriaId", $data['interCriteriaId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
   
-} //admin
+} // admin
 
 function uploadImage()
 {
@@ -3331,6 +3346,9 @@ switch ($operation) {
     break;
   case "getHRUserLevel":
     echo json_encode($admin->getHRUserLevel());
+    break;
+  case "updateInterviewCriteriaMaster":
+    echo $admin->updateInterviewCriteriaMaster($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
