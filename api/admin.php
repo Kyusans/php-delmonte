@@ -2917,7 +2917,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function updateInterviewCriteriaMaster($json){
+  function updateInterviewCriteriaMaster($json)
+  {
     // {"criteriaId": 8, "question": "question", "points": 1, "interCriteriaId": 23}
     include "connection.php";
     $data = json_decode($json, true);
@@ -2931,8 +2932,6 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
-
-  
 } // admin
 
 function uploadImage()
