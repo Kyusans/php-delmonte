@@ -30,7 +30,6 @@ class Admin
     $jobMasterDuties = $data['jobMasterDuties'];
     $jobEducation = $data['jobEducation'];
     $jobTraining = $data['jobTraining'];
-    $jobKnowledge = $data['jobKnowledge'];
     $jobSkills = $data['jobSkill'];
     $jobWorkExperience = $data['jobExperience'];
     $todayDate = $this->getCurrentDate();
@@ -50,6 +49,7 @@ class Admin
       $stmt->bindParam(":passing_jobId", $jobMasterId);
       $stmt->bindParam(":passing_points", $jobMaster['passingPercentage']);
       $stmt->execute();
+
       $sql = "INSERT INTO tbljobsmasterduties (duties_jobId, duties_text) VALUES (:duties_jobId, :duties_text)";
       foreach ($jobMasterDuties as $duty) {
         $stmt = $conn->prepare($sql);
@@ -68,32 +68,22 @@ class Admin
         $stmt->execute();
       }
       // jtrng_text
-      $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_trainingId, jtrng_points) VALUES (:jtrng_jobId, :jtrng_trainingId, :points)";
+      $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_points) VALUES (:jtrng_jobId, :training, :points)";
       foreach ($jobTraining as $training) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jtrng_jobId", $jobMasterId);
         // $stmt->bindParam(":jtrng_text", $training['jobTraining']);
-        $stmt->bindParam(":jtrng_trainingId", $training['training']);
+        $stmt->bindParam(":training", $training['training']);
         $stmt->bindParam(":points", $training['points']);
         $stmt->execute();
       }
-      // jknow_text
-      $sql = "INSERT INTO tbljobsknowledge (jknow_jobId, jknow_knowledgeId, jknow_points) VALUES (:jknow_jobId, :jknow_knowledgeId, :points)";
-      foreach ($jobKnowledge as $knowledge) {
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":jknow_jobId", $jobMasterId);
-        // $stmt->bindParam(":jknow_text", $knowledge['jobKnowledge']);
-        $stmt->bindParam(":jknow_knowledgeId", $knowledge['knowledgeId']);
-        $stmt->bindParam(":points", $knowledge['points']);
-        $stmt->execute();
-      }
       // jskills_text
-      $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_skillsId, jskills_points) VALUES (:jskills_jobId, :jskills_skillsId, :points)";
+      $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_text, jskills_points) VALUES (:jskills_jobId, :skill, :points)";
       foreach ($jobSkills as $skill) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jskills_jobId", $jobMasterId);
         // $stmt->bindParam(":jskills_text", $skill['jobSkill']);
-        $stmt->bindParam(":jskills_skillsId", $skill['skill']);
+        $stmt->bindParam(":skill", $skill['skill']);
         $stmt->bindParam(":points", $skill['points']);
         $stmt->execute();
       }
@@ -157,20 +147,20 @@ class Admin
       $stmt->execute();
       $data['courseCategory'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
-      $sql = "SELECT * FROM tblpersonaltraining";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['personalTraining'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+      // $sql = "SELECT * FROM tblpersonaltraining";
+      // $stmt = $conn->prepare($sql);
+      // $stmt->execute();
+      // $data['personalTraining'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
-      $sql = "SELECT * FROM tblpersonalskills";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['personalSkills'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+      // $sql = "SELECT * FROM tblpersonalskills";
+      // $stmt = $conn->prepare($sql);
+      // $stmt->execute();
+      // $data['personalSkills'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
-      $sql = "SELECT * FROM tblpersonalknowledge";
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $data['knowledge'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+      // $sql = "SELECT * FROM tblpersonalknowledge";
+      // $stmt = $conn->prepare($sql);
+      // $stmt->execute();
+      // $data['knowledge'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
       $conn->commit();
       return json_encode($data);
