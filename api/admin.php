@@ -196,24 +196,14 @@ class Admin
     $stmt->execute();
     $returnValue["jobEducation"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT a.*, b.perT_name FROM tbljobstrainings a
-            INNER JOIN tblpersonaltraining b ON b.perT_id = a.jtrng_trainingId
+    $sql = "SELECT * FROM tbljobstrainings
             WHERE jtrng_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     $returnValue["jobTrainings"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT a.*, b.knowledge_name FROM tbljobsknowledge a
-            INNER JOIN tblpersonalknowledge b ON b.knowledge_id = a.jknow_knowledgeId
-            WHERE jknow_jobId = :jobId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->execute();
-    $returnValue["jobKnowledge"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-
-    $sql = "SELECT a.*, b.perS_name FROM tbljobsskills a
-            INNER JOIN tblpersonalskills b ON b.perS_id = a.jskills_skillsId
+    $sql = "SELECT * FROM tbljobsskills 
             WHERE jskills_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
@@ -654,11 +644,11 @@ class Admin
     // {"jobId": 11, "skillId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_skillsId, jskills_points)
-            VALUES (:jobId, :skillId, :points)";
+    $sql = "INSERT INTO tbljobsskills (jskills_jobId, jskills_text, jskills_points)
+            VALUES (:jobId, :skill, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":skillId", $data['skillId']);
+    $stmt->bindParam(":skill", $data['skill']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
