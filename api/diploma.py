@@ -35,4 +35,47 @@ if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000)
 
 
+# frontend 
+
+# "use client";
+# import { useState } from "react";
+# import axios from "axios";
+
+# export default function Home() {
+#   const [file, setFile] = useState(null);
+
+#   const handleFileChange = (event) => {
+#     setFile(event.target.files[0]);
+#   };
+
+#   const handleUpload = async () => {
+#     if (!file) return alert("Please choose a file!");
+
+#     const formData = new FormData();
+#     formData.append("image", file);
+
+#     try {
+#       const response = await axios.post("http://localhost:5000/api/diploma", formData, {
+#         headers: {
+#           "Content-Type": "multipart/form-data",
+#         },
+#       });
+
+
+#       console.log("Server Response:", response.data);
+#     } catch (error) {
+#       console.error("Error uploading file:", error);
+#     }
+#   };
+
+#   return (
+#     <div>
+#       <input type="file" onChange={handleFileChange} />
+#       <button onClick={handleUpload}>Upload</button>
+#     </div>
+#   );
+# }
+   
+
+
 
