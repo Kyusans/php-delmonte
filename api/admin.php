@@ -683,11 +683,11 @@ class Admin
     // {"jobId": 11, "trainingId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_trainingId, jtrng_points)
-            VALUES (:jobId, :trainingId, :points)";
+    $sql = "INSERT INTO tbljobstrainings (jtrng_jobId, jtrng_text, jtrng_points)
+            VALUES (:jobId, :training, :points)";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->bindParam(":trainingId", $data['trainingId']);
+    $stmt->bindParam(":training", $data['training']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
