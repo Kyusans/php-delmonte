@@ -630,9 +630,9 @@ class Admin
     // {"id": 3, "skillId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tbljobsskills SET jskills_skillsId = :skillId, jskills_points = :points WHERE jskills_id = :id";
+    $sql = "UPDATE tbljobsskills SET jskills_text = :skill, jskills_points = :points WHERE jskills_id = :id";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":skillId", $data['skillId']);
+    $stmt->bindParam(":skill", $data['skill']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":id", $data['id']);
     $stmt->execute();
@@ -698,9 +698,9 @@ class Admin
     // {"id": 10, "trainingId": 3, "points": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tbljobstrainings SET jtrng_trainingId = :trainingId, jtrng_points = :points WHERE jtrng_id = :id";
+    $sql = "UPDATE tbljobstrainings SET jtrng_text = :training, jtrng_points = :points WHERE jtrng_id = :id";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":trainingId", $data['trainingId']);
+    $stmt->bindParam(":training", $data['training']);
     $stmt->bindParam(":points", $data['points']);
     $stmt->bindParam(":id", $data['id']);
     $stmt->execute();
