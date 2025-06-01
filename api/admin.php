@@ -566,7 +566,9 @@ class Admin
     // {"jobId": 10}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT * FROM tbljobseducation WHERE jeduc_jobId = :jobId";
+    $sql = "SELECT a.*, b.course_categoryName FROM tbljobseducation a 
+            INNER JOIN tblcoursescategory b ON a.jeduc_categoryId = b.course_categoryId
+            WHERE jeduc_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
