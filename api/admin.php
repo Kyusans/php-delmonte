@@ -2586,6 +2586,7 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $jobId = $data['jobId'];
+    $returnValue = [];
 
     // Fetch raw candidates
     $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename, cand_email
@@ -2617,8 +2618,14 @@ class Admin
         'candQualifications' => $candQualifications
       ];
     }
+    $jobQualifications = $this->getJobQualifications($jobId);
 
-    return !empty($formattedCandidates) ? $formattedCandidates : 0;
+    $returnValue = [
+      "jobQualifications" => $jobQualifications,
+      "candidates" => $formattedCandidates
+    ];
+
+    return !empty($returnValue["candidates"]) ? $returnValue : 0;
   }
 
   function getCandidateEducations($candId)
@@ -2660,7 +2667,6 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
-
   function getCandidateQualifications($candId)
   {
     include "connection.php";
@@ -2683,6 +2689,19 @@ class Admin
   {
     include "connection.php";
     $jobQualifications = [];
+    $educations = $this->getJobEducation(json_encode(["jobId" => $jobId]));
+    $skills = $this->getJobSkills(json_encode(["jobId" => $jobId]));
+    $trainings = $this->getJobTraining(json_encode(["jobId" => $jobId]));
+    $employments = $this->getJobExperience(json_encode(["jobId" => $jobId]));
+
+    $jobQualifications = [
+      'educations' => json_decode($educations),
+      'skills' => json_decode($skills),
+      'trainings' => json_decode($trainings),
+      'employments' => json_decode($employments)
+    ];
+
+    return $jobQualifications ? $jobQualifications : 0;
   }
 
   function sendPotentialCandidateEmail($json)
