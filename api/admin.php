@@ -2631,29 +2631,44 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
+  function getCandidateSkills($candId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblcandskills WHERE skills_candId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getCandidateTrainings($candId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblcandtraining WHERE training_candId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getCandidateExperiences($candId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
   function getCandidateQualifications($candId)
   {
     include "connection.php";
     $candQualifications = [];
     $educations = $this->getCandidateEducations($candId);
-
-    $sql = "SELECT * FROM tblcandskills WHERE skills_candId = :candId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":candId", $candId);
-    $stmt->execute();
-    $skills = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
-
-    $sql = "SELECT * FROM tblcandtraining WHERE training_candId = :candId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":candId", $candId);
-    $stmt->execute();
-    $trainings = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
-
-    $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId  = :candId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":candId", $candId);
-    $stmt->execute();
-    $employments = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    $skills = $this->getCandidateSkills($candId);
+    $trainings = $this->getCandidateTrainings($candId);
+    $employments = $this->getCandidateExperiences($candId);
 
     $candQualifications = [
       'educations' => $educations,
