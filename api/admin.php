@@ -2565,11 +2565,11 @@ class Admin
     $sql = 'SELECT c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", c.cand_middlename) as fullName,
             DATE_FORMAT(b.appS_date, "%b %d, %Y %l:%i %p") as appS_date,
             (SELECT s.status_name
-             FROM tblapplicationstatus ast
-             INNER JOIN tblstatus s ON s.status_id = ast.appS_statusId
-             WHERE ast.appS_appId = a.app_id
-             ORDER BY ast.appS_id DESC
-             LIMIT 1) as status
+            FROM tblapplicationstatus ast
+            INNER JOIN tblstatus s ON s.status_id = ast.appS_statusId
+            WHERE ast.appS_appId = a.app_id
+            ORDER BY ast.appS_id DESC
+            LIMIT 1) as status
             FROM tblapplications a
             INNER JOIN tblapplicationstatus b ON b.appS_appId = a.app_id
             INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
@@ -2582,47 +2582,81 @@ class Admin
 
   function getPotentialCandidates($json)
   {
-    // {"jobId": 1, "passingPercentage": 50}
+    // {"jobId": 19}
     include "connection.php";
     $data = json_decode($json, true);
-
     $jobId = $data['jobId'];
-    $passingPercentage = $data['passingPercentage'];
-    // Fetch candidates where cand_isApplied = 0
+
+    // Fetch raw candidates
     $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename, cand_email
             FROM tblcandidates c
             WHERE c.cand_isEmployed = 0
               AND NOT EXISTS (
-                  SELECT 1
-                  FROM tblapplications a
-                  WHERE a.app_candId = c.cand_id
-                    AND a.app_jobMId = :jobId
-              );
-            ";
+                  SELECT 1 FROM tblapplications a WHERE a.app_candId = c.cand_id AND a.app_jobMId = :jobId
+              )
+              AND EXISTS (
+                  SELECT 1 FROM tblcandresume cr WHERE cr.canres_candId = c.cand_id
+              )";
+
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $jobId);
     $stmt->execute();
-    $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $fitCandidates = [];
-    foreach ($candidates as $candidate) {
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $formattedCandidates = [];
+    foreach ($results as $candidate) {
       $candId = $candidate['cand_id'];
       $fullName = $candidate['cand_lastname'] . ", " . $candidate['cand_firstname'] . " " . $candidate['cand_middlename'];
       $email = $candidate['cand_email'];
-      // Calculate points for each candidate
-      $points = $this->calculateCandidatePoints($candId, $jobId);
-      // Check if candidate fits the job
-      if ($points['percentage'] >= $passingPercentage) {
-        $fitCandidates[] = [
-          'candId' => $candId,
-          'fullName' => $fullName,
-          'email' => $email,
-          'maxPoints' => $points['maxPoints'],
-          'totalPoints' => $points['totalPoints'],
-          'percentage' => $points['percentage'],
-        ];
-      }
+      $candQualifications = $this->getCandidateQualifications($candId);
+
+      $formattedCandidates[] = [
+        'candId' => $candId,
+        'fullName' => $fullName,
+        'email' => $email,
+        'candQualifications' => $candQualifications
+      ];
     }
-    return !empty($fitCandidates) ? $fitCandidates : 0;
+
+    return !empty($formattedCandidates) ? $formattedCandidates : 0;
+  }
+
+
+  function getCandidateQualifications($candId)
+  {
+    include "connection.php";
+    $candQualifications = [];
+    $sql = "SELECT * FROM tblcandeducbackground WHERE educ_canId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    $educations = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+    $sql = "SELECT * FROM tblcandskills WHERE skills_candId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    $skills = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+    $sql = "SELECT * FROM tblcandtraining WHERE training_candId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    $trainings = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+    $sql = "SELECT * FROM tblcandemploymenthistory WHERE empH_candId  = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    $employments = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+
+    $candQualifications = [
+      'educations' => $educations,
+      'skills' => $skills,
+      'trainings' => $trainings,
+      'employments' => $employments
+    ];
+    return $candQualifications ? $candQualifications : 0;
   }
 
   function sendPotentialCandidateEmail($json)

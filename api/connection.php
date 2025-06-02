@@ -1,7 +1,7 @@
 <?php
     $servername = "localhost";
-    $dbusername = "kyusans";
-    $dbpassword = "123123";
+    $dbusername = "root";
+    $dbpassword = "";
     $dbname = "dbdelmonte";
 
     try {
