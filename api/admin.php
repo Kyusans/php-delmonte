@@ -2621,16 +2621,21 @@ class Admin
     return !empty($formattedCandidates) ? $formattedCandidates : 0;
   }
 
+  function getCandidateEducations($candId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblcandeducbackground WHERE educ_canId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 
   function getCandidateQualifications($candId)
   {
     include "connection.php";
     $candQualifications = [];
-    $sql = "SELECT * FROM tblcandeducbackground WHERE educ_canId = :candId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":candId", $candId);
-    $stmt->execute();
-    $educations = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    $educations = $this->getCandidateEducations($candId);
 
     $sql = "SELECT * FROM tblcandskills WHERE skills_candId = :candId";
     $stmt = $conn->prepare($sql);
@@ -2657,6 +2662,12 @@ class Admin
       'employments' => $employments
     ];
     return $candQualifications ? $candQualifications : 0;
+  }
+
+  function getJobQualifications($jobId)
+  {
+    include "connection.php";
+    $jobQualifications = [];
   }
 
   function sendPotentialCandidateEmail($json)
