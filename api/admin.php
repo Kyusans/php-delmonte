@@ -320,9 +320,9 @@ class Admin
 
     $returnValue['exam'] = $this->getExamDetails($json);
 
-    foreach ($returnValue["candidates"] as &$candidate) {
-      $candidate['points'] = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
-    }
+    // foreach ($returnValue["candidates"] as &$candidate) {
+    //   $candidate['points'] = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
+    // }
 
     $returnValue['jobTotalPoints'] = $totalPoints;
     // $returnValue['interviewPassing'] = $this->getInterviewPassingPercent($data['jobId']);
@@ -2635,7 +2635,7 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":candId", $candId);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
   function getCandidateSkills($candId)
@@ -2645,7 +2645,7 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":candId", $candId);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
   function getCandidateTrainings($candId)
@@ -2655,7 +2655,7 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":candId", $candId);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
   function getCandidateExperiences($candId)
@@ -2665,7 +2665,7 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":candId", $candId);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
   function getCandidateQualifications($candId)
   {
@@ -2695,10 +2695,10 @@ class Admin
     $employments = $this->getJobExperience(json_encode(["jobId" => $jobId]));
 
     $jobQualifications = [
-      'educations' => json_decode($educations),
-      'skills' => json_decode($skills),
-      'trainings' => json_decode($trainings),
-      'employments' => json_decode($employments)
+      'educations' => json_decode($educations) ?: [],
+      'skills' => json_decode($skills) ?: [],
+      'trainings' => json_decode($trainings) ?: [],
+      'employments' => json_decode($employments) ?: []
     ];
 
     return $jobQualifications ? $jobQualifications : 0;
