@@ -2993,6 +2993,14 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getAllCandidateResumes(){
+    include "connection.php";
+    $sql = 'SELECT * FROM tblcandresume';
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
 } // admin
 
 function uploadImage()
@@ -3409,6 +3417,9 @@ switch ($operation) {
     break;
   case "updateInterviewCriteriaMaster":
     echo $admin->updateInterviewCriteriaMaster($json);
+    break;
+  case "getAllCandidateResumes":
+    echo json_encode($admin->getAllCandidateResumes());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
