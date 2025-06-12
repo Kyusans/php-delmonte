@@ -3052,6 +3052,57 @@ class Admin
     return $totalPoints;
   }
 
+  function getAllCandidateQualificationPoints(){
+    include "connection.php";
+    $totalPoints = 0;
+    $appId = 1;
+
+    $sql = "SELECT candEduc_points FROM tblcandeducpoints WHERE candEduc_appId = :appId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":appId", $appId);
+    $stmt->execute();
+    $education = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    if($education != 0){
+      foreach($education as $educ){
+        $totalPoints += $educ["candEduc_points"];
+      }
+    }
+
+    $sql = "SELECT candEmp_points FROM tblcandemppoints WHERE candEmp_appId = :appId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":appId", $appId);
+    $stmt->execute();
+    $employment = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    if($employment != 0){
+      foreach($employment as $emp){
+        $totalPoints += $emp["candEmp_points"];
+      }
+    }
+
+    $sql = "SELECT candSkill_points FROM tblcandskillpoints WHERE candSkill_appId = :appId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":appId", $appId);
+    $stmt->execute();
+    $skills = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    if($skills != 0){
+      foreach($skills as $skill){
+        $totalPoints += $skill["candSkill_points"];
+      }
+    }
+
+    $sql = "SELECT candTrain_points FROM tblcandtrainpoints WHERE candTrain_appId = :appId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":appId", $appId);
+    $stmt->execute();
+    $training = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    if($training != 0){
+      foreach($training as $train){
+        $totalPoints += $train["candTrain_points"];
+      }
+    }
+    return $totalPoints;
+  }
+
 } // admin
 
 function uploadImage()
@@ -3474,6 +3525,9 @@ switch ($operation) {
     break;
   case "getAllJobQualificationPoints":
     echo json_encode($admin->getAllJobQualificationPoints());
+    break;
+  case "getAllCandidateQualificationPoints":
+    echo json_encode($admin->getAllCandidateQualificationPoints());
     break;
   // case "getCandidateJobPoints":
   //   echo json_encode($admin->getCandidateJobPoints());
