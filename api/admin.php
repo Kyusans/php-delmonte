@@ -2345,7 +2345,7 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["passing_percentage"] : 0;
   }
 
   function getPendingDetails($json)
@@ -3144,7 +3144,10 @@ class Admin
         "status" => $status
       ];
     }
+
+    $passingPercentage = $this->getJobPassingPercentage($json);
     $result = [
+      "passingPercentage" => $passingPercentage,
       "jobTotalPoints" => $jobTotalPoints,
       "candidates" => $candidates
     ];
