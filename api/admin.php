@@ -3128,7 +3128,7 @@ class Admin
       $stmt->execute();
       $candFullName = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["full_name"] : "";
 
-      $sql = "SELECT status_name FROM tblstatus a 
+      $sql = "SELECT a.status_name, b.appS_date FROM tblstatus a 
               INNER JOIN tblapplicationstatus b ON b.appS_statusId  = a.status_id
               WHERE b.appS_appId = :appId
               ORDER BY b.appS_date DESC
@@ -3136,12 +3136,14 @@ class Admin
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":appId", $app["app_id"]);
       $stmt->execute();
-      $status = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["status_name"] : "";
+      $data = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : "";
 
       $candidates[] = [
         "fullName" => $candFullName,
         "totalPoints" => $candidateTotalPoints,
-        "status" => $status
+        "percentage" => round($candidateTotalPoints / $jobTotalPoints * 100, 2),
+        "status" => $data["status_name"],
+        "date" => $data["appS_date"]
       ];
     }
 
@@ -3152,10 +3154,8 @@ class Admin
       "candidates" => $candidates
     ];
 
-    return $result;
+    return $result ? $result : 0;
   }
-
-  
 } // admin
 
 function uploadImage()
