@@ -909,15 +909,16 @@ class Admin
     $stmt->execute();
     $candidateInformation = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    $sql = "SELECT b.course_categoryName, a.candEduc_points FROM tblcandeducpoints a
-            INNER JOIN tblcoursescategory b ON b.course_categoryId = a.candEduc_educId
-            WHERE candEduc_appId = :appId";
+    $sql = "SELECT c.course_categoryName, a.candEduc_points, b.jeduc_points FROM tblcandeducpoints a 
+            INNER JOIN tbljobseducation b ON b.jeduc_id = a.candEduc_educId
+            INNER JOIN tblcoursescategory c ON c.course_categoryId = b.jeduc_categoryId
+            WHERE a.candEduc_appId = :appId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':appId', $appId);
     $stmt->execute();
     $education = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.jwork_responsibilities, a.candEmp_points FROM tblcandemppoints a 
+    $sql = "SELECT b.jwork_responsibilities, a.candEmp_points, b.jwork_points FROM tblcandemppoints a 
             INNER JOIN tbljobsworkexperience b ON b.jwork_id = a.candEmp_jworkId
             WHERE candEmp_appId = :appId";
     $stmt = $conn->prepare($sql);
@@ -925,7 +926,7 @@ class Admin
     $stmt->execute();
     $experience = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.jskills_text, a.candSkill_points FROM tblcandskillpoints a
+    $sql = "SELECT b.jskills_text, a.candSkill_points, b.jskills_points FROM tblcandskillpoints a
             INNER JOIN tbljobsskills b ON b.jskills_id = a.candSkill_jobSkillsId
             WHERE candSkill_appId = :appId";
     $stmt = $conn->prepare($sql);
@@ -933,7 +934,7 @@ class Admin
     $stmt->execute();
     $skills = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.jtrng_text, a.candTrain_points FROM tblcandtrainpoints a 
+    $sql = "SELECT b.jtrng_text, a.candTrain_points, b.jtrng_points FROM tblcandtrainpoints a 
             INNER JOIN tbljobstrainings b ON b.jtrng_id = a.candTrain_trngId
             WHERE candTrain_appId = :appId";
     $stmt = $conn->prepare($sql);
