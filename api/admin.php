@@ -2684,7 +2684,7 @@ class Admin
   function getAdminActivityLogs($json)
   {
     include "connection.php";
-    $sql = 'SELECT CONCAT(b.hr_lastname, ", ", b.hr_firstname, " ", b.hr_middlename) AS HRName, c.status_name, e.jobM_title, e.jobM_id, f.cand_id, CONCAT(f.cand_lastname, ", ", f.cand_firstname, " ", f.cand_middlename) AS CandName, a.appS_date FROM tblapplicationstatus a
+    $sql = 'SELECT d.app_id, CONCAT(b.hr_lastname, ", ", b.hr_firstname, " ", b.hr_middlename) AS HRName, c.status_name, e.jobM_title, e.jobM_id, f.cand_id, CONCAT(f.cand_lastname, ", ", f.cand_firstname, " ", f.cand_middlename) AS CandName, a.appS_date FROM tblapplicationstatus a
         INNER JOIN tblhr b ON a.appS_hrId = b.hr_id
         INNER JOIN tblstatus c ON a.appS_statusId = c.status_id
         INNER JOIN tblapplications d ON d.app_id = a.appS_appId
@@ -3046,6 +3046,18 @@ class Admin
     ];
 
     return $result ? $result : 0;
+  }
+
+  function cancelJob($json)
+  {
+    // {"jobId": 20}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobsmaster SET jobM_status = 2 WHERE jobM_id = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } // admin
 
@@ -3469,6 +3481,9 @@ switch ($operation) {
     break;
   case "getCandidateJobPoints":
     echo json_encode($admin->getCandidateJobPoints($json));
+    break;
+  case "cancelJob":
+    echo $admin->cancelJob($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
