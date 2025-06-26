@@ -310,7 +310,7 @@ class Admin
     $stmt->execute();
     $returnValue["hasCandidates"] = $stmt->rowCount() > 0 ? $stmt->fetchColumn() : 0;
 
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, b.cand_email, e.status_name
+    $sql = "SELECT b.cand_id, SELECT CONCAT_WS(' ', CONCAT(cand_lastname, ', ', cand_firstname), cand_middleName) AS FullName, b.cand_email, e.status_name
               FROM tblapplications a
               INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
               INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
