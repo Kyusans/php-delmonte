@@ -3011,7 +3011,7 @@ class Admin
 
     foreach ($applications as $app) {
       $candidateTotalPoints = $this->getAllCandidateQualificationPoints($app["app_id"]);
-      $sql = "SELECT CONCAT(cand_lastname, ', ', cand_firstname, ' ', cand_middleName) AS full_name FROM tblcandidates WHERE cand_id = :candId";
+      $sql = "SELECT CONCAT_WS(' ', CONCAT(cand_lastname, ', ', cand_firstname), cand_middleName) AS full_name FROM tblcandidates WHERE cand_id = :candId";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":candId", $app["app_candId"]);
       $stmt->execute();
