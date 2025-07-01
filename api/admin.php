@@ -36,10 +36,11 @@ class Admin
     $todayDate = $this->getCurrentDate();
 
     try {
-      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_status, jobM_createdAt) VALUES (:jobM_title, :jobM_description, :jobM_status, :jobM_createdAt)";
+      $sql = "INSERT INTO tbljobsmaster (jobM_title, jobM_description, jobM_passpercentage, jobM_status, jobM_createdAt) VALUES (:jobM_title, :jobM_description, :jobM_passpercentage, :jobM_status, :jobM_createdAt)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobM_title", $jobMaster['title']);
       $stmt->bindParam(":jobM_description", $jobMaster['description']);
+      $stmt->bindParam(":jobM_passpercentage", $jobMaster['passingPercentage']);
       $stmt->bindParam(":jobM_status", $jobMaster['isJobActive']);
       $stmt->bindParam(":jobM_createdAt", $todayDate);
       $stmt->execute();
@@ -1291,11 +1292,12 @@ class Admin
     // {"jobId": 11, "passingPercent": 80}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "UPDATE tbljobpassing SET passing_points = :passingPercent WHERE passing_jobId = :jobId";
+    $sql = "UPDATE tbljobsmaster SET jobM_passpercentage = :passingPercent WHERE jobM_id = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':jobId', $data['jobId']);
     $stmt->bindParam(':passingPercent', $data['passingPercent']);
     $stmt->execute();
+
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
@@ -2261,7 +2263,7 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT passing_points as passing_percentage FROM tbljobpassing WHERE passing_jobId = :jobId";
+    $sql = "SELECT jobM_passpercentage as passing_percentage FROM tbljobsmaster WHERE jobM_id = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
@@ -3040,33 +3042,35 @@ class Admin
     $stmt->execute();
     $applications = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
-    foreach ($applications as $app) {
-      $candidateTotalPoints = $this->getAllCandidateQualificationPoints($app["app_id"]);
-      $sql = "SELECT CONCAT_WS(' ', CONCAT(cand_lastname, ', ', cand_firstname), cand_middleName) AS full_name FROM tblcandidates WHERE cand_id = :candId";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(":candId", $app["app_candId"]);
-      $stmt->execute();
-      $candFullName = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["full_name"] : "";
+    if ($applications != 0) {
+      foreach ($applications as $app) {
+        $candidateTotalPoints = $this->getAllCandidateQualificationPoints($app["app_id"]);
+        $sql = "SELECT CONCAT_WS(' ', CONCAT(cand_lastname, ', ', cand_firstname), cand_middleName) AS full_name FROM tblcandidates WHERE cand_id = :candId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":candId", $app["app_candId"]);
+        $stmt->execute();
+        $candFullName = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["full_name"] : "";
 
-      $sql = "SELECT a.status_name, b.appS_date FROM tblstatus a 
+        $sql = "SELECT a.status_name, b.appS_date FROM tblstatus a 
               INNER JOIN tblapplicationstatus b ON b.appS_statusId  = a.status_id
               WHERE b.appS_appId = :appId
               ORDER BY b.appS_date DESC
               LIMIT 1";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(":appId", $app["app_id"]);
-      $stmt->execute();
-      $data = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : "";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":appId", $app["app_id"]);
+        $stmt->execute();
+        $data = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : "";
 
-      $candidates[] = [
-        "applicationId" => $app["app_id"],
-        "candidateId" => $app["app_candId"],
-        "fullName" => $candFullName,
-        "totalPoints" => $candidateTotalPoints,
-        "percentage" => round($candidateTotalPoints / $jobTotalPoints * 100, 2),
-        "status" => $data["status_name"],
-        "date" => $data["appS_date"]
-      ];
+        $candidates[] = [
+          "applicationId" => $app["app_id"],
+          "candidateId" => $app["app_candId"],
+          "fullName" => $candFullName,
+          "totalPoints" => $candidateTotalPoints,
+          "percentage" => round($candidateTotalPoints / $jobTotalPoints * 100, 2),
+          "status" => $data["status_name"],
+          "date" => $data["appS_date"]
+        ];
+      }
     }
 
     $passingPercentage = $this->getJobPassingPercentage($json);
