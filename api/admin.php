@@ -223,6 +223,14 @@ class Admin
     $stmt->execute();
     $returnValue["jobSkills"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
+    $sql = "SELECT a.*, b.license_master_name FROM tbljobslicense a 
+            INNER JOIN tbllicensemaster b ON b.license_master_id = a.jlicense_licenceMId
+            WHERE jlicense_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobLicenses"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
     $sql = "SELECT * FROM tbljobsworkexperience WHERE jwork_jobId  = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
