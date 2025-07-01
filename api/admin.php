@@ -284,7 +284,7 @@ class Admin
     }
     $returnValue["jobTrainings"] = $trainings;
 
-    $sql = "SELECT jlicense_points FROM tbljobslicenses WHERE jlicense_jobId = :jobId";
+    $sql = "SELECT jlicense_points FROM tbljobslicense WHERE jlicense_jobId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
