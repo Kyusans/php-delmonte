@@ -32,6 +32,7 @@ class Admin
     $jobTraining = $data['jobTraining'];
     $jobSkills = $data['jobSkill'];
     $jobWorkExperience = $data['jobExperience'];
+    $jobLicense = $data['jobLicense'];
     $todayDate = $this->getCurrentDate();
 
     try {
@@ -95,6 +96,17 @@ class Admin
         $stmt->bindParam(":jwork_duration", $experience['yearsOfExperience']);
         $stmt->bindParam(":jwork_responsibilities", $experience['jobExperience']);
         $stmt->bindParam(":points", $experience['points']);
+        $stmt->execute();
+      }
+
+      // job license
+
+      $sql = "INSERT INTO tbljobslicense (jlicense_licenceMId, jlicense_jobId, jlicense_points) VALUES (:jlicense_licenceMId, :jlicense_jobId, :jlicense_points)";
+      foreach ($jobLicense as $license) {
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":jlicense_licenceMId", $license['licenseId']);
+        $stmt->bindParam(":jlicense_jobId", $jobMasterId);
+        $stmt->bindParam(":jlicense_points", $license['points']);
         $stmt->execute();
       }
 
@@ -264,15 +276,15 @@ class Admin
     }
     $returnValue["jobTrainings"] = $trainings;
 
-    $sql = "SELECT jknow_points FROM tbljobsknowledge WHERE jknow_jobId = :jobId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->execute();
-    $knowledge = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($knowledge as $know) {
-      $totalPoints += $know['jknow_points'];
-    }
-    $returnValue["jobKnowledge"] = $knowledge;
+    // $sql = "SELECT jknow_points FROM tbljobsknowledge WHERE jknow_jobId = :jobId";
+    // $stmt = $conn->prepare($sql);
+    // $stmt->bindParam(":jobId", $data['jobId']);
+    // $stmt->execute();
+    // $knowledge = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // foreach ($knowledge as $know) {
+    //   $totalPoints += $know['jknow_points'];
+    // }
+    // $returnValue["jobKnowledge"] = $knowledge;
 
     $sql = "SELECT jskills_points FROM tbljobsskills WHERE jskills_jobId = :jobId";
     $stmt = $conn->prepare($sql);
@@ -293,6 +305,8 @@ class Admin
       $totalPoints += $exp['jwork_points'];
     }
     $returnValue["jobExperience"] = $experience;
+
+
 
     $sql = "SELECT passing_points as passing_percentage FROM tbljobpassing WHERE passing_jobId = :jobId";
     $stmt = $conn->prepare($sql);
@@ -3056,26 +3070,37 @@ class Admin
     include "send_email.php";
     $sendEmail = new SendEmail();
     $data = json_decode($json, true);
-    $sql = "UPDATE tbljobsmaster SET jobM_status = 2 WHERE jobM_id = :jobId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->execute();
+    $conn->beginTransaction();
+    try {
+      $sql = "UPDATE tbljobsmaster SET jobM_status = 2 WHERE jobM_id = :jobId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $data['jobId']);
+      $stmt->execute();
 
-    $sql = "SELECT b.cand_email FROM tblapplications a
+      $sql = "SELECT b.cand_email FROM tblapplications a
             INNER JOIN tblcandidates b ON b.cand_id = a.app_candId
             WHERE a.app_jobMId = :jobId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->execute();
-    $candidate = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-    if (!empty($candidate)) {
-      foreach ($candidate as $cand) {
-        $emailSubject = "Job Cancelled";
-        $emailBody = "The job you applied for has been cancelled by the HR.";
-        $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $data['jobId']);
+      $stmt->execute();
+      $candidate = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+      if (!empty($candidate)) {
+        foreach ($candidate as $cand) {
+          $emailSubject = "Job Cancelled";
+          $emailBody = "The job you applied for has been cancelled by the HR.";
+          $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+        }
       }
+
+      $conn->commit();
+      return 1;
+    } catch (PDOException $e) {
+      $conn->rollBack();
+      if ($e->getCode() == '23000') {
+        return $e;
+      }
+      throw 0;
     }
-    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
   function reactivateJob($json)
