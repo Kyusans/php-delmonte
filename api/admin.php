@@ -3110,25 +3110,34 @@ class Admin
     include "send_email.php";
     $sendEmail = new SendEmail();
     $data = json_decode($json, true);
-    $sql = "UPDATE tbljobsmaster SET jobM_status = 1 WHERE jobM_id = :jobId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->execute();
-    $sql = "SELECT b.cand_email FROM tblapplications a
+    $conn->beginTransaction();
+    try {
+      $sql = "UPDATE tbljobsmaster SET jobM_status = 1 WHERE jobM_id = :jobId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $data['jobId']);
+      $stmt->execute();
+      $sql = "SELECT b.cand_email FROM tblapplications a
             INNER JOIN tblcandidates b ON b.cand_id = a.app_candId
             WHERE a.app_jobMId = :jobId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $data['jobId']);
-    $stmt->execute();
-    $candidate = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
-    if (!empty($candidate)) {
-      foreach ($candidate as $cand) {
-        $emailSubject = "Job Reactivated";
-        $emailBody = "The job you applied for has been reactivated by the HR.";
-        $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $data['jobId']);
+      $stmt->execute();
+      $candidate = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+      if (!empty($candidate)) {
+        foreach ($candidate as $cand) {
+          $emailSubject = "Job Reactivated";
+          $emailBody = "The job you applied for has been reactivated by the HR.";
+          $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+        }
       }
+      $conn->commit();
+    } catch (PDOException $e) {
+      $conn->rollBack();
+      if ($e->getCode() == '23000') {
+        return $e;
+      }
+      throw 0;
     }
-    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } // admin
 
