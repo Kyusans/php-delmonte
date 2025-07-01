@@ -276,6 +276,16 @@ class Admin
     }
     $returnValue["jobTrainings"] = $trainings;
 
+    $sql = "SELECT jlicense_points FROM tbljobslicenses WHERE jlicense_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $licenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($licenses as $license) {
+      $totalPoints += $license['jlicense_points'];
+    }
+    $returnValue["jobLicenses"] = $licenses;
+
     // $sql = "SELECT jknow_points FROM tbljobsknowledge WHERE jknow_jobId = :jobId";
     // $stmt = $conn->prepare($sql);
     // $stmt->bindParam(":jobId", $data['jobId']);
@@ -305,8 +315,6 @@ class Admin
       $totalPoints += $exp['jwork_points'];
     }
     $returnValue["jobExperience"] = $experience;
-
-
 
     $sql = "SELECT passing_points as passing_percentage FROM tbljobpassing WHERE passing_jobId = :jobId";
     $stmt = $conn->prepare($sql);
