@@ -538,9 +538,7 @@ class Admin
     try {
       $data = [];
       $data['courseCategory'] = $this->getCourseCategory();
-      $data['skills'] = $this->getSkills();
-      $data['training'] = $this->getTraining();
-      $data['knowledge'] = $this->getKnowledge();
+      $data['license'] = $this->getLicenseMaster();
       $conn->commit();
       return json_encode($data);
     } catch (\Throwable $th) {
