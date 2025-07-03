@@ -3157,6 +3157,20 @@ class Admin
       throw 0;
     }
   }
+
+  function updateJobLicense($json)
+  {
+    // {"licenseId": 5, "licenseMId": 2, "points": 5, "jobId": 23}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobslicense SET jlicense_licenceMId = :licenseMId, jlicense_points = :points WHERE jlicense_id = :licenseId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":licenseId", $data['licenseId']);
+    $stmt->bindParam(":licenseMId", $data['licenseMId']);
+    $stmt->bindParam(":points", $data['points']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } // admin
 
 function uploadImage()
@@ -3585,6 +3599,9 @@ switch ($operation) {
     break;
   case "reactivateJob":
     echo $admin->reactivateJob($json);
+    break;
+  case "updateJobLicense":
+    echo $admin->updateJobLicense($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
