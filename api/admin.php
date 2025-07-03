@@ -226,7 +226,8 @@ class Admin
 
     $sql = "SELECT a.*, b.license_master_name FROM tbljobslicense a 
             INNER JOIN tbllicensemaster b ON b.license_master_id = a.jlicense_licenceMId
-            WHERE jlicense_jobId = :jobId";
+            WHERE jlicense_jobId = :jobId
+            ORDER BY license_master_name DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
@@ -3158,11 +3159,15 @@ class Admin
     }
   }
 
-  function getJobLicense($json) {
+  function getJobLicense($json)
+  {
     // {"jobId": 23}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT * FROM tbljobslicense WHERE jlicense_jobId = :jobId";
+    $sql = "SELECT a.*, b.license_master_name FROM tbljobslicense a 
+            INNER JOIN tbllicensemaster b ON b.license_master_id = a.jlicense_licenceMId
+            WHERE jlicense_jobId = :jobId
+            ORDER BY license_master_name DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
