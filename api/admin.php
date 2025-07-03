@@ -3158,6 +3158,17 @@ class Admin
     }
   }
 
+  function getJobLicense($json) {
+    // {"jobId": 23}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tbljobslicense WHERE jlicense_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
   function updateJobLicense($json)
   {
     // {"licenseId": 5, "licenseMId": 2, "points": 5, "jobId": 23}
@@ -3602,6 +3613,9 @@ switch ($operation) {
     break;
   case "updateJobLicense":
     echo $admin->updateJobLicense($json);
+    break;
+  case "getJobLicense":
+    echo json_encode($admin->getJobLicense($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
