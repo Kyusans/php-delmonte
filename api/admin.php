@@ -3188,13 +3188,27 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function deleteJobLicense($json){
+  function deleteJobLicense($json)
+  {
     // {"licenseId": 2}
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "DELETE FROM tbljobslicense WHERE jlicense_id = :licenseId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":licenseId", $data['licenseId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function addJobLicense($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbljobslicense (jlicense_jobId, jlicense_licenceMId, jlicense_points) VALUES (:jobId, :licenseMId, :points)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->bindParam(":licenseMId", $data['licenseMId']);
+    $stmt->bindParam(":points", $data['points']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -3635,6 +3649,9 @@ switch ($operation) {
     break;
   case "deleteJobLicense":
     echo $admin->deleteJobLicense($json);
+    break;
+  case "addJobLicense":
+    echo $admin->addJobLicense($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
