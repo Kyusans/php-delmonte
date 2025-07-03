@@ -3187,6 +3187,17 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function deleteJobLicense($json){
+    // {"licenseId": 2}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "DELETE FROM tbljobslicense WHERE jlicense_id = :licenseId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":licenseId", $data['licenseId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } // admin
 
 function uploadImage()
@@ -3621,6 +3632,9 @@ switch ($operation) {
     break;
   case "getJobLicense":
     echo json_encode($admin->getJobLicense($json));
+    break;
+  case "deleteJobLicense":
+    echo $admin->deleteJobLicense($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
