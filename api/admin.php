@@ -2713,16 +2713,17 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function getAdminActivityLogs($json)
+  function getAdminActivityLogs()
   {
     include "connection.php";
-    $sql = 'SELECT d.app_id, CONCAT(b.hr_lastname, ", ", b.hr_firstname, " ", b.hr_middlename) AS HRName, c.status_name, e.jobM_title, e.jobM_id, f.cand_id, CONCAT(f.cand_lastname, ", ", f.cand_firstname, " ", f.cand_middlename) AS CandName, a.appS_date FROM tblapplicationstatus a
-        INNER JOIN tblhr b ON a.appS_hrId = b.hr_id
-        INNER JOIN tblstatus c ON a.appS_statusId = c.status_id
-        INNER JOIN tblapplications d ON d.app_id = a.appS_appId
-        INNER JOIN tbljobsmaster e ON e.jobM_id = d.app_jobMId
-        INNER JOIN tblcandidates f ON f.cand_id = d.app_candId
-        ORDER BY a.appS_date DESC';
+    $sql = 'SELECT d.app_id, CONCAT_WS(" ", CONCAT(b.hr_lastname, ", ", b.hr_firstname), b.hr_middlename) AS HRName, c.status_name, e.jobM_title, e.jobM_id, f.cand_id, 
+            CONCAT_WS(" ", CONCAT(f.cand_lastname, ", ", f.cand_firstname), f.cand_middlename) AS CandName, a.appS_date FROM tblapplicationstatus a
+            INNER JOIN tblhr b ON a.appS_hrId = b.hr_id
+            INNER JOIN tblstatus c ON a.appS_statusId = c.status_id
+            INNER JOIN tblapplications d ON d.app_id = a.appS_appId
+            INNER JOIN tbljobsmaster e ON e.jobM_id = d.app_jobMId
+            INNER JOIN tblcandidates f ON f.cand_id = d.app_candId
+            ORDER BY a.appS_date DESC';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
@@ -3600,7 +3601,7 @@ switch ($operation) {
     echo json_encode($admin->addMedicalMaster($json));
     break;
   case "getAdminActivityLogs":
-    echo json_encode($admin->getAdminActivityLogs($json));
+    echo json_encode($admin->getAdminActivityLogs());
     break;
   case "getInterviewSchedule":
     echo json_encode($admin->getInterviewSchedule());
