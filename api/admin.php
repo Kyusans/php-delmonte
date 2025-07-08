@@ -946,54 +946,73 @@ class Admin
     $stmt->execute();
     $candidateInformation = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    $sql = "SELECT c.course_categoryName, a.candEduc_points, b.jeduc_points FROM tblcandeducpoints a 
-            INNER JOIN tbljobseducation b ON b.jeduc_id = a.candEduc_educId
-            INNER JOIN tblcoursescategory c ON c.course_categoryId = b.jeduc_categoryId
-            WHERE a.candEduc_appId = :appId";
+    $sql = "SELECT 
+            c.course_categoryName, 
+            IFNULL(a.candEduc_points, 0) AS candEduc_points, 
+            IFNULL(b.jeduc_points, 0) AS jeduc_points 
+          FROM tblcandeducpoints a 
+          INNER JOIN tbljobseducation b ON b.jeduc_id = a.candEduc_educId
+          INNER JOIN tblcoursescategory c ON c.course_categoryId = b.jeduc_categoryId
+          WHERE a.candEduc_appId = :appId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':appId', $appId);
     $stmt->execute();
     $education = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.jwork_responsibilities, a.candEmp_points, b.jwork_points FROM tblcandemppoints a 
-            INNER JOIN tbljobsworkexperience b ON b.jwork_id = a.candEmp_jworkId
-            WHERE candEmp_appId = :appId";
+    $sql = "SELECT 
+            b.jwork_responsibilities, 
+            IFNULL(a.candEmp_points, 0) AS candEmp_points, 
+            IFNULL(b.jwork_points, 0) AS jwork_points 
+          FROM tblcandemppoints a 
+          INNER JOIN tbljobsworkexperience b ON b.jwork_id = a.candEmp_jworkId
+          WHERE candEmp_appId = :appId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':appId', $appId);
     $stmt->execute();
     $experience = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.jskills_text, a.candSkill_points, b.jskills_points FROM tblcandskillpoints a
-            INNER JOIN tbljobsskills b ON b.jskills_id = a.candSkill_jobSkillsId
-            WHERE candSkill_appId = :appId";
+    $sql = "SELECT 
+            b.jskills_text, 
+            IFNULL(a.candSkill_points, 0) AS candSkill_points, 
+            IFNULL(b.jskills_points, 0) AS jskills_points 
+          FROM tblcandskillpoints a
+          INNER JOIN tbljobsskills b ON b.jskills_id = a.candSkill_jobSkillsId
+          WHERE candSkill_appId = :appId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':appId', $appId);
     $stmt->execute();
     $skills = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT b.jtrng_text, a.candTrain_points, b.jtrng_points FROM tblcandtrainpoints a 
-            INNER JOIN tbljobstrainings b ON b.jtrng_id = a.candTrain_trngId
-            WHERE candTrain_appId = :appId";
+    $sql = "SELECT 
+            b.jtrng_text, 
+            IFNULL(a.candTrain_points, 0) AS candTrain_points, 
+            IFNULL(b.jtrng_points, 0) AS jtrng_points 
+          FROM tblcandtrainpoints a 
+          INNER JOIN tbljobstrainings b ON b.jtrng_id = a.candTrain_trngId
+          WHERE candTrain_appId = :appId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':appId', $appId);
     $stmt->execute();
     $training = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT COUNT(`joboffer_id`) AS isJobOffered FROM tbljoboffer WHERE `joboffer_candId` = :cand_id AND `joboffer_jobMId` = :job_id";
+    $sql = "SELECT COUNT(`joboffer_id`) AS isJobOffered 
+          FROM tbljoboffer 
+          WHERE `joboffer_candId` = :cand_id AND `joboffer_jobMId` = :job_id";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':cand_id', $candId);
     $stmt->bindParam(':job_id', $jobId);
     $stmt->execute();
     $isJobOffered = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    $sql = "SELECT COUNT(medicalM_id) as isMedicalChecked FROM tblmedicalmaster WHERE `medicalM_candId` = :cand_id";
+    $sql = "SELECT COUNT(medicalM_id) as isMedicalChecked 
+          FROM tblmedicalmaster 
+          WHERE `medicalM_candId` = :cand_id";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':cand_id', $cand_id);
+    $stmt->bindParam(':cand_id', $candId);
     $stmt->execute();
     $isMedicalChecked = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
     $medicalClassification = $this->getCandMedClassification($candId);
-
     $candEducationalBackground = $this->fetchEducationalBackground($candId);
     $candEmploymentHistory = $this->fetchEmploymentHistory($candId);
     $candSkills = $this->fetchSkills($candId);
@@ -1022,6 +1041,7 @@ class Admin
 
     return json_encode($returnValue);
   }
+
 
   function fetchLicenses($cand_id)
   {
