@@ -1044,8 +1044,15 @@ class Admin
 
   function getPotentialCandidateProfile($json)
   {
+    include "connection.php";
     $data = json_decode($json, true);
     $candId = $data['candId'];
+
+    $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':cand_id', $candId);
+    $stmt->execute();
+    $candidateInformation = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
     $medicalClassification = $this->getCandMedClassification($candId);
     $candEducationalBackground = $this->fetchEducationalBackground($candId);
     $candEmploymentHistory = $this->fetchEmploymentHistory($candId);
@@ -1054,7 +1061,7 @@ class Admin
     $candLicenses = $this->fetchLicenses($candId);
 
     $returnValue = [
-      "medicalClassification" => $medicalClassification,
+      "candidateInformation" => $candidateInformation,
       "educationalBackground" => $candEducationalBackground,
       "employmentHistory" => $candEmploymentHistory,
       "licenses" => $candLicenses,
