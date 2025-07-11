@@ -1042,6 +1042,29 @@ class Admin
     return json_encode($returnValue);
   }
 
+  function getPotentialCandidateProfile($json)
+  {
+    $data = json_decode($json, true);
+    $candId = $data['candId'];
+    $medicalClassification = $this->getCandMedClassification($candId);
+    $candEducationalBackground = $this->fetchEducationalBackground($candId);
+    $candEmploymentHistory = $this->fetchEmploymentHistory($candId);
+    $candSkills = $this->fetchSkills($candId);
+    $candTraining = $this->fetchTraining($candId);
+    $candLicenses = $this->fetchLicenses($candId);
+
+    $returnValue = [
+      "medicalClassification" => $medicalClassification,
+      "educationalBackground" => $candEducationalBackground,
+      "employmentHistory" => $candEmploymentHistory,
+      "licenses" => $candLicenses,
+      "skills" => $candSkills,
+      "training" => $candTraining
+    ];
+
+    return json_encode($returnValue);
+  }
+
 
   function fetchLicenses($cand_id)
   {
@@ -3673,6 +3696,9 @@ switch ($operation) {
     break;
   case "addJobLicense":
     echo $admin->addJobLicense($json);
+    break;
+  case "getPotentialCandidateProfile":
+    echo $admin->getPotentialCandidateProfile($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
