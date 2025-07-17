@@ -369,6 +369,40 @@ class Admin
     return json_encode($returnValue);
   }
 
+    public function calculateCandidatePotentialPoints($candId, $jobId)
+  {
+    include "connection.php";
+    $totalPoints = 0;
+    $maxPoints = 0;
+
+    // Education Points
+    $sql = "SELECT SUM(c.jeduc_points) as educ_points,
+          (SELECT SUM(jeduc_points) FROM tbljobseducation WHERE jeduc_jobId = :jobId) as max_educ_points
+          FROM tblcourses a
+          INNER JOIN tblcoursescategory b ON b.course_categoryId = a.courses_coursecategoryId
+          INNER JOIN tbljobseducation c ON c.jeduc_categoryId = b.course_categoryId
+          INNER JOIN tblcandeducbackground d ON d.educ_coursesId = a.courses_id
+          WHERE d.educ_canId = :candId AND c.jeduc_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $educationPoints = $result['educ_points'] ?? 0;
+    $maxEducationPoints = $result['max_educ_points'] ?? 0;
+    $totalPoints += $educationPoints;
+    $maxPoints += $maxEducationPoints;
+
+    // Calculate percentage
+    $percentage = ($maxPoints > 0) ? round(($totalPoints / $maxPoints) * 100, 2) : 0;
+
+    return [
+      'maxPoints' => $maxPoints,
+      'totalPoints' => $totalPoints,
+      'percentage' => $percentage,
+    ];
+  }
+
 
   public function calculateCandidatePoints($candId, $jobId)
   {
@@ -2551,52 +2585,97 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
+  // function getPotentialCandidates($json)
+  // {
+  //   // {"jobId": 19}
+  //   include "connection.php";
+  //   $data = json_decode($json, true);
+  //   $jobId = $data['jobId'];
+  //   $returnValue = [];
+
+  //   // Fetch raw candidates
+  //   $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename, cand_email
+  //           FROM tblcandidates c
+  //           WHERE c.cand_isEmployed = 0
+  //             AND NOT EXISTS (
+  //                 SELECT 1 FROM tblapplications a WHERE a.app_candId = c.cand_id AND a.app_jobMId = :jobId
+  //             )
+  //             AND EXISTS (
+  //                 SELECT 1 FROM tblcandresume cr WHERE cr.canres_candId = c.cand_id
+  //             )";
+
+  //   $stmt = $conn->prepare($sql);
+  //   $stmt->bindParam(":jobId", $jobId);
+  //   $stmt->execute();
+  //   $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  //   $formattedCandidates = [];
+  //   foreach ($results as $candidate) {
+  //     $candId = $candidate['cand_id'];
+  //     $fullName = $candidate['cand_lastname'] . ", " . $candidate['cand_firstname'] . " " . $candidate['cand_middlename'];
+  //     $email = $candidate['cand_email'];
+  //     $candQualifications = $this->getCandidateQualifications($candId);
+
+  //     $formattedCandidates[] = [
+  //       'candId' => $candId,
+  //       'fullName' => $fullName,
+  //       'email' => $email,
+  //       'candQualifications' => $candQualifications
+  //     ];
+  //   }
+  //   $jobQualifications = $this->getJobQualifications($jobId);
+
+  //   $returnValue = [
+  //     "jobQualifications" => $jobQualifications,
+  //     "candidates" => $formattedCandidates
+  //   ];
+
+  //   return !empty($returnValue["candidates"]) ? $returnValue : 0;
+  // }
+
   function getPotentialCandidates($json)
   {
-    // {"jobId": 19}
+    // {"jobId": 1, "passingPercentage": 50}
     include "connection.php";
     $data = json_decode($json, true);
-    $jobId = $data['jobId'];
-    $returnValue = [];
 
-    // Fetch raw candidates
+    $jobId = $data['jobId'];
+    $passingPercentage = $data['passingPercentage'];
+    // Fetch candidates where cand_isApplied = 0
     $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename, cand_email
             FROM tblcandidates c
             WHERE c.cand_isEmployed = 0
               AND NOT EXISTS (
-                  SELECT 1 FROM tblapplications a WHERE a.app_candId = c.cand_id AND a.app_jobMId = :jobId
-              )
-              AND EXISTS (
-                  SELECT 1 FROM tblcandresume cr WHERE cr.canres_candId = c.cand_id
-              )";
-
+                  SELECT 1
+                  FROM tblapplications a
+                  WHERE a.app_candId = c.cand_id
+                    AND a.app_jobMId = :jobId
+              );
+            ";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $jobId);
     $stmt->execute();
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $formattedCandidates = [];
-    foreach ($results as $candidate) {
+    $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $fitCandidates = [];
+    foreach ($candidates as $candidate) {
       $candId = $candidate['cand_id'];
       $fullName = $candidate['cand_lastname'] . ", " . $candidate['cand_firstname'] . " " . $candidate['cand_middlename'];
       $email = $candidate['cand_email'];
-      $candQualifications = $this->getCandidateQualifications($candId);
-
-      $formattedCandidates[] = [
-        'candId' => $candId,
-        'fullName' => $fullName,
-        'email' => $email,
-        'candQualifications' => $candQualifications
-      ];
+      // Calculate points for each candidate
+      $points = $this->calculateCandidatePotentialPoints($candId, $jobId);
+      // Check if candidate fits the job
+      if ($points['percentage'] >= $passingPercentage) {
+        $fitCandidates[] = [
+          'candId' => $candId,
+          'fullName' => $fullName,
+          'email' => $email,
+          'maxPoints' => $points['maxPoints'],
+          'totalPoints' => $points['totalPoints'],
+          'percentage' => $points['percentage'],
+        ];
+      }
     }
-    $jobQualifications = $this->getJobQualifications($jobId);
-
-    $returnValue = [
-      "jobQualifications" => $jobQualifications,
-      "candidates" => $formattedCandidates
-    ];
-
-    return !empty($returnValue["candidates"]) ? $returnValue : 0;
+    return !empty($fitCandidates) ? $fitCandidates : 0;
   }
 
   function getCandidateEducations($candId)
