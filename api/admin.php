@@ -369,7 +369,7 @@ class Admin
     return json_encode($returnValue);
   }
 
-    public function calculateCandidatePotentialPoints($candId, $jobId)
+  public function calculateCandidatePotentialPoints($candId, $jobId)
   {
     include "connection.php";
     $totalPoints = 0;
@@ -398,7 +398,7 @@ class Admin
 
     return [
       'maxPoints' => $maxPoints,
-      'totalPoints' => $totalPoints,
+      'Points' => $totalPoints,
       'percentage' => $percentage,
     ];
   }
@@ -2795,7 +2795,7 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
 
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName,
+    $sql = "SELECT c.cand_id, CONCAT_WS(' ', CONCAT(c.cand_lastname, ', ', c.cand_firstname), c.cand_middlename) AS fullName,
                     c.cand_email, d.status_name, DATE_FORMAT(e.latest_sched_date, '%b %d, %Y') AS schedDate,
                     DATE_FORMAT(e.latest_sched_date, '%l:%i %p') AS schedTime
               FROM tblapplicationstatus a
