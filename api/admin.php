@@ -343,7 +343,7 @@ class Admin
     $stmt->execute();
     $returnValue["hasCandidates"] = $stmt->rowCount() > 0 ? $stmt->fetchColumn() : 0;
 
-    $sql = "SELECT b.cand_id, CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName, b.cand_email, e.status_name
+    $sql = "SELECT b.cand_id, CONCAT_WS(' ', CONCAT(b.cand_lastname, ', ', b.cand_firstname), b.cand_middlename) AS FullName, b.cand_email, e.status_name
               FROM tblapplications a
               INNER JOIN tblcandidates b ON a.app_candId = b.cand_id
               INNER JOIN tblapplicationstatus d ON d.appS_appId = a.app_id
@@ -2146,7 +2146,7 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
 
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName,
+    $sql = "SELECT c.cand_id, CONCAT_WS(CONCAT(c.cand_lastname, ', ', c.cand_firstname), c.cand_middlename) AS fullName,
                     c.cand_email, d.status_name, DATE_FORMAT(e.latest_sched_date, '%b %d, %Y') AS schedDate,
                     DATE_FORMAT(e.latest_sched_date, '%l:%i %p') AS schedTime
               FROM tblapplicationstatus a
@@ -2169,7 +2169,7 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+    $sql = "SELECT c.cand_id, CONCAT_WS(' ', CONCAT(c.cand_lastname, ', ', c.cand_firstname), c.cand_middlename) AS fullName, d.status_name
             FROM tblapplicationstatus a
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
@@ -2253,7 +2253,7 @@ class Admin
     // Fetch candidates
     $sql = "SELECT 
                 b.cand_id, 
-                CONCAT(b.cand_lastname, ', ', b.cand_firstname, ' ', b.cand_middlename) AS FullName,
+                CONCAT_WS(' ', CONCAT(b.cand_lastname, ', ', b.cand_firstname), b.cand_middlename) AS FullName,
                 b.cand_email, 
                 e.status_name,
                 DATE_FORMAT(d.appS_date, '%b %d, %Y') as Date
@@ -2366,7 +2366,7 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+    $sql = "SELECT c.cand_id, CONCAT_WS(' ',CONCAT(c.cand_lastname, ', ', c.cand_firstname), c.cand_middlename) AS fullName, d.status_name
             FROM tblapplicationstatus a
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
@@ -2384,7 +2384,7 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName,
+    $sql = "SELECT c.cand_id, CONCAT_WS(' ', CONCAT(c.cand_lastname, ', ', c.cand_firstname), c.cand_middlename) AS fullName,
             g.jobofferS_name as jobOfferStatus, e.joboffer_salary, e.joboffer_document,
             DATE_FORMAT(e.joboffer_date, '%b %d, %Y') as joboffer_date, joboffer_expiryDate
             FROM tblapplicationstatus a
@@ -2480,7 +2480,7 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+    $sql = "SELECT c.cand_id, CONCAT_WS(' ', CONCAT(c.cand_lastname, ', ', c.cand_firstname), c.cand_middlename) AS fullName, d.status_name
             FROM tblapplicationstatus a
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
@@ -2498,7 +2498,7 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', c.cand_middlename) AS fullName, d.status_name
+    $sql = "SELECT c.cand_id, CONCAT_WS(' ', CONCAT(c.cand_lastname, ', ', c.cand_firstname), c.cand_middlename) AS fullName, d.status_name
             FROM tblapplicationstatus a
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
@@ -2567,7 +2567,7 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = 'SELECT c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", c.cand_middlename) as fullName,
+    $sql = 'SELECT c.cand_id, CONCAT_WS(" ", CONCAT(c.cand_lastname, ", ", c.cand_firstname,), c.cand_middlename) as fullName,
             DATE_FORMAT(b.appS_date, "%b %d, %Y %l:%i %p") as appS_date,
             (SELECT s.status_name
             FROM tblapplicationstatus ast
@@ -2861,7 +2861,7 @@ class Admin
   function getInterviewSchedule()
   {
     include "connection.php";
-    $sql = 'SELECT a.intsched_date, b.jobM_title, b.jobM_id, c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", c.cand_middlename) FullName 
+    $sql = 'SELECT a.intsched_date, b.jobM_title, b.jobM_id, c.cand_id, CONCAT_WS(" ", CONCAT(c.cand_lastname, ", ", c.cand_firstname), c.cand_middlename) FullName 
             FROM tblinterviewschedule a
             INNER JOIN tbljobsmaster b ON b.jobM_id = a.intsched_jobId
             INNER JOIN tblcandidates c ON c.cand_id = a.intsched_candId
@@ -2876,7 +2876,7 @@ class Admin
   {
     include "connection.php";
     // echo $id;
-    $sql = 'SELECT a.medicalM_id, b.medicalC_id, b.medicalC_name, CONCAT(c.cand_lastname, ", ", c.cand_firstname," ", c.cand_middlename) CandName FROM tblmedicalmaster a 
+    $sql = 'SELECT a.medicalM_id, b.medicalC_id, b.medicalC_name, CONCAT_WS(" ",CONCAT(c.cand_lastname, ", ", c.cand_firstname), c.cand_middlename) CandName FROM tblmedicalmaster a 
             INNER JOIN tblmedicalclassification b ON b.medicalC_id = a.medicalM_medicalCId 
             INNER JOIN tblcandidates c ON c.cand_id = a.medicalM_candId
             WHERE c.cand_id = :candId';
@@ -2951,7 +2951,7 @@ class Admin
   function getHR()
   {
     include "connection.php";
-    $sql = 'SELECT a.hr_id, CONCAT(a.hr_lastname, ", ", a.hr_firstname, " ", a.hr_middlename) AS fullName, a.*, b.UserL_description, b.userL_id FROM tblhr a
+    $sql = 'SELECT a.hr_id, CONCAT_WS(" ", CONCAT(a.hr_lastname, ", ", a.hr_firstname), a.hr_middlename) AS fullName, a.*, b.UserL_description, b.userL_id FROM tblhr a
             INNER JOIN tbluserlevel b ON a.hr_userLevel = b.userL_id
             ORDER BY a.hr_createdAt DESC';
     $stmt = $conn->prepare($sql);
