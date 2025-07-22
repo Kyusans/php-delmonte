@@ -2479,8 +2479,10 @@ class Admin
   function getDecisionPendingCandidates($json)
   {
     include "connection.php";
+    $candidates = [];
+    $decisionPendingCand = [];
     $data = json_decode($json, true);
-    $sql = "SELECT c.cand_id, CONCAT_WS(' ', CONCAT(c.cand_lastname, ', ', c.cand_firstname), c.cand_middlename) AS fullName, d.status_name
+    $sql = "SELECT b.app_id, c.cand_id, CONCAT_WS(' ', CONCAT(c.cand_lastname, ', ', c.cand_firstname), c.cand_middlename) AS fullName, d.status_name, c.cand_email
             FROM tblapplicationstatus a
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId
             INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
@@ -2491,7 +2493,50 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($candidates as $cand) {
+      $candId = $cand['cand_id'];
+      $fullName = $cand['fullName'];
+      $email = $cand['cand_email'];
+      $status = $cand['status_name'];
+
+      $candJobPoints = $this->getAllCandidateQualificationPoints($cand["app_id"]);
+      $totalJobPoints = $this->getAllJobQualificationPoints($data['jobId']);
+
+      $sql = "SELECT interviewR_score, interviewR_totalScore FROM tblinterviewresult WHERE interviewR_jobId = :jobId AND interviewR_candId = :candId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $data['jobId']);
+      $stmt->bindParam(":candId", $candId);
+      $stmt->execute();
+      $interview = $stmt->fetch(PDO::FETCH_ASSOC);
+      $interviewScore = $interview['interviewR_score'];
+      $interviewTotalScore = $interview['interviewR_totalScore'];
+
+      $sql = "SELECT examR_score, examR_totalScore FROM tblexamresult WHERE examR_jobMId = :jobId AND examR_candId = :candId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $data['jobId']);
+      $stmt->bindParam(":candId", $candId);
+      $stmt->execute();
+      $exam = $stmt->fetch(PDO::FETCH_ASSOC);
+      $examScore = $exam['examR_score'];
+      $examTotalScore = $exam['examR_totalScore'];
+
+      $overallJobPoints = $totalJobPoints + $interviewTotalScore + $examTotalScore;
+      $candOverAllPoints = $candJobPoints + $interviewScore + $examScore;
+
+      $overallPointsPercent = ($candOverAllPoints / $overallJobPoints) * 100;
+
+      $decisionPendingCand[] = [
+        "cand_id" => $candId,
+        "fullName" => $fullName,
+        "email" => $email,
+        "candOverAllPoints" => $candOverAllPoints . "/" . $overallJobPoints,
+        "overallPointsPercent" => $overallPointsPercent . "%",
+      ];
+      // echo "overallpoints" . $overallPointsPercent;
+      // echo "candpoints: " . $candOverAllPoints . " / " . $overallJobPoints;
+    }
+    return $stmt->rowCount() > 0 ? $decisionPendingCand : 0;
   }
 
   function getEmployedCandidates($json)
