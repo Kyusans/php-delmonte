@@ -3173,22 +3173,31 @@ class Admin
 
     if ($applications != 0) {
       foreach ($applications as $app) {
-        $candidateTotalPoints = $this->getAllCandidateQualificationPoints($app["app_id"]);
-        $sql = "SELECT CONCAT_WS(' ', CONCAT(cand_lastname, ', ', cand_firstname), cand_middleName) AS full_name FROM tblcandidates WHERE cand_id = :candId";
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam(":candId", $app["app_candId"]);
-        $stmt->execute();
-        $candFullName = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["full_name"] : "";
-
-        $sql = "SELECT a.status_name, b.appS_date FROM tblstatus a 
-              INNER JOIN tblapplicationstatus b ON b.appS_statusId  = a.status_id
+        $sql = "SELECT a.status_id, a.status_name, b.appS_date 
+              FROM tblstatus a 
+              INNER JOIN tblapplicationstatus b ON b.appS_statusId = a.status_id
               WHERE b.appS_appId = :appId
               ORDER BY b.appS_date DESC
               LIMIT 1";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":appId", $app["app_id"]);
         $stmt->execute();
-        $data = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : "";
+        $statusData = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
+
+        // Skip if no status or status is not Pending (1) or Processed (2)
+        if (!$statusData || !in_array($statusData["status_id"], [1, 2])) {
+          continue;
+        }
+
+        $sql = "SELECT CONCAT_WS(' ', CONCAT(cand_lastname, ', ', cand_firstname), cand_middleName) AS full_name 
+              FROM tblcandidates 
+              WHERE cand_id = :candId";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":candId", $app["app_candId"]);
+        $stmt->execute();
+        $candFullName = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["full_name"] : "";
+
+        $candidateTotalPoints = $this->getAllCandidateQualificationPoints($app["app_id"]);
 
         $candidates[] = [
           "applicationId" => $app["app_id"],
@@ -3196,8 +3205,8 @@ class Admin
           "fullName" => $candFullName,
           "totalPoints" => $candidateTotalPoints,
           "percentage" => round($candidateTotalPoints / $jobTotalPoints * 100, 2),
-          "status" => $data["status_name"],
-          "date" => $data["appS_date"]
+          "status" => $statusData["status_name"],
+          "date" => $statusData["appS_date"]
         ];
       }
     }
@@ -3211,6 +3220,7 @@ class Admin
 
     return $result ? $result : 0;
   }
+
 
   function cancelJob($json)
   {
