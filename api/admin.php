@@ -2531,7 +2531,7 @@ class Admin
         "fullName" => $fullName,
         "email" => $email,
         "candOverAllPoints" => $candOverAllPoints . "/" . $overallJobPoints,
-        "overallPointsPercent" => $overallPointsPercent . "%",
+        "overallPointsPercent" => number_format($overallPointsPercent, 2) . "%",
       ];
       // echo "overallpoints" . $overallPointsPercent;
       // echo "candpoints: " . $candOverAllPoints . " / " . $overallJobPoints;
