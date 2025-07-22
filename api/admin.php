@@ -2498,7 +2498,6 @@ class Admin
       $candId = $cand['cand_id'];
       $fullName = $cand['fullName'];
       $email = $cand['cand_email'];
-      $status = $cand['status_name'];
 
       $candJobPoints = $this->getAllCandidateQualificationPoints($cand["app_id"]);
       $totalJobPoints = $this->getAllJobQualificationPoints($data['jobId']);
@@ -2527,7 +2526,8 @@ class Admin
       $overallPointsPercent = ($candOverAllPoints / $overallJobPoints) * 100;
 
       $decisionPendingCand[] = [
-        "cand_id" => $candId,
+        "appId" => $cand["app_id"],
+        "candId" => $candId,
         "fullName" => $fullName,
         "email" => $email,
         "candOverAllPoints" => $candOverAllPoints . "/" . $overallJobPoints,
@@ -2582,7 +2582,7 @@ class Admin
 
       // Delete child records first
       $sqlChild = "DELETE FROM tblstatusjoboffer WHERE statusjobO_jobofferId =
-                       (SELECT joboffer_id FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId)";
+                      (SELECT joboffer_id FROM tbljoboffer WHERE joboffer_candId = :candId AND joboffer_jobMId = :jobId)";
       $stmtChild = $conn->prepare($sqlChild);
       $stmtChild->bindParam(":candId", $data['candId']);
       $stmtChild->bindParam(":jobId", $data['jobId']);
