@@ -160,6 +160,7 @@ class Admin
       $stmt->execute();
       $data['courseCategory'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
       $data['licenseMaster'] = $this->getLicenseMaster();
+      $data['branch'] = $this->getBranch();
 
       // $sql = "SELECT * FROM tblpersonaltraining";
       // $stmt = $conn->prepare($sql);
