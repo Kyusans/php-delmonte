@@ -184,6 +184,7 @@ class Admin
     }
   }
 
+
   function getJobDetails($json)
   {
     // {"jobId": 10}
@@ -3397,6 +3398,14 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getBranch(){
+    include "connection.php";
+    $sql = "SELECT * FROM tblbranch";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
 } // admin
 
 function uploadImage()
@@ -3840,6 +3849,9 @@ switch ($operation) {
     break;
   case "getPotentialCandidateProfile":
     echo $admin->getPotentialCandidateProfile($json);
+    break;
+  case "getBranch":
+    echo json_encode($admin->getBranch());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
