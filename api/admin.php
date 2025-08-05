@@ -3215,7 +3215,9 @@ class Admin
     $candidates = [];
     $result = [];
 
-    $sql = "SELECT * FROM tblapplications WHERE app_jobMId = :jobId";
+    $sql = "SELECT a.*, b.branch_location FROM tblapplications a
+            INNER JOIN tblbranch b ON b.branch_id = a.app_branchId
+            WHERE app_jobMId = :jobId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $jobId);
     $stmt->execute();
@@ -3248,6 +3250,7 @@ class Admin
         $candidateTotalPoints = $this->getAllCandidateQualificationPoints($app["app_id"]);
 
         $candidates[] = [
+          "branch" => $app["branch_location"],
           "applicationId" => $app["app_id"],
           "candidateId" => $app["app_candId"],
           "fullName" => $candFullName,
