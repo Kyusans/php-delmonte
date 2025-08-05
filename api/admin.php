@@ -53,8 +53,8 @@ class Admin
       $stmt->bindParam(":passing_points", $jobMaster['passingPercentage']);
       $stmt->execute();
 
-      $sql ="INSERT INTO tbljobbranch (jobB_jobMId, jobB_branchId) VALUES (:jobId, :branchId)";
-      foreach ($jobBranch as $jobBranch){
+      $sql = "INSERT INTO tbljobbranch (jobB_jobMId, jobB_branchId) VALUES (:jobId, :branchId)";
+      foreach ($jobBranch as $jobBranch) {
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":jobId", $jobMasterId);
         $stmt->bindParam(":branchId", $jobBranch['branchId']);
@@ -233,6 +233,14 @@ class Admin
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     $returnValue["jobExperience"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+    $sql = "SELECT a.*, b.branch_location FROM tbljobbranch a
+            INNER JOIN tblbranch b ON b.branch_id = a.jobB_branchId
+            WHERE jobB_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    $returnValue["jobBranch"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
     $sql = "SELECT passing_points as passing_percentage FROM tbljobpassing WHERE passing_jobId  = :jobId";
     $stmt = $conn->prepare($sql);
@@ -3393,7 +3401,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function getBranch(){
+  function getBranch()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblbranch";
     $stmt = $conn->prepare($sql);
