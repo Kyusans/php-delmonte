@@ -26,6 +26,7 @@ class Admin
     $conn->beginTransaction();
     $data = json_decode($json, true);
 
+    $jobBranch = $data['jobBranch'];
     $jobMaster = $data['jobMaster'];
     $jobMasterDuties = $data['jobMasterDuties'];
     $jobEducation = $data['jobEducation'];
@@ -51,6 +52,14 @@ class Admin
       $stmt->bindParam(":passing_jobId", $jobMasterId);
       $stmt->bindParam(":passing_points", $jobMaster['passingPercentage']);
       $stmt->execute();
+
+      $sql ="INSERT INTO tbljobbranch (jobB_jobMId, jobB_branchId) VALUES (:jobId, :branchId)";
+      foreach ($jobBranch as $jobBranch){
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(":jobId", $jobMasterId);
+        $stmt->bindParam(":branchId", $jobBranch['branchId']);
+        $stmt->execute();
+      }
 
       $sql = "INSERT INTO tbljobsmasterduties (duties_jobId, duties_text) VALUES (:duties_jobId, :duties_text)";
       foreach ($jobMasterDuties as $duty) {
@@ -161,22 +170,6 @@ class Admin
       $data['courseCategory'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
       $data['licenseMaster'] = $this->getLicenseMaster();
       $data['branch'] = $this->getBranch();
-
-      // $sql = "SELECT * FROM tblpersonaltraining";
-      // $stmt = $conn->prepare($sql);
-      // $stmt->execute();
-      // $data['personalTraining'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
-
-      // $sql = "SELECT * FROM tblpersonalskills";
-      // $stmt = $conn->prepare($sql);
-      // $stmt->execute();
-      // $data['personalSkills'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
-
-      // $sql = "SELECT * FROM tblpersonalknowledge";
-      // $stmt = $conn->prepare($sql);
-      // $stmt->execute();
-      // $data['knowledge'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
-
       $conn->commit();
       return json_encode($data);
     } catch (PDOException $th) {
