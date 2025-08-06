@@ -3412,6 +3412,18 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
+
+  function addBranch($json){
+    // {"location": "Dhaka", "userId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tblbranch (branch_location, branch_userId, branch_createdAt) VALUES (:location, :userId, NOW())";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":location", $data['location']);
+    $stmt->bindParam(":userId", $data['userId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } // admin
 
 function uploadImage()
@@ -3858,6 +3870,9 @@ switch ($operation) {
     break;
   case "getBranch":
     echo json_encode($admin->getBranch());
+    break;
+  case "addBranch":
+    echo $admin->addBranch($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
