@@ -3413,7 +3413,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
-  function addBranch($json){
+  function addBranch($json)
+  {
     // {"location": "Dhaka", "userId": 1}
     include "connection.php";
     $data = json_decode($json, true);
@@ -3426,7 +3427,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $lastId : 0;
   }
 
-  function updateBranch($json){
+  function updateBranch($json)
+  {
     // {"branchId": 1, "location": "Dhaka"}
     include "connection.php";
     $data = json_decode($json, true);
@@ -3436,6 +3438,26 @@ class Admin
     $stmt->bindParam(":location", $data['location']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+
+  function deleteBranch($json)
+  {
+    // {"branchId": 1}
+    try {
+      include "connection.php";
+      $data = json_decode($json, true);
+      $sql = "DELETE FROM tblbranch WHERE branch_id = :branchId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":branchId", $data['branchId']);
+      $stmt->execute();
+      return $stmt->rowCount() > 0 ? 1 : 0;
+    } catch (PDOException $e) {
+      if ($e->getCode() == '23000') {
+        // Foreign key constraint violation
+        return -1;
+      }
+      throw $e;
+    }
   }
 } // admin
 
@@ -3889,6 +3911,9 @@ switch ($operation) {
     break;
   case "updateBranch":
     echo $admin->updateBranch($json);
+    break;
+  case "deleteBranch":
+    echo $admin->deleteBranch($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
