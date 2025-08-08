@@ -3422,6 +3422,19 @@ class Admin
     $stmt->bindParam(":location", $data['location']);
     $stmt->bindParam(":userId", $data['userId']);
     $stmt->execute();
+    $lastId = $conn->lastInsertId();
+    return $stmt->rowCount() > 0 ? $lastId : 0;
+  }
+
+  function updateBranch($json){
+    // {"branchId": 1, "location": "Dhaka"}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblbranch SET branch_location = :location WHERE branch_id = :branchId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":branchId", $data['branchId']);
+    $stmt->bindParam(":location", $data['location']);
+    $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } // admin
@@ -3873,6 +3886,9 @@ switch ($operation) {
     break;
   case "addBranch":
     echo $admin->addBranch($json);
+    break;
+  case "updateBranch":
+    echo $admin->updateBranch($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
