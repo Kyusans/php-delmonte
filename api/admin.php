@@ -3461,7 +3461,8 @@ class Admin
     }
   }
 
-  function getJobBranch($json){
+  function getJobBranch($json)
+  {
     // {"jobId": 17}
     include "connection.php";
     $data = json_decode($json, true);
@@ -3473,6 +3474,19 @@ class Admin
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
+  function addJobBranch($json)
+  {
+    // {"jobId": 17, "branchId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "INSERT INTO tbljobbranch (jobB_jobMId, jobB_branchId) VALUES (:jobId, :branchId)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->bindParam(":branchId", $data['branchId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
 } // admin
 
@@ -3932,6 +3946,9 @@ switch ($operation) {
     break;
   case "getJobBranch":
     echo json_encode($admin->getJobBranch($json));
+    break;
+  case "addJobBranch":
+    echo $admin->addJobBranch($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
