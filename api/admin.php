@@ -3500,6 +3500,17 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function deleteJobBranch($json){
+    // {"jobBranchId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "DELETE FROM tbljobbranch WHERE jobB_id = :jobBranchId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobBranchId", $data['jobBranchId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } // admin
 
 function uploadImage()
@@ -3964,6 +3975,9 @@ switch ($operation) {
     break;
   case "updateJobBranch":
     echo $admin->updateJobBranch($json);
+    break;
+  case "deleteJobBranch":
+    echo $admin->deleteJobBranch($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
