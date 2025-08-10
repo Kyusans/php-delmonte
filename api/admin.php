@@ -3368,7 +3368,7 @@ class Admin
 
   function updateJobLicense($json)
   {
-    // {"licenseId": 5, "licenseMId": 2, "points": 5, "jobId": 23}
+    // {"licenseId": 5, "licenseMId": 2, "points": 5}
     include "connection.php";
     $data = json_decode($json, true);
     $sql = "UPDATE tbljobslicense SET jlicense_licenceMId = :licenseMId, jlicense_points = :points WHERE jlicense_id = :licenseId";
@@ -3485,6 +3485,18 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->bindParam(":branchId", $data['branchId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+  function updateJobBranch($json)
+  {
+    // {"branchId": 1, "jobBranchId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tbljobbranch SET jobB_branchId = :branchId WHERE jobB_id = :jobBranchId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":branchId", $data['branchId']);
+    $stmt->bindParam(":jobBranchId", $data['jobBranchId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
@@ -3949,6 +3961,9 @@ switch ($operation) {
     break;
   case "addJobBranch":
     echo $admin->addJobBranch($json);
+    break;
+  case "updateJobBranch":
+    echo $admin->updateJobBranch($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
