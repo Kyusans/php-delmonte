@@ -577,6 +577,7 @@ class Admin
       $data = [];
       $data['courseCategory'] = $this->getCourseCategory();
       $data['license'] = $this->getLicenseMaster();
+      $data['branch'] = $this->getBranch();
       $conn->commit();
       return json_encode($data);
     } catch (\Throwable $th) {
@@ -3459,6 +3460,20 @@ class Admin
       throw $e;
     }
   }
+
+  function getJobBranch($json){
+    // {"jobId": 17}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT a.*, b.branch_location FROM tbljobbranch a
+            INNER JOIN tblbranch b ON b.branch_id = a.jobB_branchId
+            WHERE a.jobB_jobMId = :jobId
+            ORDER BY b.branch_location DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
 } // admin
 
 function uploadImage()
@@ -3914,6 +3929,9 @@ switch ($operation) {
     break;
   case "deleteBranch":
     echo $admin->deleteBranch($json);
+    break;
+  case "getJobBranch":
+    echo json_encode($admin->getJobBranch($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
