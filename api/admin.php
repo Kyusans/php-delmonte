@@ -2898,7 +2898,7 @@ class Admin
     include "connection.php";
     $sql = 'SELECT d.app_id, CONCAT(b.hr_lastname, ", ", b.hr_firstname, " ", COALESCE(b.hr_middlename, "")) AS HRName, c.status_name, e.jobM_title, e.jobM_id, f.cand_id, 
             CONCAT(f.cand_lastname, ", ", f.cand_firstname, " ", COALESCE(f.cand_middlename, "")) AS CandName, a.appS_date FROM tblapplicationstatus a
-            INNER JOIN tblhr b ON a.appS_hrId = b.hr_id
+            LEFT JOIN tblhr b ON a.appS_hrId = b.hr_id
             INNER JOIN tblstatus c ON a.appS_statusId = c.status_id
             INNER JOIN tblapplications d ON d.app_id = a.appS_appId
             INNER JOIN tbljobsmaster e ON e.jobM_id = d.app_jobMId
