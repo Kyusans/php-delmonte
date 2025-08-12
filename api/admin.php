@@ -3519,9 +3519,11 @@ class Admin
     $data = json_decode($json, true);
     $startDate = $data['from'];
     $endDate = $data['to'];
-    $sql = "SELECT b.jobM_title, COUNT(DISTINCT a.app_candId) as totalCandidate FROM tblapplications a 
+    $sql = "SELECT b.jobM_id, b.jobM_title, COUNT(DISTINCT a.app_candId) as totalCandidate FROM tblapplications a 
             INNER JOIN tbljobsmaster b ON b.jobM_id = a.app_jobMId
-            WHERE a.app_datetime BETWEEN :startDate AND :endDate";
+            WHERE a.app_datetime BETWEEN :startDate AND :endDate
+            GROUP BY b.jobM_id
+            ORDER BY totalCandidate DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":startDate", $startDate);
     $stmt->bindParam(":endDate", $endDate);
