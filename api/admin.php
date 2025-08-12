@@ -3533,6 +3533,13 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
+  function getLoginLogs(){
+    include "connection.php";
+    $sql = "SELECT * FROM tblloginlogs";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
 } // admin
 
 function uploadImage()
@@ -4003,6 +4010,9 @@ switch ($operation) {
     break;
   case "getNumberOfApplicationInJob":
     echo json_encode($admin->getNumberOfApplicationInJob($json));
+    break;
+  case "getLoginLogs":
+    echo json_encode($admin->getLoginLogs());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
