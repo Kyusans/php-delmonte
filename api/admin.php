@@ -2917,7 +2917,8 @@ class Admin
             INNER JOIN tbljobsmaster b ON b.jobM_id = a.intsched_jobId
             INNER JOIN tblcandidates c ON c.cand_id = a.intsched_candId
             INNER JOIN tblapplications d ON d.app_jobMId = b.jobM_id AND d.app_candId = c.cand_id
-            WHERE a.intsched_date >= CURDATE()
+            WHERE a.intsched_date >= CURDATE() 
+            AND NOT EXISTS (SELECT 1 FROM tblinterviewresult WHERE b.jobM_id = interviewR_jobId AND c.cand_id = interviewR_candId )
             ORDER BY a.intsched_date';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
