@@ -2912,10 +2912,11 @@ class Admin
   function getInterviewSchedule()
   {
     include "connection.php";
-    $sql = 'SELECT a.intsched_date, b.jobM_title, b.jobM_id, c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", COALESCE(c.cand_middlename, "")) AS FullName 
+    $sql = 'SELECT d.app_id, a.intsched_date, b.jobM_title, b.jobM_id, c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", COALESCE(c.cand_middlename, "")) AS FullName 
             FROM tblinterviewschedule a
             INNER JOIN tbljobsmaster b ON b.jobM_id = a.intsched_jobId
             INNER JOIN tblcandidates c ON c.cand_id = a.intsched_candId
+            INNER JOIN tblapplications d ON d.app_jobMId = b.jobM_id AND d.app_candId = c.cand_id
             WHERE a.intsched_date >= CURDATE()
             ORDER BY a.intsched_date';
     $stmt = $conn->prepare($sql);
