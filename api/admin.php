@@ -3488,6 +3488,7 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+  
   function updateJobBranch($json)
   {
     // {"branchId": 1, "jobBranchId": 1}
@@ -3511,6 +3512,23 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getNumberOfApplicationInJob($json){
+    // {"from":"2024-06-30T16:00:00.000Z","to":"2025-09-05T16:00:00.000Z"}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $startDate = $data['from'];
+    $endDate = $data['to'];
+    $sql = "SELECT b.jobM_title, COUNT(DISTINCT a.app_candId) as totalCandidate FROM tblapplications a 
+            INNER JOIN tbljobsmaster b ON b.jobM_id = a.app_jobMId
+            WHERE a.app_datetime BETWEEN :startDate AND :endDate";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":startDate", $startDate);
+    $stmt->bindParam(":endDate", $endDate);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
 } // admin
 
 function uploadImage()
@@ -3978,6 +3996,9 @@ switch ($operation) {
     break;
   case "deleteJobBranch":
     echo $admin->deleteJobBranch($json);
+    break;
+  case "getNumberOfApplicationInJob":
+    echo json_encode($admin->getNumberOfApplicationInJob($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
