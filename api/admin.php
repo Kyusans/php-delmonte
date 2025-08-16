@@ -2486,6 +2486,7 @@ class Admin
     $candidates = [];
     $decisionPendingCand = [];
     $data = json_decode($json, true);
+
     $sql = "SELECT b.app_id, c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', COALESCE(c.cand_middlename, '')) AS fullName, d.status_name, c.cand_email
             FROM tblapplicationstatus a
             INNER JOIN tblapplications b ON b.app_id = a.appS_appId
@@ -2494,40 +2495,67 @@ class Admin
             WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
             AND (a.appS_statusId = 13)
             AND b.app_jobMId = :jobId";
+
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     $candidates = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     foreach ($candidates as $cand) {
       $candId = $cand['cand_id'];
       $fullName = $cand['fullName'];
       $email = $cand['cand_email'];
 
+      // candidate + job qualification points
       $candJobPoints = $this->getAllCandidateQualificationPoints($cand["app_id"]);
       $totalJobPoints = $this->getAllJobQualificationPoints($data['jobId']);
 
-      $sql = "SELECT interviewR_score, interviewR_totalScore FROM tblinterviewresult WHERE interviewR_jobId = :jobId AND interviewR_candId = :candId";
+      // --- INTERVIEW ---
+      $sql = "SELECT interviewR_score, interviewR_totalScore 
+                FROM tblinterviewresult 
+                WHERE interviewR_jobId = :jobId AND interviewR_candId = :candId";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobId", $data['jobId']);
       $stmt->bindParam(":candId", $candId);
       $stmt->execute();
       $interview = $stmt->fetch(PDO::FETCH_ASSOC);
-      $interviewScore = $interview['interviewR_score'];
-      $interviewTotalScore = $interview['interviewR_totalScore'];
 
-      $sql = "SELECT examR_score, examR_totalScore FROM tblexamresult WHERE examR_jobMId = :jobId AND examR_candId = :candId";
+      if ($interview) {
+        $interviewScore = $interview['interviewR_score'];
+        $interviewTotalScore = $interview['interviewR_totalScore'];
+      } else {
+        $interviewScore = 0;
+        $interviewTotalScore = 0;
+      }
+
+      // --- EXAM ---
+      $sql = "SELECT examR_score, examR_totalScore 
+                FROM tblexamresult 
+                WHERE examR_jobMId = :jobId AND examR_candId = :candId";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobId", $data['jobId']);
       $stmt->bindParam(":candId", $candId);
       $stmt->execute();
       $exam = $stmt->fetch(PDO::FETCH_ASSOC);
-      $examScore = $exam['examR_score'];
-      $examTotalScore = $exam['examR_totalScore'];
 
+      if ($exam) {
+        $examScore = $exam['examR_score'];
+        $examTotalScore = $exam['examR_totalScore'];
+      } else {
+        $examScore = 0;
+        $examTotalScore = 0;
+      }
+
+      // --- CALCULATIONS ---
       $overallJobPoints = $totalJobPoints + $interviewTotalScore + $examTotalScore;
       $candOverAllPoints = $candJobPoints + $interviewScore + $examScore;
 
-      $overallPointsPercent = ($candOverAllPoints / $overallJobPoints) * 100;
+      // avoid division by zero
+      if ($overallJobPoints > 0) {
+        $overallPointsPercent = ($candOverAllPoints / $overallJobPoints) * 100;
+      } else {
+        $overallPointsPercent = 0;
+      }
 
       $decisionPendingCand[] = [
         "appId" => $cand["app_id"],
@@ -2537,11 +2565,11 @@ class Admin
         "candOverAllPoints" => $candOverAllPoints . "/" . $overallJobPoints,
         "overallPointsPercent" => number_format($overallPointsPercent, 2) . "%",
       ];
-      // echo "overallpoints" . $overallPointsPercent;
-      // echo "candpoints: " . $candOverAllPoints . " / " . $overallJobPoints;
     }
-    return $stmt->rowCount() > 0 ? $decisionPendingCand : 0;
+
+    return count($decisionPendingCand) > 0 ? $decisionPendingCand : 0;
   }
+
 
   function getEmployedCandidates($json)
   {
@@ -3490,7 +3518,7 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
-  
+
   function updateJobBranch($json)
   {
     // {"branchId": 1, "jobBranchId": 1}
@@ -3504,7 +3532,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function deleteJobBranch($json){
+  function deleteJobBranch($json)
+  {
     // {"jobBranchId": 1}
     include "connection.php";
     $data = json_decode($json, true);
@@ -3515,7 +3544,8 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
-  function getNumberOfApplicationInJob($json){
+  function getNumberOfApplicationInJob($json)
+  {
     // {"from":"2024-06-30T16:00:00.000Z","to":"2025-09-05T16:00:00.000Z"}
     include "connection.php";
     $data = json_decode($json, true);
@@ -3533,7 +3563,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
-  function getLoginLogs(){
+  function getLoginLogs()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblloginlogs";
     $stmt = $conn->prepare($sql);
