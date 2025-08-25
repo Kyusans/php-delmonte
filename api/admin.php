@@ -1455,12 +1455,12 @@ class Admin
     }
   }
 
-  function getExam($jobId)
+  function getExam($examId)
   {
     include "connection.php";
-    $sql = "SELECT * FROM tblexam WHERE exam_jobMId = :jobId";
+    $sql = "SELECT * FROM tblexam WHERE exam_id  = :exam_id";
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':jobId', $jobId);
+    $stmt->bindParam(':exam_id', $examId);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
@@ -1470,12 +1470,12 @@ class Admin
     include "connection.php";
     $returnValue = [];
     $data = json_decode($json, true);
-    $jobId = $data['jobId'];
-    $exam = $this->getExam($jobId);
+    $examId = $data['examId'];
+    $exam = $this->getExam($examId);
     if ($exam !== 0) {
       $returnValue['examMaster'] = $exam;
-      $returnValue['questionMaster'] = $this->getExamQuestions($exam[0]['exam_id']);
-      $returnValue['passingPercentage'] = $this->getExamPassingPercentage($jobId);
+      $returnValue['questionMaster'] = $this->getExamQuestions($examId);
+      $returnValue['passingPercentage'] = $this->getExamPassingPercentage($exam[0]['exam_jobMId']);
     } else {
       $returnValue = 0;
     }
@@ -3583,6 +3583,17 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
+  function getSelectedExam($json){
+    // {"examId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tblexam WHERE exam_id = :examId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":examId", $data['examId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
+  }
+
 } // admin
 
 function uploadImage()
@@ -4059,6 +4070,9 @@ switch ($operation) {
     break;
   case "getJobExams":
     echo json_encode($admin->getJobExams($json));
+    break;
+  case "getSelectedExam":
+    echo json_encode($admin->getSelectedExam($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
