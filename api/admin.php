@@ -360,7 +360,7 @@ class Admin
     $stmt->execute();
     $returnValue["candidates"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $returnValue['exam'] = $this->getExamDetails($json);
+    $returnValue['exam'] = $this->getExam($data['jobId']);
 
     // foreach ($returnValue["candidates"] as &$candidate) {
     //   $candidate['points'] = $this->calculateCandidatePoints($candidate['cand_id'], $data['jobId']);
@@ -1455,7 +1455,17 @@ class Admin
     }
   }
 
-  function getExam($examId)
+  function getExam($jobId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblexam WHERE exam_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $jobId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getSpecificExam($examId)
   {
     include "connection.php";
     $sql = "SELECT * FROM tblexam WHERE exam_id  = :exam_id";
@@ -1465,13 +1475,14 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
+
   function getExamDetails($json)
   {
     include "connection.php";
     $returnValue = [];
     $data = json_decode($json, true);
     $examId = $data['examId'];
-    $exam = $this->getExam($examId);
+    $exam = $this->getSpecificExam($examId);
     if ($exam !== 0) {
       $returnValue['examMaster'] = $exam;
       $returnValue['questionMaster'] = $this->getExamQuestions($examId);
@@ -3572,18 +3583,20 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getJobExams($json){
-    // {"jobId": 17}
+  function getJobExams($json)
+  {
+    // {"jobId": 25}
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT * FROM tblexam WHERE exam_jobMId = :jobId";
+    $sql = "SELECT * FROM tblexam WHERE exam_jobMId = :jobId ORDER BY exam_isActive DESC";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
-  function getSelectedExam($json){
+  function getSelectedExam($json)
+  {
     // {"examId": 1}
     include "connection.php";
     $data = json_decode($json, true);
@@ -3593,7 +3606,6 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
   }
-
 } // admin
 
 function uploadImage()
