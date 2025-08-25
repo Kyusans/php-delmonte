@@ -3571,6 +3571,18 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getJobExams($json){
+    // {"jobId": 17}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT * FROM tblexam WHERE exam_jobMId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
 } // admin
 
 function uploadImage()
@@ -4044,6 +4056,9 @@ switch ($operation) {
     break;
   case "getLoginLogs":
     echo json_encode($admin->getLoginLogs());
+    break;
+  case "getJobExams":
+    echo json_encode($admin->getJobExams($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";

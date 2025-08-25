@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 11, 2025 at 08:43 AM
+-- Generation Time: Aug 23, 2025 at 02:51 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -72,7 +72,7 @@ CREATE TABLE `tbl2fa` (
 --
 
 INSERT INTO `tbl2fa` (`email`, `code`, `expires_at`, `created_at`) VALUES
-('ralp.pelino11@gmail.com', '259318', '2025-03-30 13:55:53', '2025-03-11 14:32:23'),
+('ralp.pelino11@gmail.com', '602123', '2025-07-14 06:33:59', '2025-03-11 14:32:23'),
 ('rape.gallegos.coc@phinmaed.com', '206671', '2025-05-03 05:38:59', '2025-03-16 06:18:19');
 
 -- --------------------------------------------------------
@@ -95,7 +95,7 @@ CREATE TABLE `tbl2fasetting` (
 --
 
 INSERT INTO `tbl2fasetting` (`setting_id`, `setting_everylogs`, `setting_days`, `setting_email`, `setting_number`, `last_verification`) VALUES
-(6, 0, NULL, 'ralp.pelino11@gmail.com', '09056548089', '2025-03-30 21:46:44'),
+(6, 0, NULL, 'ralp.pelino11@gmail.com', '09056548089', '2025-07-14 14:24:41'),
 (7, 0, NULL, 'rape.gallegos.coc@phinmaed.com', NULL, '2025-05-03 13:30:03');
 
 -- --------------------------------------------------------
@@ -127,8 +127,18 @@ CREATE TABLE `tblapplications` (
   `app_id` int(11) NOT NULL,
   `app_candId` int(11) DEFAULT NULL,
   `app_jobMId` int(20) NOT NULL,
-  `app_datetime` datetime NOT NULL
+  `app_branchId` int(11) NOT NULL,
+  `app_datetime` datetime NOT NULL,
+  `app_updatedAt` datetime DEFAULT NULL,
+  `app_statusUpdate` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblapplications`
+--
+
+INSERT INTO `tblapplications` (`app_id`, `app_candId`, `app_jobMId`, `app_branchId`, `app_datetime`, `app_updatedAt`, `app_statusUpdate`) VALUES
+(1, 40, 17, 1, '2025-08-04 03:15:47', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -143,6 +153,17 @@ CREATE TABLE `tblapplicationstatus` (
   `appS_hrId` int(11) DEFAULT NULL,
   `appS_date` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblapplicationstatus`
+--
+
+INSERT INTO `tblapplicationstatus` (`appS_id`, `appS_appId`, `appS_statusId`, `appS_hrId`, `appS_date`) VALUES
+(1, 1, 1, NULL, '2025-08-04 03:15:47'),
+(2, 1, 2, 1, '2025-08-11 02:53:59'),
+(3, 1, 6, 1, '2025-08-11 02:54:18'),
+(4, 1, 5, 1, '2025-08-11 02:54:34'),
+(9, 1, 9, NULL, '2025-08-11 15:17:02');
 
 --
 -- Triggers `tblapplicationstatus`
@@ -263,6 +284,29 @@ CREATE TABLE `tblbireport` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tblbranch`
+--
+
+CREATE TABLE `tblbranch` (
+  `branch_id` int(11) NOT NULL,
+  `branch_location` varchar(100) NOT NULL,
+  `branch_userId` int(11) NOT NULL,
+  `branch_createdAt` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblbranch`
+--
+
+INSERT INTO `tblbranch` (`branch_id`, `branch_location`, `branch_userId`, `branch_createdAt`) VALUES
+(1, 'Bugo', 3, '2025-08-04 08:26:52'),
+(2, 'Opol', 3, '2025-08-04 08:26:52'),
+(3, 'Manila', 3, '2025-08-04 08:26:52'),
+(4, 'Cebu', 3, '2025-08-04 08:26:52');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tblcandconsent`
 --
 
@@ -294,8 +338,24 @@ CREATE TABLE `tblcandeducbackground` (
   `educ_coursesId` int(20) NOT NULL,
   `educ_institutionId` int(20) NOT NULL,
   `educ_dategraduate` date NOT NULL,
-  `educ_diploma_path` varchar(250) NOT NULL
+  `educ_diploma_path` varchar(250) NOT NULL,
+  `educ_createdAt` datetime DEFAULT NULL,
+  `educ_updatedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcandeducbackground`
+--
+
+INSERT INTO `tblcandeducbackground` (`educ_back_id`, `educ_canId`, `educ_coursesId`, `educ_institutionId`, `educ_dategraduate`, `educ_diploma_path`, `educ_createdAt`, `educ_updatedAt`) VALUES
+(6, 37, 48, 1484, '0000-00-00', '', NULL, NULL),
+(11, 24, 46, 2422, '0000-00-00', '', '2025-07-12 11:10:13', NULL),
+(13, 39, 132, 1476, '2025-07-02', 'diploma4.jpg', '2025-07-21 00:39:14', '2025-07-23 20:37:18'),
+(24, 41, 102, 2435, '0000-00-00', '', '2025-07-23 21:46:02', NULL),
+(25, 41, 135, 2436, '0000-00-00', '', '2025-07-23 21:46:02', NULL),
+(26, 41, 49, 2436, '0000-00-00', '', '2025-07-23 21:46:02', NULL),
+(27, 41, 48, 2437, '0000-00-00', '', '2025-07-23 21:46:02', NULL),
+(29, 40, 49, 2422, '2024-07-12', 'secondaryEducation.jpg', '2025-07-24 14:04:56', '2025-07-24 14:11:01');
 
 -- --------------------------------------------------------
 
@@ -307,9 +367,16 @@ CREATE TABLE `tblcandeducpoints` (
   `candEduc_id` int(11) NOT NULL,
   `candEduc_educId` int(11) NOT NULL,
   `candEduc_appId` int(11) NOT NULL,
-  `candEduc_points` varchar(20) DEFAULT NULL,
+  `candEduc_points` int(20) DEFAULT NULL,
   `candEduc_datetime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcandeducpoints`
+--
+
+INSERT INTO `tblcandeducpoints` (`candEduc_id`, `candEduc_educId`, `candEduc_appId`, `candEduc_points`, `candEduc_datetime`) VALUES
+(1, 17, 1, 11, '2025-08-04 03:15:47');
 
 -- --------------------------------------------------------
 
@@ -320,20 +387,27 @@ CREATE TABLE `tblcandeducpoints` (
 CREATE TABLE `tblcandemploymenthistory` (
   `empH_id` int(20) NOT NULL,
   `empH_candId` int(11) NOT NULL,
-  `empH_positionName` varchar(250) NOT NULL,
+  `empH_positionName` varchar(250) DEFAULT NULL,
   `empH_responsibilities` varchar(250) DEFAULT NULL,
-  `empH_companyName` varchar(250) NOT NULL,
+  `empH_companyName` varchar(250) DEFAULT NULL,
   `empH_startdate` varchar(100) DEFAULT NULL,
-  `empH_enddate` varchar(100) DEFAULT NULL
+  `empH_enddate` varchar(100) DEFAULT NULL,
+  `empH_createdAt` datetime DEFAULT NULL,
+  `empH_updatedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblcandemploymenthistory`
 --
 
-INSERT INTO `tblcandemploymenthistory` (`empH_id`, `empH_candId`, `empH_positionName`, `empH_responsibilities`, `empH_companyName`, `empH_startdate`, `empH_enddate`) VALUES
-(19, 24, 'Logistic Officer', 'Planning and coordination of all logistical aspects of events.. Ensuring timely and efficient delivery of resources and services.. Managing vendor relationships.. Coordinating transportation and setup.. Overseeing inventory.. Troubleshooting on-site ', 'La Kreativ Events Organizing Services', '12/2024', '03/2025'),
-(20, 24, 'Assistant Coordinator', 'Providing support to the lead coordinator.. Pre-event planning and vendor coordination.. On-site execution and post-event follow-up.. Managing logistics.. Assisting with client communication.. Ensuring timely vendor setups.. Troubleshooting issues du', 'La Kreativ Events Organizing Services', '02/2022', '11/2023');
+INSERT INTO `tblcandemploymenthistory` (`empH_id`, `empH_candId`, `empH_positionName`, `empH_responsibilities`, `empH_companyName`, `empH_startdate`, `empH_enddate`, `empH_createdAt`, `empH_updatedAt`) VALUES
+(30, 37, 'Student Teacher Intern', 'Facilitated lessons in English, Mathematics, and Araling Panlipunan. Created engaging lesson plans and instructional materials. Assessed student learning and assisted in remedial instruction. Practiced effective classroom management strategies', 'Carmen Elementary School', 'January 2025 – May 2025', NULL, NULL, NULL),
+(44, 24, 'Supplier Specialist', 'Orchestrated end-to-end logistical planning for diverse events, ranging from corporate conferences to social gatherings, ensuring seamless execution.\n\nManaged supplier sourcing, negotiation, and relationship management to secure optimal resources and', 'La Kreativ Events Organizing Services', '12/2024', '03/2025', '2025-07-12 11:10:13', '2025-07-21 10:55:21'),
+(46, 24, 'Event Coordinator', 'Providing crucial support to the lead coordinator. Pre-event planning. Vendor coordination. On-site execution. Post-event follow-up. Managing logistics. Assisting with client communication. Ensuring timely vendor setups.', 'La Kreativ Events Organizing Services', '02/2022', '08/2024', '2025-07-21 10:59:00', NULL),
+(51, 41, 'Youth Treasurer', '', 'Youth Quarry Organization', '2019-2020', NULL, '2025-07-23 21:46:02', NULL),
+(52, 41, 'Army recervist', '', 'Army', '2022', NULL, '2025-07-23 21:46:02', NULL),
+(55, 40, 'Student Intern', 'Assisted cooperating teachers in lesson planning, classroom management, and instructional delivery.. Conducted actual teaching sessions in accordance with the Department of Education\'s curriculum standards.. Developed teaching materials and facilitat', 'Bulua National High School - Cagayan de Oro City', 'August', 'October 2023', '2025-07-24 14:04:56', NULL),
+(56, 40, 'Student Intern', 'Delivered daily classroom instruction to junior high school students under the guidance of a mentor teacher.. Applied varied teaching strategies to accommodate diverse learners.. Utilized educational technology tools for interactive learning.. Conduc', 'Kauswagan National High School - Cagayan de Oro City', 'January', 'March 2024', '2025-07-24 14:04:56', NULL);
 
 -- --------------------------------------------------------
 
@@ -349,6 +423,13 @@ CREATE TABLE `tblcandemppoints` (
   `candEmp_datetime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblcandemppoints`
+--
+
+INSERT INTO `tblcandemppoints` (`candEmp_id`, `candEmp_appId`, `candEmp_jworkId`, `candEmp_points`, `candEmp_datetime`) VALUES
+(1, 1, 16, 11, '2025-08-04 03:15:47');
+
 -- --------------------------------------------------------
 
 --
@@ -363,6 +444,7 @@ CREATE TABLE `tblcandidates` (
   `cand_contactNo` varchar(50) NOT NULL,
   `cand_alternatecontactNo` varchar(50) DEFAULT NULL,
   `cand_email` varchar(255) NOT NULL,
+  `cand_google_id` varchar(255) DEFAULT NULL,
   `cand_alternateEmail` varchar(255) DEFAULT NULL,
   `cand_dateofBirth` date DEFAULT NULL,
   `cand_sex` enum('Male','Female','Other') DEFAULT NULL,
@@ -394,27 +476,13 @@ CREATE TABLE `tblcandidates` (
 -- Dumping data for table `tblcandidates`
 --
 
-INSERT INTO `tblcandidates` (`cand_id`, `cand_lastname`, `cand_firstname`, `cand_middlename`, `cand_contactNo`, `cand_alternatecontactNo`, `cand_email`, `cand_alternateEmail`, `cand_dateofBirth`, `cand_sex`, `cand_sssNo`, `cand_tinNo`, `cand_philhealthNo`, `cand_pagibigNo`, `cand_password`, `cand_presentStreet`, `cand_presentBarangay`, `cand_presentCity`, `cand_presentProvince`, `cand_presentPostalCode`, `cand_permanentStreet`, `cand_permanentBarangay`, `cand_permanentCity`, `cand_permanentProvince`, `cand_permanentPostalCode`, `cand_createdDatetime`, `cand_updatedDatetime`, `cand_pinCode`, `cand_activeStatus`, `cand_userLevel`, `cand_profPic`, `cand_isEmployed`) VALUES
-(6, 'macario', 'mel', 'sabido', '096768745321', '096498231232', 'mel@gmail.com', 'mel@gmail.com', '2024-08-08', 'Male', '031245', '123123', '123123', '123123', 'mel', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 0, 1, '', 0),
-(7, 'Gallegos', 'Ralph Jan', 'Pelino', '09056548089', '09261853553', 'rape.ss.coc@phinmaed.com', 'ralp.pelino12@gmail.com', '2014-08-08', 'Female', '56565', '5656565', '56566', '56565123126', '@ralphjan12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 0, 1, 'camera-capture-1735329129084-qias3c.jpg', 0),
-(8, 'macario', 'kobid', 'joe', '0945635345345', '09456353434545', 'kobid1212@gmail.com', 'kobid12@gmail.com', '2024-09-02', 'Male', '123', '123', '123', '123', 'macario123', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-09-05 11:32:10', NULL, '', 0, 0, '', 0),
-(9, 'Gallegos', 'Ralph Jan', 'Jan P.', '09056548089', '09056548089', 'kobid1212@gmail.com', '', '2001-11-08', 'Male', '8998', '7878', '8998', '7878', 'gwapo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-09-11 11:24:50', NULL, '', 0, 0, '', 0),
-(10, 'Roaya', 'Jake', 'Lumaktod', '09675868967857', '09675868967812', 'jake@gmail.com', 'jake12@gmail.com', '2002-10-20', 'Other', '8998', '7878', '8998', '7878', 'jake123', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-09-12 09:34:22', NULL, '', 0, 1, '', 0),
-(11, 'Gallegos', 'Jecham', 'Macario', '090909', '9090900', 'rape.gallegos.coc@phinmaed.com', 'ralp.pelino121@gmail.com', '2001-11-08', 'Male', '123-123', '123-123', '123-123', '123-123', '$2y$10$obaOkyOtY84By2tRkIv8Oue9xzy95ixpm9pyTjITO.dKk6O1zxi9K', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-19 01:06:30', NULL, '', 0, 1, '21004063.jpg', 1),
-(13, 'Plaza', 'Krystyll Ira Andrei', 'Tano', '09090909', '0909099009', 'andreiplaza03@gmail.com', 'ralp.pelino211@gmail.com', '2001-11-08', 'Female', '', '123123', NULL, NULL, '@krystyll03', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-23 06:38:37', NULL, '', 0, 1, '', 0),
-(14, 'Rogan', 'Joe ', 'Rogan', '09465746352', '094657463345', 'nutsgoddy1@gmail.com', 'nutsgoddy2@gmail.com', '2001-03-14', 'Male', NULL, NULL, NULL, NULL, 'Rogan', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-11-27 02:03:46', NULL, '', 0, 1, '', 0),
-(17, 'Plaza', 'Krystyll Ira Andrei', 'Tano', '0909090909', '4123123123', 'rape.galsdslegos.coc@phinmaed.com', 'krta.plaza.coc@phinmaed.com', '2003-10-03', 'Female', NULL, NULL, NULL, NULL, '@andrei08', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-08 10:05:33', NULL, '', 0, 1, 'camera-capture-1736319482101-1cezuz.jpg', 0),
-(18, 'Gallegos', 'Ralph Jan', 'Pelino', '09056548089', '09056548089', 'sss@gmail.com', 'ralp.pelino112@gmail.com', '2001-11-08', 'Male', NULL, NULL, NULL, NULL, '@pelino12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-08 07:28:14', NULL, '', 0, 1, 'naks.jpg', 1),
-(19, 'Gallegos', 'Ralph Jan', 'Pelino', '09056548089', '09056548089', 'ralphjangaffllegos@gmail.com', 'ralphssjanpelino@gmail.com', '2001-11-08', 'Male', NULL, NULL, NULL, NULL, '@pelino08', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-09 04:49:41', NULL, '', 0, 1, '', 0),
-(20, 'Sacay', 'Grizon', 'Sacay', '9009900909', '0990900909', 'grizonrussell@gmail.com', 'grizonrussell@gmail.com', '2003-10-11', 'Female', NULL, NULL, NULL, NULL, '@grizon', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-09 09:16:06', NULL, '', 0, 1, 'camera-capture-1736386253071-xo6tso.jpg', 1),
-(21, 'Roaya', 'Francis', 'Jake', '09056548089', '09056548089', 'sss@gmail.com', 'ss@gmail.com', '2001-11-08', 'Male', NULL, NULL, NULL, NULL, '@jake', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-09 01:32:23', NULL, '', 0, 1, '', 1),
-(23, 'Gallegos', 'Ralph Jan', 'Pelino', '09056548089', '09056548089', 'ralphjangassllegos@gmail.com', 'ralp.pelino112@gmail.com', '2001-01-13', 'Male', NULL, NULL, NULL, NULL, '@ralphjan12', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-01-31 10:25:51', NULL, '', 0, 1, '1000002345.jpg', 0),
-(24, 'Gallegos', 'Ralph Jan', 'Pelino', '09056548089', '09056548089', 'ralp.pelino11@gmail.com', 'ralphjanpelino@gmail.com', '2001-11-08', 'Male', '', '123544', '23355', '466-', '$2y$10$obaOkyOtY84By2tRkIv8Oue9xzy95ixpm9pyTjITO.dKk6O1zxi9K', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-06 06:13:50', NULL, '', 0, 1, '21004063.jpg', 0),
-(26, 'Roaya', 'Francis Jake', 'The ', '090474788', '093737378', 'roayafrancisjake@gmail.com', 'roayafrancisjake@gmail.com', '2001-11-08', 'Male', NULL, NULL, NULL, NULL, '$2y$10$esD81Lw6S65T.9JFDAilm.28uUdZDD99XmzxZpRY1PYO4neVJmdji', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-07 03:17:15', NULL, '', 0, 1, '', 0),
-(31, 'Gallegos', 'Ralph Jan', 'Pelino', '+63 905 654 8089', '+63 905 654 8089', 'ralphjanpelino11@gmail.com', 'krystyllp@gmail.com', '2002-03-19', 'Male', NULL, NULL, NULL, NULL, '$2y$10$FUA/bdbLVxfuPTaQsG5v8OVq/rhh1wAgQc7cqExHah.dDmqYIAZU6', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-02 01:11:21', NULL, '', 0, 1, '', 0),
-(32, 'Macario', 'Mel', 'Sabido', '+63 096 768 8786', '+63 976 476 5456', 'frlu.roaya.coc@phinmaed.com', 'xmelmacario12@gmail.com', '2023-03-09', 'Male', NULL, NULL, NULL, NULL, '$2y$10$WPrQnztrHCuXOfm3S5cNd.6dCCoN6JCvveTrw/m1Id9PNxaClgbai', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-17 09:31:34', NULL, '', 0, 1, '', 0),
-(34, 'Sacay', 'Grizon', 'Russel', '+63 096 754 5345', '+63 096 754 5345', 'genzorussell@gmail.com', 'genzorussell@gmail.com', '2003-03-20', 'Male', NULL, NULL, NULL, NULL, '$2y$10$ZsCctC1UvpygvaeM0t.Uv.i7ysU.X3mwnBV2EBM09QmWjg1Gi7eB.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-17 09:37:37', NULL, '', 0, 1, '', 0),
-(35, 'Roaya', 'Grizon', '', '+63 090 909 0923', '+63 232 323 2323', 'grba.sacay.coc@phinmaed.com', '', '2001-12-18', 'Male', NULL, NULL, NULL, NULL, '$2y$10$vQgKPX9JMMPe5/6.uGvU/OAZH.y3rkGlMP2KLG1/80iXMulm5/bem', 'Honesty St', 'Iponan', 'Cagayan de Oro City', 'Misamis Oriental', 9000, '', '', '', '', 0, '2025-05-27 10:34:07', NULL, '', 0, 1, '', 0);
+INSERT INTO `tblcandidates` (`cand_id`, `cand_lastname`, `cand_firstname`, `cand_middlename`, `cand_contactNo`, `cand_alternatecontactNo`, `cand_email`, `cand_google_id`, `cand_alternateEmail`, `cand_dateofBirth`, `cand_sex`, `cand_sssNo`, `cand_tinNo`, `cand_philhealthNo`, `cand_pagibigNo`, `cand_password`, `cand_presentStreet`, `cand_presentBarangay`, `cand_presentCity`, `cand_presentProvince`, `cand_presentPostalCode`, `cand_permanentStreet`, `cand_permanentBarangay`, `cand_permanentCity`, `cand_permanentProvince`, `cand_permanentPostalCode`, `cand_createdDatetime`, `cand_updatedDatetime`, `cand_pinCode`, `cand_activeStatus`, `cand_userLevel`, `cand_profPic`, `cand_isEmployed`) VALUES
+(24, 'Gallegos', 'Ralph Jan', 'Pelino', '09056548089', '09056548089', 'ralp.pelino11@gmail.com', NULL, 'ralphjanpelino1@gmail.com', '2001-11-08', 'Male', '', '123544', '23355', '466-', '$2y$10$obaOkyOtY84By2tRkIv8Oue9xzy95ixpm9pyTjITO.dKk6O1zxi9K', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-06 06:13:50', NULL, '', 0, 1, '21004063.jpg', 0),
+(36, 'Sacay', 'Grizon', NULL, '', NULL, 'grba.sacay.coc@phinmaed.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$10$MfNpeYEVRRhQMfN4RUorN.UY7PTL17TpP6yDLiKLa86nzQj3/qhU.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-24 21:46:35', NULL, '', 0, 1, '', 0),
+(37, 'Roaya', 'Francis Jake', 'Lumactod ', '', NULL, 'frlu.roaya.coc@phinmaed.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '$2y$10$ohYxHGco8IIqfEEBWyeXaeGi2s.ilqTlGDZrmJa9BVKH6IHREYgvu', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-06-26 09:23:08', NULL, '', 0, 1, '', 0),
+(39, 'Macario', 'Jimboy', 'Sabido', '+63 090 565 4808', '+63 090 565 4878', 'rape.gallegos.coc@phinmaed.com', NULL, '', '2001-11-08', 'Male', NULL, NULL, NULL, NULL, '$2y$10$V7GXI99Z3N0.lO4zMgJXmeHG7Jz9rZ.MqejDIwq5Wq1PiYKWoCYlO', 'Ficoville', 'Bulua', 'Cagayan de Oro City', 'Misamis Oriental', 9000, '', '', '', '', 0, '2025-07-19 01:04:34', NULL, '', 0, 1, '', 0),
+(40, 'Ruaya', 'Suzanne Gell', 'B', '+63 909 601 5541', '+63 909 601 5541', 'ralphjanpelino@gmail.com', NULL, '', '1990-10-17', 'Female', NULL, NULL, NULL, NULL, '$2y$10$DbI31rU8iIOc/teu8/QSY.D.nCZDBd6y6SdRzTI6SpUdkvgZxH9I.', 'P-3', 'San Isidro', 'Talakag', 'Bukidnon', 9000, '', '', '', '', 0, '2025-07-22 09:38:10', NULL, '', 0, 1, '', 0),
+(41, 'Taba', 'Rhea Jean', 'B', '+63 090 909 0909', '+63 090 909 0909', 'ralphjangallegos11@gmail.com', NULL, '', '2006-12-07', 'Female', NULL, NULL, NULL, NULL, '$2y$10$VbV0Q6/GW1ocqzoK1FdzG.Xl73sygev5pKjwcSMM7ohk3E0o/0UrC', 'Zone 7, Acacia EXT', 'Carmen', 'Cagayan de Oro City', 'Misamis Oriental', 9000, '', '', '', '', 0, '2025-07-23 08:48:24', NULL, '', 0, 1, '', 0);
 
 -- --------------------------------------------------------
 
@@ -477,19 +545,11 @@ CREATE TABLE `tblcandlicense` (
   `license_id` int(11) NOT NULL,
   `license_number` int(50) NOT NULL,
   `license_canId` int(11) NOT NULL,
-  `license_masterId` int(11) NOT NULL
+  `license_masterId` int(11) NOT NULL,
+  `license_image` varchar(250) DEFAULT NULL,
+  `license_createdAt` datetime DEFAULT NULL,
+  `license_updatedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tblcandlicense`
---
-
-INSERT INTO `tblcandlicense` (`license_id`, `license_number`, `license_canId`, `license_masterId`) VALUES
-(1, 5666264, 7, 9),
-(4, 89989, 9, 9),
-(5, 89989, 10, 1),
-(7, 123123123, 11, 9),
-(12, 1231123, 13, 3);
 
 -- --------------------------------------------------------
 
@@ -515,15 +575,21 @@ CREATE TABLE `tblcandresume` (
   `canres_id` int(11) NOT NULL,
   `canres_candId` int(11) NOT NULL,
   `canres_file` varchar(255) NOT NULL,
-  `canres_datetime` datetime NOT NULL
+  `canres_datetime` datetime NOT NULL,
+  `canres_createdAt` datetime DEFAULT NULL,
+  `canres_updatedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblcandresume`
 --
 
-INSERT INTO `tblcandresume` (`canres_id`, `canres_candId`, `canres_file`, `canres_datetime`) VALUES
-(118, 24, 'resume.docx', '0000-00-00 00:00:00');
+INSERT INTO `tblcandresume` (`canres_id`, `canres_candId`, `canres_file`, `canres_datetime`, `canres_createdAt`, `canres_updatedAt`) VALUES
+(126, 37, 'Francis_Jake_Roaya_Resume.docx', '0000-00-00 00:00:00', NULL, NULL),
+(130, 38, 'simo.docx', '0000-00-00 00:00:00', NULL, NULL),
+(136, 24, 'resume.docx', '0000-00-00 00:00:00', NULL, NULL),
+(142, 41, 'resumeRJ.docx', '0000-00-00 00:00:00', NULL, NULL),
+(144, 40, 'zanne.pdf', '0000-00-00 00:00:00', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -539,6 +605,15 @@ CREATE TABLE `tblcandskillpoints` (
   `candSkill_datetime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblcandskillpoints`
+--
+
+INSERT INTO `tblcandskillpoints` (`candSkill_id`, `candSkill_appId`, `candSkill_jobSkillsId`, `candSkill_points`, `candSkill_datetime`) VALUES
+(1, 1, 27, 0, '2025-08-04 03:15:47'),
+(2, 1, 28, 0, '2025-08-04 03:15:47'),
+(3, 1, 29, 0, '2025-08-04 03:15:47');
+
 -- --------------------------------------------------------
 
 --
@@ -549,26 +624,46 @@ CREATE TABLE `tblcandskills` (
   `skills_id` int(20) NOT NULL,
   `skills_candId` int(11) NOT NULL,
   `skills_name` varchar(50) NOT NULL,
-  `skills_datetime` datetime NOT NULL
+  `skills_description` varchar(250) DEFAULT NULL,
+  `skills_createdAt` datetime NOT NULL,
+  `skills_updatedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblcandskills`
 --
 
-INSERT INTO `tblcandskills` (`skills_id`, `skills_candId`, `skills_name`, `skills_datetime`) VALUES
-(74, 24, 'Organizing Events', '2025-06-01 12:17:47'),
-(75, 24, 'Communication', '2025-06-01 12:17:47'),
-(76, 24, 'Leadership', '2025-06-01 12:17:47'),
-(77, 24, 'Time Management', '2025-06-01 12:17:47'),
-(78, 24, 'Coordination', '2025-06-01 12:17:47'),
-(79, 24, 'Attention to Detail', '2025-06-01 12:17:47'),
-(80, 24, 'Client Relations', '2025-06-01 12:17:47'),
-(81, 24, 'Programming', '2025-06-01 12:17:47'),
-(82, 24, 'Logistics Planning', '2025-06-01 12:17:47'),
-(84, 24, 'Inventory Management', '2025-06-01 12:17:47'),
-(85, 24, 'Event Setup and Breakdown', '2025-06-01 12:17:47'),
-(88, 24, 'Vendor Management', '2025-06-09 10:23:09');
+INSERT INTO `tblcandskills` (`skills_id`, `skills_candId`, `skills_name`, `skills_description`, `skills_createdAt`, `skills_updatedAt`) VALUES
+(138, 37, 'Lesson Planning and Facilitation', '', '2025-06-26 10:39:21', NULL),
+(139, 37, 'Classroom and Behavior Management', '', '2025-06-26 10:39:21', NULL),
+(140, 37, 'Student-Centered Teaching Approach', '', '2025-06-26 10:39:21', NULL),
+(141, 37, 'Communication and Interpersonal Skills', '', '2025-06-26 10:39:21', NULL),
+(142, 37, 'Educational Technology (Google Classroom, MS Offic', '', '2025-06-26 10:39:21', NULL),
+(185, 24, 'Communication', NULL, '2025-07-12 11:10:13', NULL),
+(186, 24, 'Leadership', NULL, '2025-07-12 11:10:13', NULL),
+(187, 24, 'Time Management', NULL, '2025-07-12 11:10:13', NULL),
+(188, 24, 'Coordination', NULL, '2025-07-12 11:10:13', NULL),
+(189, 24, 'Attention to Detail', NULL, '2025-07-12 11:10:13', NULL),
+(190, 24, 'Client Relations', NULL, '2025-07-12 11:10:13', NULL),
+(191, 24, 'Programming', NULL, '2025-07-12 11:10:13', NULL),
+(192, 24, 'Organizing Events', NULL, '2025-07-12 11:10:13', NULL),
+(193, 24, 'Logistics Planning', NULL, '2025-07-12 11:10:13', NULL),
+(194, 24, 'Vendor Management', NULL, '2025-07-12 11:10:13', NULL),
+(195, 24, 'Inventory Management', NULL, '2025-07-12 11:10:13', NULL),
+(196, 24, 'Event Setup and Breakdown', NULL, '2025-07-12 11:10:13', NULL),
+(197, 24, 'Data Analysis', 'Strong understanding of statistical concepts (e.g., hypothesis testing, regression, correlation) and ability to apply them to real-world data.', '2025-07-18 23:01:53', NULL),
+(198, 24, 'Microsoft Excel', 'Expert level skills for data cleaning, data analysis, pivot tables, VLOOKUP, and advanced formulas.', '2025-07-18 23:03:05', '2025-07-19 22:15:43'),
+(199, 24, 'Data Manager', 'Proficiency in data manipulation tools like SQL and Python is crucial for efficiently extracting, cleaning, and transforming raw data into usable formats, eLearning and AI courseware..', '2025-07-19 14:15:02', '2025-07-19 22:41:49'),
+(206, 41, 'Creativity', NULL, '2025-07-23 21:46:02', NULL),
+(207, 41, 'Adaptability', NULL, '2025-07-23 21:46:02', NULL),
+(214, 40, 'Educational Technology (e.g., Google Classroom, Po', NULL, '2025-07-24 14:04:56', NULL),
+(215, 40, 'Communication and Interpersonal Skills', NULL, '2025-07-24 14:04:56', NULL),
+(216, 40, 'Time Management', NULL, '2025-07-24 14:04:56', NULL),
+(217, 40, 'Student Engagement', NULL, '2025-07-24 14:04:56', NULL),
+(218, 40, 'Lesson Planning and Instruction', NULL, '2025-07-24 14:04:56', NULL),
+(219, 40, 'Classroom Management', NULL, '2025-07-24 14:04:56', NULL),
+(221, 39, 'Project management', 'Managing business with have a multiple project', '2025-08-12 22:14:32', NULL),
+(224, 39, 'Business analysis', 'Analyze data of the any business', '2025-08-12 22:38:19', NULL);
 
 -- --------------------------------------------------------
 
@@ -579,9 +674,19 @@ INSERT INTO `tblcandskills` (`skills_id`, `skills_candId`, `skills_name`, `skill
 CREATE TABLE `tblcandtraining` (
   `training_id` int(20) NOT NULL,
   `training_candId` int(20) NOT NULL,
-  `training_name` int(20) NOT NULL,
-  `training_image` varchar(50) NOT NULL
+  `training_name` varchar(20) NOT NULL,
+  `training_image` varchar(50) NOT NULL,
+  `training_createdAt` datetime DEFAULT NULL,
+  `training_updatedAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcandtraining`
+--
+
+INSERT INTO `tblcandtraining` (`training_id`, `training_candId`, `training_name`, `training_image`, `training_createdAt`, `training_updatedAt`) VALUES
+(11, 37, 'Innovative Strategie', '', NULL, NULL),
+(12, 37, 'Campus Teaching Demo', '', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -596,6 +701,13 @@ CREATE TABLE `tblcandtrainpoints` (
   `candTrain_points` int(11) DEFAULT NULL,
   `candTrain_datetime` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblcandtrainpoints`
+--
+
+INSERT INTO `tblcandtrainpoints` (`candTrain_id`, `candTrain_appId`, `candTrain_trngId`, `candTrain_points`, `candTrain_datetime`) VALUES
+(1, 1, 25, NULL, '2025-08-04 03:15:47');
 
 -- --------------------------------------------------------
 
@@ -627,9 +739,9 @@ INSERT INTO `tblcolorstatus` (`colorS_id`, `colorS_name`, `colorS_description`, 
 
 CREATE TABLE `tblcourses` (
   `courses_id` int(20) NOT NULL,
-  `courses_name` varchar(250) NOT NULL,
-  `courses_coursecategoryId` int(20) NOT NULL,
-  `courses_courseTypeId` int(11) NOT NULL DEFAULT 2,
+  `courses_name` varchar(250) DEFAULT NULL,
+  `courses_coursecategoryId` int(20) DEFAULT NULL,
+  `courses_courseTypeId` int(11) DEFAULT NULL,
   `courses_hrId` int(11) DEFAULT NULL,
   `courses_datetime` datetime DEFAULT NULL,
   `courses_passpercentage` int(11) DEFAULT NULL
@@ -640,77 +752,79 @@ CREATE TABLE `tblcourses` (
 --
 
 INSERT INTO `tblcourses` (`courses_id`, `courses_name`, `courses_coursecategoryId`, `courses_courseTypeId`, `courses_hrId`, `courses_datetime`, `courses_passpercentage`) VALUES
-(23, 'Bachelor of Arts (AB) in English', 5, 2, NULL, NULL, 0),
+(23, 'Bachelor of Arts (AB) in English', 5, 2, NULL, NULL, 60),
 (24, 'Bachelor of Arts (AB) in Filipino', 5, 2, NULL, NULL, 60),
-(25, 'Bachelor of Arts (AB) in History', 5, 2, NULL, NULL, 0),
-(26, 'Bachelor of Arts (AB) in Philosophy', 5, 2, NULL, NULL, 0),
-(27, 'Bachelor of Arts (AB) in Political Science', 5, 2, NULL, NULL, 0),
-(28, 'Bachelor of Arts (AB) in Psychology', 5, 2, NULL, NULL, 0),
-(29, 'Bachelor of Fine Arts (BFA) in Painting', 5, 2, NULL, NULL, 0),
-(30, 'Bachelor of Fine Arts (BFA) in Sculpture', 5, 2, NULL, NULL, 0),
-(31, 'Bachelor of Fine Arts (BFA) in Graphic Design', 5, 2, NULL, NULL, 0),
-(32, 'Bachelor of Fine Arts (BFA) in Photography', 5, 2, NULL, NULL, 0),
-(33, 'Bachelor of Music (BM) in Performance', 5, 2, NULL, NULL, 0),
-(34, 'Bachelor of Music (BM) in Music Education', 5, 2, NULL, NULL, 0),
-(35, 'Bachelor of Music (BM) in Music Therapy', 5, 2, NULL, NULL, 0),
-(36, 'Bachelor of Science in Business Administration (BSBA) in Accounting', 1, 2, NULL, NULL, 0),
-(37, 'Bachelor of Science in Business Administration (BSBA) in Business Management', 1, 2, NULL, NULL, 0),
-(38, 'Bachelor of Science in Business Administration (BSBA) in Entrepreneurship', 1, 2, NULL, NULL, 0),
-(39, 'Bachelor of Science in Business Administration (BSBA) in Finance', 1, 2, NULL, NULL, 0),
-(40, 'Bachelor of Science in Business Administration (BSBA) in Human Resource Management', 1, 2, NULL, NULL, 0),
-(41, 'Bachelor of Science in Business Administration (BSBA) in Marketing', 1, 2, NULL, NULL, 0),
-(42, 'Bachelor of Science in Business Administration (BSBA) in Operations Management', 1, 2, NULL, NULL, 0),
-(43, 'Bachelor of Science in Entrepreneurship (BSE)', 1, 2, NULL, NULL, 0),
-(44, 'Bachelor of Science in Management (BSM)', 1, 2, NULL, NULL, 0),
-(45, 'Bachelor of Science in Computer Science (BSCS)', 18, 2, NULL, NULL, 0),
-(46, 'Bachelor of Science in Information Technology (BSIT)', 18, 2, NULL, NULL, 65),
-(47, 'Bachelor of Science in Information Systems (BSIS)', 18, 2, NULL, NULL, 70),
-(48, 'Bachelor of Elementary Education (BEEd)', 4, 2, NULL, NULL, 0),
-(49, 'Bachelor of Secondary Education (BSEd) in English', 4, 2, NULL, NULL, 0),
-(50, 'Bachelor of Secondary Education (BSEd) in Filipino', 4, 2, NULL, NULL, 0),
-(51, 'Bachelor of Secondary Education (BSEd) in Mathematics', 4, 2, NULL, NULL, 0),
-(52, 'Bachelor of Secondary Education (BSEd) in Science', 4, 2, NULL, NULL, 0),
-(53, 'Bachelor of Secondary Education (BSEd) in Social Studies', 4, 2, NULL, NULL, 0),
-(54, 'Bachelor of Physical Education (BPE)', 4, 2, NULL, NULL, 0),
-(55, 'Bachelor of Special Needs Education (BSNEd)', 4, 2, NULL, NULL, 0),
-(56, 'Bachelor of Science in Civil Engineering (BSCE)', 2, 2, NULL, NULL, 0),
-(57, 'Bachelor of Science in Computer Engineering (BSCoE)', 2, 2, NULL, NULL, 0),
-(58, 'Bachelor of Science in Electrical Engineering (BSEE)', 2, 2, NULL, NULL, 0),
-(59, 'Bachelor of Science in Electronics Engineering (BSECE)', 2, 2, NULL, NULL, 0),
-(60, 'Bachelor of Science in Mechanical Engineering (BSME)', 2, 2, NULL, NULL, 0),
-(61, 'Bachelor of Science in Industrial Engineering (BSIE)', 2, 2, NULL, NULL, 0),
-(83, 'Bachelor of Science in Nursing (BSN)', 3, 2, NULL, NULL, 0),
-(84, 'Bachelor of Science in Medical Technology (BSMT)', 3, 2, NULL, NULL, 0),
-(85, 'Bachelor of Science in Pharmacy (BSPharm)', 3, 2, NULL, NULL, 0),
-(86, 'Bachelor of Science in Physical Therapy (BSPT)', 3, 2, NULL, NULL, 0),
-(87, 'Bachelor of Science in Occupational Therapy (BSOT)', 3, 2, NULL, NULL, 0),
-(91, 'Bachelor of Science in Hospitality Management (BSHM)', 9, 2, NULL, NULL, 0),
-(92, 'Bachelor of Science in Tourism Management (BSTM)', 9, 2, NULL, NULL, 0),
-(93, 'Bachelor of Science in Biology (BSBio)', 19, 2, NULL, NULL, 0),
-(94, 'Bachelor of Science in Chemistry (BSChem)', 19, 2, NULL, NULL, 0),
-(95, 'Bachelor of Science in Mathematics (BSMath)', 19, 2, NULL, NULL, 0),
-(96, 'Bachelor of Science in Physics (BSPhy)', 19, 2, NULL, NULL, 0),
-(97, 'Bachelor of Science in Statistics (BSStat)', 19, 2, NULL, NULL, 0),
-(98, 'Bachelor of Science in Economics (BSEcon)', 11, 2, NULL, NULL, 0),
-(99, 'Bachelor of Science in Psychology (BSPsy)', 11, 2, NULL, NULL, 0),
-(100, 'Bachelor of Science in Sociology (BSSoc)', 11, 2, NULL, NULL, 0),
-(101, 'Bachelor of Science in Anthropology (BSAnthro)', 11, 2, NULL, NULL, 0),
-(102, 'Bachelor of Science in Criminology (BSCrim)', 20, 2, NULL, NULL, 0),
-(103, 'Bachelor of Science in Environmental Science (BSES)', 20, 2, NULL, NULL, 0),
-(104, 'Bachelor of Science in Forestry (BSFor)', 20, 2, NULL, NULL, 0),
-(105, 'Bachelor of Science in Geology (BSGeo)', 20, 2, NULL, NULL, 0),
-(106, 'Bachelor of Science in Marine Biology (BSMB)', 20, 2, NULL, NULL, 0),
-(107, 'Bachelor of Science in Agriculture (BSA)', 21, 2, NULL, NULL, 0),
-(108, 'Bachelor of Science in Agricultural Business (BSAB)', 21, 2, NULL, NULL, 0),
-(109, 'Bachelor of Science in Agricultural Economics (BSAE)', 21, 2, NULL, NULL, 0),
-(110, 'Bachelor of Science in Agronomy (BSAgr)', 21, 2, NULL, NULL, 0),
-(111, 'Bachelor of Science in Animal Science (BSAS)', 21, 2, NULL, NULL, 0),
-(112, 'Bachelor of Science in Entomology (BSEnt)', 21, 2, NULL, NULL, 0),
-(113, 'Bachelor of Science Criminal', 4, 2, NULL, NULL, 0),
-(118, 'Bachelor of Science Criminal', 22, 4, NULL, NULL, 0),
-(119, 'Bachelor of Science Programmer', 18, 2, NULL, NULL, 0),
-(121, 'Bachelor of Programming', 18, 2, NULL, NULL, 0),
-(122, 'Bachelor of Make Up', 1, 2, NULL, NULL, 0);
+(25, 'Bachelor of Arts (AB) in History', 5, 2, NULL, NULL, 60),
+(26, 'Bachelor of Arts (AB) in Philosophy', 5, 2, NULL, NULL, 60),
+(27, 'Bachelor of Arts (AB) in Political Science', 5, 2, NULL, NULL, 60),
+(28, 'Bachelor of Arts (AB) in Psychology', 5, 2, NULL, NULL, 60),
+(29, 'Bachelor of Fine Arts (BFA) in Painting', 5, 2, NULL, NULL, 60),
+(30, 'Bachelor of Fine Arts (BFA) in Sculpture', 5, 2, NULL, NULL, 60),
+(31, 'Bachelor of Fine Arts (BFA) in Graphic Design', 5, 2, NULL, NULL, 60),
+(32, 'Bachelor of Fine Arts (BFA) in Photography', 5, 2, NULL, NULL, 60),
+(33, 'Bachelor of Music (BM) in Performance', 5, 2, NULL, NULL, 60),
+(34, 'Bachelor of Music (BM) in Music Education', 5, 2, NULL, NULL, 60),
+(35, 'Bachelor of Music (BM) in Music Therapy', 5, 2, NULL, NULL, 60),
+(36, 'Bachelor of Science in Business Administration (BSBA) in Accounting', 1, 2, NULL, NULL, 60),
+(37, 'Bachelor of Science in Business Administration (BSBA) in Business Management', 1, 2, NULL, NULL, 60),
+(38, 'Bachelor of Science in Business Administration (BSBA) in Entrepreneurship', 1, 2, NULL, NULL, 60),
+(39, 'Bachelor of Science in Business Administration (BSBA) in Finance', 1, 2, NULL, NULL, 60),
+(40, 'Bachelor of Science in Business Administration (BSBA) in Human Resource Management', 1, 2, NULL, NULL, 60),
+(41, 'Bachelor of Science in Business Administration (BSBA) in Marketing', 1, 2, NULL, NULL, 60),
+(42, 'Bachelor of Science in Business Administration (BSBA) in Operations Management', 1, 2, NULL, NULL, 60),
+(43, 'Bachelor of Science in Entrepreneurship (BSE)', 1, 2, NULL, NULL, 60),
+(44, 'Bachelor of Science in Management (BSM)', 1, 2, NULL, NULL, 60),
+(45, 'Bachelor of Science in Computer Science (BSCS)', 18, 2, NULL, NULL, 60),
+(46, 'Bachelor of Science in Information Technology (BSIT)', 18, 2, NULL, NULL, 60),
+(47, 'Bachelor of Science in Information Systems (BSIS)', 18, 2, NULL, NULL, 60),
+(48, 'Bachelor of Elementary Education (BEEd)', 4, 2, NULL, NULL, 60),
+(49, 'Bachelor of Secondary Education (BSEd) in English', 4, 2, NULL, NULL, 60),
+(50, 'Bachelor of Secondary Education (BSEd) in Filipino', 4, 2, NULL, NULL, 60),
+(51, 'Bachelor of Secondary Education (BSEd) in Mathematics', 4, 2, NULL, NULL, 60),
+(52, 'Bachelor of Secondary Education (BSEd) in Science', 4, 2, NULL, NULL, 60),
+(53, 'Bachelor of Secondary Education (BSEd) in Social Studies', 4, 2, NULL, NULL, 60),
+(54, 'Bachelor of Physical Education (BPE)', 4, 2, NULL, NULL, 60),
+(55, 'Bachelor of Special Needs Education (BSNEd)', 4, 2, NULL, NULL, 60),
+(56, 'Bachelor of Science in Civil Engineering (BSCE)', 2, 2, NULL, NULL, 60),
+(57, 'Bachelor of Science in Computer Engineering (BSCoE)', 2, 2, NULL, NULL, 60),
+(58, 'Bachelor of Science in Electrical Engineering (BSEE)', 2, 2, NULL, NULL, 60),
+(59, 'Bachelor of Science in Electronics Engineering (BSECE)', 2, 2, NULL, NULL, 60),
+(60, 'Bachelor of Science in Mechanical Engineering (BSME)', 2, 2, NULL, NULL, 60),
+(61, 'Bachelor of Science in Industrial Engineering (BSIE)', 2, 2, NULL, NULL, 60),
+(83, 'Bachelor of Science in Nursing (BSN)', 3, 2, NULL, NULL, 60),
+(84, 'Bachelor of Science in Medical Technology (BSMT)', 3, 2, NULL, NULL, 60),
+(85, 'Bachelor of Science in Pharmacy (BSPharm)', 3, 2, NULL, NULL, 60),
+(86, 'Bachelor of Science in Physical Therapy (BSPT)', 3, 2, NULL, NULL, 60),
+(87, 'Bachelor of Science in Occupational Therapy (BSOT)', 3, 2, NULL, NULL, 60),
+(91, 'Bachelor of Science in Hospitality Management (BSHM)', 9, 2, NULL, NULL, 60),
+(92, 'Bachelor of Science in Tourism Management (BSTM)', 9, 2, NULL, NULL, 60),
+(93, 'Bachelor of Science in Biology (BSBio)', 19, 2, NULL, NULL, 60),
+(94, 'Bachelor of Science in Chemistry (BSChem)', 19, 2, NULL, NULL, 60),
+(95, 'Bachelor of Science in Mathematics (BSMath)', 19, 2, NULL, NULL, 60),
+(96, 'Bachelor of Science in Physics (BSPhy)', 19, 2, NULL, NULL, 60),
+(97, 'Bachelor of Science in Statistics (BSStat)', 19, 2, NULL, NULL, 60),
+(98, 'Bachelor of Science in Economics (BSEcon)', 11, 2, NULL, NULL, 60),
+(99, 'Bachelor of Science in Psychology (BSPsy)', 11, 2, NULL, NULL, 60),
+(100, 'Bachelor of Science in Sociology (BSSoc)', 11, 2, NULL, NULL, 60),
+(101, 'Bachelor of Science in Anthropology (BSAnthro)', 11, 2, NULL, NULL, 60),
+(102, 'Bachelor of Science in Criminology (BSCrim)', 20, 2, NULL, NULL, 60),
+(103, 'Bachelor of Science in Environmental Science (BSES)', 20, 2, NULL, NULL, 60),
+(104, 'Bachelor of Science in Forestry (BSFor)', 20, 2, NULL, NULL, 60),
+(105, 'Bachelor of Science in Geology (BSGeo)', 20, 2, NULL, NULL, 60),
+(106, 'Bachelor of Science in Marine Biology (BSMB)', 20, 2, NULL, NULL, 60),
+(107, 'Bachelor of Science in Agriculture (BSA)', 21, 2, NULL, NULL, 60),
+(108, 'Bachelor of Science in Agricultural Business (BSAB)', 21, 2, NULL, NULL, 60),
+(109, 'Bachelor of Science in Agricultural Economics (BSAE)', 21, 2, NULL, NULL, 60),
+(110, 'Bachelor of Science in Agronomy (BSAgr)', 21, 2, NULL, NULL, 60),
+(111, 'Bachelor of Science in Animal Science (BSAS)', 21, 2, NULL, NULL, 60),
+(112, 'Bachelor of Science in Entomology (BSEnt)', 21, 2, NULL, NULL, 60),
+(113, 'Bachelor of Science Criminal', 4, 2, NULL, NULL, 60),
+(118, 'Bachelor of Science Criminal', 22, 4, NULL, NULL, 60),
+(119, 'Bachelor of Science Programmer', 18, 2, NULL, NULL, 60),
+(121, 'Bachelor of Programming', 18, 2, NULL, NULL, 60),
+(122, 'Bachelor of Make Up', 1, 2, NULL, NULL, 60),
+(132, 'Bachelor of Science in Agribusiness Management', 1, 2, NULL, NULL, 50),
+(135, 'Senior High School', 1, 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -792,26 +906,32 @@ CREATE TABLE `tblexam` (
   `exam_duration` int(11) NOT NULL,
   `exam_createdAt` date NOT NULL,
   `exam_updatedAt` date NOT NULL,
-  `exam_hrId` int(11) DEFAULT NULL
+  `exam_hrId` int(11) DEFAULT NULL,
+  `exam_isActive` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tblexam`
 --
 
-INSERT INTO `tblexam` (`exam_id`, `exam_name`, `exam_typeId`, `exam_jobMId`, `exam_isGeneral`, `exam_duration`, `exam_createdAt`, `exam_updatedAt`, `exam_hrId`) VALUES
-(1, 'General Exam mo to', 1, NULL, 0, 1, '2024-10-01', '2024-10-19', NULL),
-(2, 'Production Supervisor', 2, 1, 0, 30, '2024-10-02', '2025-01-08', NULL),
-(3, 'Management', 2, 12, 0, 60, '2024-10-19', '2025-02-24', NULL),
-(4, 'Developing', 2, 10, 0, 30, '2024-10-24', '2024-10-24', NULL),
-(5, 'Analysis', 2, 13, 0, 30, '2024-10-24', '2024-12-08', NULL),
-(6, 'Secretary exam', 2, 14, 0, 1, '2024-10-24', '2024-10-24', NULL),
-(7, 'Accounting', 2, 16, 0, 1, '2024-12-03', '2024-12-08', NULL),
-(8, 'Marketing', 2, 3, 0, 30, '2024-12-08', '2024-12-08', NULL),
-(9, 'Business', 2, 17, 0, 60, '2025-01-08', '2025-03-12', NULL),
-(10, 'Untitled Exam', 2, 18, 0, 120, '2025-01-09', '2025-01-09', NULL),
-(11, 'Production Supervisor', 2, 19, 0, 60, '2025-03-11', '2025-03-11', NULL),
-(12, 'Untitled Exam', 2, 20, 0, 120, '2025-06-01', '2025-06-01', NULL);
+INSERT INTO `tblexam` (`exam_id`, `exam_name`, `exam_typeId`, `exam_jobMId`, `exam_isGeneral`, `exam_duration`, `exam_createdAt`, `exam_updatedAt`, `exam_hrId`, `exam_isActive`) VALUES
+(1, 'General Exam mo to', 1, NULL, 1, 1, '2024-10-01', '2024-10-19', NULL, 0),
+(2, 'Production Supervisor', 2, 1, 0, 30, '2024-10-02', '2025-01-08', NULL, 0),
+(3, 'Management', 2, 12, 0, 60, '2024-10-19', '2025-02-24', NULL, 0),
+(4, 'Developing', 2, 10, 0, 30, '2024-10-24', '2024-10-24', NULL, 0),
+(5, 'Analysis', 2, 13, 0, 30, '2024-10-24', '2024-12-08', NULL, 0),
+(6, 'Secretary exam', 2, 14, 0, 1, '2024-10-24', '2024-10-24', NULL, 0),
+(7, 'Accounting', 2, 16, 0, 1, '2024-12-03', '2024-12-08', NULL, 0),
+(8, 'Marketing', 2, 3, 0, 30, '2024-12-08', '2024-12-08', NULL, 0),
+(9, 'Business', 2, 17, 0, 60, '2025-01-08', '2025-03-12', NULL, 0),
+(10, 'Untitled Exam', 2, 18, 0, 120, '2025-01-09', '2025-01-09', NULL, 0),
+(11, 'Production Supervisor', 2, 19, 0, 60, '2025-03-11', '2025-03-11', NULL, 0),
+(12, 'Untitled Exam', 2, 20, 0, 120, '2025-06-01', '2025-06-01', NULL, 0),
+(13, 'Untitled Exam', 2, 21, 0, 120, '2025-06-26', '2025-06-26', NULL, 0),
+(14, 'Untitled Exam', 2, 22, 0, 120, '2025-07-04', '2025-07-04', NULL, 0),
+(15, 'Untitled Exam', 2, 23, 0, 120, '2025-07-19', '2025-07-19', NULL, 0),
+(16, 'Untitled Exam', 2, 24, 0, 120, '2025-07-24', '2025-07-24', NULL, 0),
+(17, 'Untitled Exam', 2, 25, 0, 120, '2025-07-24', '2025-07-24', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -827,6 +947,21 @@ CREATE TABLE `tblexamcandidateanswer` (
   `examcandA_essay` text DEFAULT NULL,
   `examcandA_pointsEarned` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblexamcandidateanswer`
+--
+
+INSERT INTO `tblexamcandidateanswer` (`examcandA_id`, `examcandA_resultId`, `examcandA_questionId`, `examcandA_choiceId`, `examcandA_essay`, `examcandA_pointsEarned`) VALUES
+(19, 1, 1, 5, NULL, 0),
+(20, 1, 2, 10, NULL, 5),
+(21, 1, 5, 21, NULL, 0),
+(22, 1, 7, 31, NULL, 0),
+(23, 1, 45, 211, NULL, 5),
+(24, 1, 46, 213, NULL, 0),
+(25, 1, 47, 220, NULL, 0),
+(26, 1, 48, 223, NULL, 5),
+(27, 1, 49, 228, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -1155,6 +1290,28 @@ CREATE TABLE `tblexamresult` (
   `examR_status` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblexamresult`
+--
+
+INSERT INTO `tblexamresult` (`examR_id`, `examR_candId`, `examR_examId`, `examR_jobMId`, `examR_score`, `examR_totalscore`, `examR_date`, `examR_status`) VALUES
+(1, 40, 9, 17, 15, 41, '2025-08-11 15:17:02', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tblexamschedule`
+--
+
+CREATE TABLE `tblexamschedule` (
+  `examS_id` int(11) NOT NULL,
+  `examS_appId` int(11) NOT NULL,
+  `examS_candId` int(11) NOT NULL,
+  `examS_date` datetime NOT NULL,
+  `examS_hrId` int(11) NOT NULL,
+  `examS_createdAt` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -1194,14 +1351,14 @@ CREATE TABLE `tblfailedlogins` (
 
 INSERT INTO `tblfailedlogins` (`email`, `failed_attempts`, `lock_until`) VALUES
 ('asdsa@gmail.com', 1, NULL),
-('frlu.roaya.coc@phinmaed.com', 1, NULL),
-('grba.sacay.coc@phinmaed.com', 4, '2025-05-27 11:04:33'),
 ('hahaha@gmail.com', 1, NULL),
 ('hjakhsd@mail.com', 1, NULL),
 ('hjasd@gmail.com', 1, NULL),
 ('jecham@gmail.com', 3, NULL),
 ('mel@gmail.com', 1, NULL),
+('ralp.pelino11@gmail.com', 1, NULL),
 ('ralph@gmail.com', 1, NULL),
+('raphgwapo@gmail.com', 1, NULL),
 ('Timbal@gmail.com', 1, NULL);
 
 -- --------------------------------------------------------
@@ -1257,7 +1414,7 @@ CREATE TABLE `tblhr` (
 --
 
 INSERT INTO `tblhr` (`hr_id`, `hr_firstname`, `hr_middlename`, `hr_lastname`, `hr_contactNo`, `hr_email`, `hr_alternateEmail`, `hr_password`, `hr_userLevel`, `hr_hrId`, `hr_createdAt`) VALUES
-(1, 'Ralph Jan', 'Pelino', 'Gallegos', '09056548089', 'ralphjangallegos@gmail.com', 'ralphjangallegos@gmail.com', '$2y$10$ZVd.PA0HsxV5nC8nQQ7l0ufv44ApjwOR3HB6HUmjepuu.lhQkdyeG', 2, NULL, '2025-03-02 12:22:41'),
+(1, 'Ralph Jan', 'Pelino', 'Gallegos', '09056548089', 'ralphjangallegos@gmail.com', 'ralphjangallegos11@gmail.com', '$2y$10$ZVd.PA0HsxV5nC8nQQ7l0ufv44ApjwOR3HB6HUmjepuu.lhQkdyeG', 2, NULL, '2025-03-02 12:22:41'),
 (2, 'Maria Alva', 'C.', 'Espiritu', '9056548089', 'EspirituMAC@delmonte-phil.com', '', '$2y$10$6bbkjIZK7O20P9NA7ooMxO4tSJFoRWHrGmG1URhMLy7hQQa9t9.x6', 4, NULL, '2025-05-22 12:29:01'),
 (3, 'Jalil', 'E.', 'Quinal', '9096015541', 'QuinalJE@delmonte-phil.com', '', '$2y$10$dmJ2i0s5RVocQlvT/.GnXOejGh3vYmOa5XJiA9Hn/eFGc9SRniP2.', 5, NULL, '2025-05-22 12:30:01');
 
@@ -3693,7 +3850,11 @@ INSERT INTO `tblinstitution` (`institution_id`, `institution_name`, `institution
 (2409, 'Colegio de Puerto Galera', 5, NULL, NULL),
 (2411, 'USTP', 5, NULL, NULL),
 (2412, 'MOGCHS', 5, NULL, NULL),
-(2422, 'PHINMA Cagayan de Oro College', 5, NULL, NULL);
+(2422, 'PHINMA Cagayan de Oro College', 5, NULL, NULL),
+(2426, 'University of Science and Technology of Southern Philippines (USTP)', 5, NULL, NULL),
+(2435, 'Phinma-Cagayan de Oro College', 5, NULL, NULL),
+(2436, 'Stella Matutina Academy', 5, NULL, NULL),
+(2437, 'Migcawayan Elementary Education', 5, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3708,6 +3869,15 @@ CREATE TABLE `tblinterviewcandpoints` (
   `interviewP_candId` int(11) NOT NULL,
   `interviewP_points` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblinterviewcandpoints`
+--
+
+INSERT INTO `tblinterviewcandpoints` (`interviewP_id`, `interviewP_criteriaId`, `interviewP_jobId`, `interviewP_candId`, `interviewP_points`) VALUES
+(1, 78, 17, 40, 15),
+(2, 79, 17, 40, 10),
+(3, 80, 17, 40, 10);
 
 -- --------------------------------------------------------
 
@@ -3885,7 +4055,12 @@ INSERT INTO `tblinterviewpassingpercent` (`passing_id`, `passing_jobId`, `passin
 (28, 17, 50, NULL, NULL),
 (29, 18, 50, NULL, NULL),
 (30, 19, 50, NULL, NULL),
-(31, 20, 50, NULL, NULL);
+(31, 20, 50, NULL, NULL),
+(32, 21, 50, NULL, NULL),
+(33, 22, 50, NULL, NULL),
+(34, 23, 50, NULL, NULL),
+(35, 24, 50, NULL, NULL),
+(36, 25, 50, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3904,6 +4079,13 @@ CREATE TABLE `tblinterviewresult` (
   `interviewR_hrId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tblinterviewresult`
+--
+
+INSERT INTO `tblinterviewresult` (`interviewR_id`, `interviewR_candId`, `interviewR_jobId`, `interviewR_score`, `interviewR_totalScore`, `interviewR_date`, `interviewR_status`, `interviewR_hrId`) VALUES
+(1, 40, 17, 35, 60, '2025-08-11', 1, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -3918,6 +4100,36 @@ CREATE TABLE `tblinterviewschedule` (
   `intsched_hrId` int(11) DEFAULT NULL,
   `intsched_createdAt` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblinterviewschedule`
+--
+
+INSERT INTO `tblinterviewschedule` (`intsched_id`, `intsched_jobId`, `intsched_candId`, `intsched_date`, `intsched_hrId`, `intsched_createdAt`) VALUES
+(2, 17, 40, '2025-08-27 13:00:00', NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbljobbranch`
+--
+
+CREATE TABLE `tbljobbranch` (
+  `jobB_id` int(11) NOT NULL,
+  `jobB_jobMId` int(11) NOT NULL,
+  `jobB_branchId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbljobbranch`
+--
+
+INSERT INTO `tbljobbranch` (`jobB_id`, `jobB_jobMId`, `jobB_branchId`) VALUES
+(1, 17, 1),
+(2, 17, 4),
+(3, 24, 3),
+(4, 25, 4),
+(5, 23, 1);
 
 -- --------------------------------------------------------
 
@@ -3983,7 +4195,7 @@ INSERT INTO `tbljobpassing` (`passing_id`, `passing_jobId`, `passing_points`, `p
 (3, 4, 50, NULL, NULL),
 (5, 3, 5, NULL, NULL),
 (6, 5, 50, NULL, NULL),
-(8, 10, 50, NULL, NULL),
+(8, 10, 70, NULL, NULL),
 (9, 6, 50, NULL, NULL),
 (10, 12, 50, NULL, NULL),
 (11, 13, 10, NULL, NULL),
@@ -3993,7 +4205,12 @@ INSERT INTO `tbljobpassing` (`passing_id`, `passing_jobId`, `passing_points`, `p
 (15, 17, 50, NULL, NULL),
 (16, 18, 50, NULL, NULL),
 (17, 19, 60, NULL, NULL),
-(18, 20, 50, NULL, NULL);
+(18, 20, 60, NULL, NULL),
+(19, 21, 60, NULL, NULL),
+(20, 22, 60, NULL, NULL),
+(21, 23, 60, NULL, NULL),
+(22, 24, 60, NULL, NULL),
+(23, 25, 60, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4034,7 +4251,12 @@ INSERT INTO `tbljobseducation` (`jeduc_id`, `jeduc_jobId`, `jeduc_text`, `jeduc_
 (19, 19, '', 2, 20, NULL, NULL),
 (20, 20, '', 1, 20, NULL, NULL),
 (21, 20, '', 2, 20, NULL, NULL),
-(22, 20, '', 4, 20, NULL, NULL);
+(22, 20, '', 4, 20, NULL, NULL),
+(23, 21, '', 4, 20, NULL, NULL),
+(24, 22, '', 2, 20, NULL, NULL),
+(25, 23, '', 1, 30, NULL, NULL),
+(26, 24, '', 2, 30, NULL, NULL),
+(27, 25, '', 1, 30, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4093,7 +4315,9 @@ CREATE TABLE `tbljobslicense` (
 --
 
 INSERT INTO `tbljobslicense` (`jlicense_id`, `jlicense_licenceMId`, `jlicense_jobId`, `jlicense_points`, `jlicense_hrId`, `jlicense_datetime`) VALUES
-(2, 9, 1, 50, NULL, NULL);
+(2, 9, 1, 50, NULL, NULL),
+(3, 9, 22, 10, NULL, NULL),
+(4, 1, 23, 20, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4124,7 +4348,7 @@ INSERT INTO `tbljobsmaster` (`jobM_id`, `jobM_title`, `jobM_description`, `jobM_
 (6, 'Quality Assurance (QA) Analyst', 'The Quality Assurance (QA) Analyst is responsible for ensuring the delivery of high-quality software by conducting thorough testing at various stages of the software development lifecycle. This includes writing test cases, performing manual and automated testing, and identifying defects to improve the overall software quality. The QA Analyst works closely with developers, product managers, and other stakeholders to ensure that the software meets both functional and performance requirements. The ideal candidate will be detail-oriented, proficient in testing tools, and committed to delivering reliable, secure, and user-friendly software products. The QA Analyst will also contribute to improving processes and methodologies to enhance the quality assurance process across projects.', '2024-08-16 09:49:28', 0, 0, NULL, NULL),
 (8, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 08:49:55', 0, 0, NULL, NULL),
 (9, 'Kunwari Job title', 'Nunc nibh justo, sodales ut nunc vitae, fermentum molestie erat. Cras feugiat mauris placerat, imperdiet augue nec, pulvinar ante. Morbi gravida, nisi at aliquam mollis, sem eros rhoncus arcu, in maximus sapien dolor ut orci. Nunc vel commodo nisl, sed sollicitudin est. Nullam auctor gravida mollis. Aenean finibus semper neque, blandit bibendum libero dignissim eu. Duis justo orci, efficitur nec auctor sed, interdum sit amet neque. Cras dignissim facilisis sem, in viverra nisl interdum vel. Vestibulum lacinia semper ligula, at consectetur tortor iaculis id. Sed interdum dignissim mollis. Nunc nisi sapien, condimentum in quam quis, vehicula semper massa.', '2024-08-23 10:50:05', 0, 0, NULL, NULL),
-(10, 'Software Developer', 'The Software Developer is responsible for creating, testing, and maintaining software applications in a collaborative environment. The role involves developing new features and functionality, troubleshooting issues, and optimizing existing software for better performance. The ideal candidate will have strong programming skills, experience with various software development tools and methodologies, and a passion for delivering high-quality software. This position requires working with cross-functional teams to ensure alignment on project requirements and goals, contributing to both front-end and back-end development as needed. The Software Developer should be proactive, detail-oriented, and eager to stay up-to-date with the latest technology trends.', '2024-08-24 10:50:15', 1, 50, NULL, NULL),
+(10, 'Software Developer', 'The Software Developer is responsible for creating, testing, and maintaining software applications in a collaborative environment. The role involves developing new features and functionality, troubleshooting issues, and optimizing existing software for better performance. The ideal candidate will have strong programming skills, experience with various software development tools and methodologies, and a passion for delivering high-quality software. This position requires working with cross-functional teams to ensure alignment on project requirements and goals, contributing to both front-end and back-end development as needed. The Software Developer should be proactive, detail-oriented, and eager to stay up-to-date with the latest technology trends.', '2024-08-24 10:50:15', 1, 60, NULL, NULL),
 (11, 'Janitor', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce vehicula dui gravida ligula fringilla, sed scelerisque mi placerat. Sed in feugiat elit. Donec sed lorem viverra, pharetra risus id, congue tortor. Proin aliquet risus sed neque imperdiet feugiat. Curabitur blandit mattis odio lacinia sollicitudin. Curabitur tempor risus quis sem bibendum aliquet. Integer vel nulla vel risus euismod molestie et sit amet tortor. Sed lacinia, felis id ullamcorper condimentum, odio enim posuere nisi, vitae faucibus nisi libero vel risus. Suspendisse malesuada enim eget nulla mollis, eu tempor quam cursus. Maecenas blandit luctus turpis, et venenatis nulla aliquam eget. In in lectus blandit, eleifend diam in, vehicula nibh.', '2024-09-12 09:30:22', 0, 60, NULL, NULL),
 (12, 'Project Manager', 'The Project Manager is responsible for leading and managing projects from initiation through to completion, ensuring that each project is completed on time, within scope, and on budget. This role involves coordinating cross-functional teams, managing resources, and monitoring project progress while addressing risks, issues, and changes. The Project Manager will also act as the primary point of contact for clients and stakeholders, ensuring alignment with project goals and business objectives. The ideal candidate will have strong leadership, communication, and problem-solving skills, along with experience managing complex projects in a dynamic environment. This position is suited for a proactive, results-oriented individual who thrives in fast-paced settings and enjoys working with diverse teams to deliver successful project outcomes.', '2024-10-19 07:20:28', 1, 60, NULL, NULL),
 (13, 'Data Analyst', 'The Data Analyst will be responsible for analyzing large volumes of data to uncover meaningful insights that drive business decisions. This role requires expertise in data collection, statistical analysis, and data visualization, as well as the ability to present complex data in an understandable way. The Data Analyst will work closely with stakeholders across various departments to support data-driven decision-making and improve operational efficiency. The ideal candidate will possess strong analytical skills, proficiency in tools like Excel, SQL, and Tableau, and have the ability to work independently while collaborating effectively with teams. This position is well-suited for someone who is passionate about data, problem-solving, and delivering actionable business insights.', '2024-10-19 09:03:47', 1, 60, NULL, NULL),
@@ -4134,7 +4358,12 @@ INSERT INTO `tbljobsmaster` (`jobM_id`, `jobM_title`, `jobM_description`, `jobM_
 (17, 'Business Analyst', 'The Human Resources Manager is responsible for overseeing all HR functions, including recruiting, employee development, performance management, and compliance with labor laws. This role is key to ensuring a positive and productive work environment by managing relationships with employees, fostering engagement, and ensuring organizational objectives are met. The HR Manager works closely with leadership teams to align HR strategies with business goals and helps build a strong corporate culture.\n\n', '2025-01-08 06:46:00', 1, 60, NULL, NULL),
 (18, 'Test Engineer', 'The Test Engineer is responsible for ensuring the quality of software applications by designing and executing comprehensive test plans, identifying defects, and verifying bug fixes. This position involves manual and automated testing to ensure that the software functions correctly and meets user requirements. The Test Engineer will work closely with developers and other stakeholders to define test strategies, provide feedback on code quality, and ensure timely delivery of high-quality software products. The ideal candidate will have strong testing skills, familiarity with automation tools, and the ability to troubleshoot complex issues. The Test Engineer plays a key role in improving software quality, optimizing testing processes, and ensuring that software releases meet industry standards and organizational goals.', '2025-01-09 11:30:55', 0, 0, NULL, NULL),
 (19, 'Production Supervisor', 'The Production Supervisor is responsible for overseeing and coordinating the daily operations of a production team to ensure that manufacturing processes run smoothly, efficiently, and meet quality standards. This role involves supervising production staff, monitoring production output, and implementing strategies to optimize productivity and minimize costs. The Production Supervisor plays a crucial role in maintaining a safe work environment, ensuring product quality, and meeting production targets.', '2025-03-11 02:26:43', 1, 60, NULL, NULL),
-(20, 'Talent Management Specialist', 'Administer the organization\'s talent development strategies. This role involves designing, implementing, and evaluating comprehensive learning and development programs, and fostering a culture of continuous learning. By aligning talent development initiatives with the organization\'s strategic goals, the Talent Development Supervisor ensures a high-performing and capable workforce, ultimately driving organizational success and growth.', '2025-06-01 04:28:23', 1, 0, NULL, NULL);
+(20, 'Talent Management Specialist', 'Administer the organization\'s talent development strategies. This role involves designing, implementing, and evaluating comprehensive learning and development programs, and fostering a culture of continuous learning. By aligning talent development initiatives with the organization\'s strategic goals, the Talent Development Supervisor ensures a high-performing and capable workforce, ultimately driving organizational success and growth.', '2025-06-01 04:28:23', 1, 60, NULL, NULL),
+(21, 'Driver', 'We are seeking a reliable and experienced Driver to transport goods and/or passengers in a safe and timely manner. The ideal candidate will have excellent driving skills, a strong sense of responsibility, and a clean driving record. You will be expected to maintain the vehicle in good condition, follow traffic laws, and provide outstanding service during each trip.', '2025-06-26 10:33:02', 1, 60, NULL, NULL),
+(22, 'Project Engineering Supervisor for Civil Works', 'Supervise the conceptualization, design, implementation, coordination, and audit of cannery civil engineering works related to capital projects. Supervise other civil engineering related works in the cannery.', '2025-07-04 12:17:59', 1, 60, NULL, NULL),
+(23, 'Finance Analyst, International Processed Business', 'Provide accurate and timely financial information based on actual results and/or financial projections for total Internation Processed Business worldwide, and specifically for Del Monte Brands, to allow well-calculated and effective decision making, highlighting opportunities and risks towards achievement of targets for branded exports processed business both under DMPL and DMPI entities.', '2025-07-19 12:37:24', 1, 60, NULL, NULL),
+(24, 'Supply Planning Supervisor', 'To provide management relevant information related to pineapple pack planning, supply and demand, shipment trends, monthly production, shipment plan, ending inventories, and recovery estimates.', '2025-07-24 10:32:04', 1, 60, NULL, NULL),
+(25, 'Strategic Sourcing Supervisor', 'Serve all Raw Material requirements for Manufacturing Operations at the best price and terms, right quality and quantity, and timely delivery through negotiation and coordination with qualified suppliers and concerned departments within the organization.', '2025-07-24 02:24:30', 1, 40, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4207,7 +4436,25 @@ INSERT INTO `tbljobsmasterduties` (`duties_id`, `duties_jobId`, `duties_text`, `
 (51, 20, 'Diagnose and analyze the learning and development needs of the key stakeholders necessary in identifying the right solutions that will address performance/competency gaps.', NULL, NULL),
 (52, 20, 'Design and develop learning solutions based on analysis to deliver and implement appropriate programs that drive development to bridge the identified performance/competency gaps.', NULL, NULL),
 (53, 20, 'Deliver learning and development interventions to address employee learning and development needs.', NULL, NULL),
-(54, 20, 'Evaluate training to measure and ensure training effectiveness.\nAdminister Corporate Training and Development programs and activities to optimize resource allocation and team efficiency.', NULL, NULL);
+(54, 20, 'Evaluate training to measure and ensure training effectiveness.\nAdminister Corporate Training and Development programs and activities to optimize resource allocation and team efficiency.', NULL, NULL),
+(55, 21, 'Operate assigned vehicle safely and responsibly, adhering to all traffic laws and regulations.', NULL, NULL),
+(56, 21, 'Transport goods, materials, or passengers to designated locations on time.', NULL, NULL),
+(57, 21, 'Keep accurate records of deliveries, mileage, fuel usage, and any incidents.', NULL, NULL),
+(58, 21, 'Inspect vehicle regularly for mechanical items and safety issues and perform preventative maintenance as needed.', NULL, NULL),
+(59, 22, 'Develop concept and design for the civil works aspect of capital projects.\n', NULL, NULL),
+(60, 22, 'Coordinate with the other engineering disciplines in the development of the concept and design of civil works\n', NULL, NULL),
+(61, 22, 'Coordinate with department end-user on the concept and design for the civil works\n', NULL, NULL),
+(62, 22, 'Facilitate the preparation of detailed CAD construction drawings\n', NULL, NULL),
+(63, 22, 'Implement civil works aspect of capital projects within scope of works, allocated budget, and schedule.\n', NULL, NULL),
+(64, 23, 'Proactively report on financial performance of the Processed Business highlighting opportunities and risks towards achievement of the team\'s targets.', NULL, NULL),
+(65, 23, 'Ensure timely and accurate reporting of business results to management.\n', NULL, NULL),
+(66, 23, 'Handle the completion of the regular forecasting exercises in accordance with the targets, covering subsidiaries/entities under DMPL.\n', NULL, NULL),
+(67, 23, 'Provide decision making support to the Commercial Team for key initiatives (eg. pricing sensitivities, income optimization, A&P spending updates, etc.) to achieve financial objectives of the group.\n', NULL, NULL),
+(68, 23, 'Provide assistance to the commercial team and other support teams to achieve the operational and financial objectives of the team.\n', NULL, NULL),
+(69, 24, 'Generate the Customer Service Availability Report (CSAR) for pineapple products', NULL, NULL),
+(70, 24, 'Generate the Pineapple Supply & Demand Status', NULL, NULL),
+(71, 24, 'Provide materials for the Monthly Supply Review, Monthly Business Review and Board Meetings', NULL, NULL),
+(72, 25, 'Negotiations and strategic sourcing in order to achieve the target of at least 5% positive variance versus AOP, handling a total year materials budget of P 75 MM.', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4231,23 +4478,20 @@ CREATE TABLE `tbljobsskills` (
 INSERT INTO `tbljobsskills` (`jskills_id`, `jskills_jobId`, `jskills_text`, `jskills_points`, `jskills_hrId`, `jskills_datetime`) VALUES
 (3, 15, '', 100, NULL, NULL),
 (4, 16, '', 50, NULL, NULL),
-(5, 14, '', 10, NULL, NULL),
-(6, 14, '', 10, NULL, NULL),
-(7, 14, '', 10, NULL, NULL),
 (8, 1, '', 10, NULL, NULL),
 (9, 1, '', 10, NULL, NULL),
 (10, 1, '', 10, NULL, NULL),
 (11, 3, '', 10, NULL, NULL),
 (13, 3, '', 10, NULL, NULL),
 (14, 3, '', 10, NULL, NULL),
-(15, 13, '', 10, NULL, NULL),
-(16, 13, '', 10, NULL, NULL),
-(17, 13, '', 10, NULL, NULL),
+(15, 13, 'A strong analytical mindset allows Data Analysis to deconstruct complex problems and identify key trends within datasets, eLearning and AI courseware.', 10, NULL, NULL),
+(16, 13, 'Proficiency in data manipulation tools like SQL and Python is crucial for efficiently extracting, cleaning, and transforming raw data into usable formats.', 10, NULL, NULL),
+(17, 13, 'The ability to effectively communicate insights through compelling data visualizations and clear narratives ensures that findings drive informed business decisions.', 10, NULL, NULL),
 (18, 12, '', 10, NULL, NULL),
 (19, 12, '', 10, NULL, NULL),
 (20, 12, '', 10, NULL, NULL),
-(21, 10, '', 10, NULL, NULL),
-(22, 10, '', 10, NULL, NULL),
+(21, 10, 'Deep understanding of language-specific frameworks and libraries (e.g., React, Angular, Spring Boot, Django, .NET).', 10, NULL, NULL),
+(22, 10, 'Experience with different methodologies like Agile, Scrum, Kanban, and Waterfall.', 10, NULL, NULL),
 (24, 6, '', 10, NULL, NULL),
 (25, 6, '', 10, NULL, NULL),
 (26, 6, '', 10, NULL, NULL),
@@ -4259,7 +4503,25 @@ INSERT INTO `tbljobsskills` (`jskills_id`, `jskills_jobId`, `jskills_text`, `jsk
 (32, 19, 'Technology Skills - Microsoft Office, understanding of multimedia programs, tools, eLearning and AI courseware.', 10, NULL, NULL),
 (33, 19, 'Product Manager', 10, NULL, NULL),
 (34, 19, 'Monitoring production', 10, NULL, NULL),
-(35, 20, 'Technology Skills - Microsoft Office, understanding of multimedia programs, tools, eLearning and AI courseware.', 10, NULL, NULL);
+(35, 20, 'Technology Skills - Microsoft Office, understanding of multimedia programs, tools, eLearning and AI courseware.', 10, NULL, NULL),
+(36, 21, 'Safe Driving Skills', 10, NULL, NULL),
+(37, 21, 'Navigation and Route Planning', 10, NULL, NULL),
+(38, 21, 'Vehicle Maintenance Knowledge', 10, NULL, NULL),
+(39, 14, 'Office administration', 10, NULL, NULL),
+(40, 14, 'Calendar and schedule management', 10, NULL, NULL),
+(41, 14, 'Meeting planning and coordination', 10, NULL, NULL),
+(42, 22, 'Civil Engineering Design – Proficiency in structural design, layout planning, and construction detailing.', 10, NULL, NULL),
+(43, 22, 'Project Management – Experience managing multiple capital projects from concept to completion.', 10, NULL, NULL),
+(44, 22, 'Construction Supervision – Strong background in supervising site activities and contractors.', 10, NULL, NULL),
+(45, 22, 'Engineering Audit & Compliance – Conducting inspections, audits, and ensuring compliance with safety and quality standards.', 10, NULL, NULL),
+(46, 23, 'MS Office Applications.', 10, NULL, NULL),
+(47, 23, 'SAP an advantage.', 10, NULL, NULL),
+(48, 24, 'Coordinates with Export Sales with regards to supply diversions and reallocations according to market’s requirement/specifications.', 10, NULL, NULL),
+(49, 24, 'Compute for long range tonnage requirement', 10, NULL, NULL),
+(50, 24, 'Production Planning', 10, NULL, NULL),
+(51, 25, 'Sourcing and accreditation of qualified suppliers to serve requirements for materials intended for new product developments.', 10, NULL, NULL),
+(52, 25, 'Procurement Information Systems - Delivery tracking reports and other critical database must be readily available.', 10, NULL, NULL),
+(53, 25, 'Timely and periodic cascade of SQMP reports to suppliers', 10, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4287,15 +4549,18 @@ INSERT INTO `tbljobstrainings` (`jtrng_id`, `jtrng_jobId`, `jtrng_text`, `jtrng_
 (17, 1, '', 10, NULL, NULL),
 (18, 1, '', 10, NULL, NULL),
 (19, 3, '', 10, NULL, NULL),
-(20, 13, '', 20, NULL, NULL),
+(20, 13, 'Advanced SQL for Data Analysis: Focus on complex queries, performance optimization, and specific database functionalities.', 20, NULL, NULL),
 (21, 12, '', 20, NULL, NULL),
-(22, 10, '', 10, NULL, NULL),
-(23, 10, '', 10, NULL, NULL),
+(22, 10, 'Advanced SQL & Database Management', 10, NULL, NULL),
+(23, 10, 'Statistical Analysis & Business Analytics', 10, NULL, NULL),
 (24, 6, '', 20, NULL, NULL),
 (25, 17, '', 20, NULL, NULL),
 (26, 18, '', 20, NULL, NULL),
-(27, 19, '', 10, NULL, NULL),
-(28, 19, '', 10, NULL, NULL);
+(27, 19, 'Supervising an Events', 10, NULL, NULL),
+(28, 19, 'Team leadership', 10, NULL, NULL),
+(29, 21, 'Defensive Driving Techniques', 10, NULL, NULL),
+(30, 21, 'Cargo Handling and Safety (for Delivery/Truck Drivers)', 10, NULL, NULL),
+(31, 22, 'AutoCAD Civil 3D / Revit Structure – for civil design and documentation', 10, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4334,7 +4599,13 @@ INSERT INTO `tbljobsworkexperience` (`jwork_id`, `jwork_jobId`, `jwork_duration`
 (17, 18, '2', 'a testing or QA role, with a focus on software application testing.', 10, NULL, NULL),
 (18, 19, '3', 'a production environment, with supervisory experience preferred.', 20, NULL, NULL),
 (19, 20, '2', 'Instructional Systems Design (ISD) and courseware development, multimedia based training.', 15, NULL, NULL),
-(20, 20, '3', 'Experience with Learning Management Systems, Learning Content Management Systems, industry standards, and accessibility compliance standards.', 15, NULL, NULL);
+(20, 20, '3', 'Experience with Learning Management Systems, Learning Content Management Systems, industry standards, and accessibility compliance standards.', 10, NULL, NULL),
+(21, 21, '3', 'Light vehicle (cars/vans), Medium/heavy trucks', 30, NULL, NULL),
+(22, 22, '5', 'commercial and industrial building design, structural design and analysis, project cost estimation, and project scheduling.', 10, NULL, NULL),
+(23, 22, '5', 'project implementation.', 10, NULL, NULL),
+(24, 23, '2', 'Finance Background', 30, NULL, NULL),
+(25, 24, '2', 'production planning, supply planning, forecasting, or other related experience.', 40, NULL, NULL),
+(26, 25, '3', 'procurement an advantage.', 40, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -4454,6 +4725,42 @@ INSERT INTO `tbllicensetype` (`license_type_id`, `license_type_name`, `license_t
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tblloginlogs`
+--
+
+CREATE TABLE `tblloginlogs` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `user_level` varchar(100) DEFAULT NULL,
+  `method` enum('password','2fa','google') NOT NULL,
+  `status` enum('success','failure','locked','2fa_required') NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` varchar(512) DEFAULT NULL,
+  `reason` varchar(255) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `tblloginlogs`
+--
+
+INSERT INTO `tblloginlogs` (`id`, `email`, `user_id`, `user_level`, `method`, `status`, `ip_address`, `user_agent`, `reason`, `created_at`) VALUES
+(1, 'ralphjangallegos@gmail.com', 1, 'HR Administrator', 'google', 'success', '::1', 'node', 'Google login successful', '2025-08-12 13:01:27'),
+(2, 'ralphjanpelino@gmail.com', 40, 'Candidates', 'google', 'success', '::1', 'node', 'Google login successful', '2025-08-12 13:22:49'),
+(3, 'ralphjangallegos@gmail.com', 1, 'HR Administrator', 'google', 'success', '::1', 'node', 'Google login successful', '2025-08-12 13:28:39'),
+(4, 'ralp.pelino11@gmail.com', 24, 'Candidates', 'password', 'success', '::1', 'node', 'Password login successful', '2025-08-12 13:33:43'),
+(5, 'rape.gallegos.coc@phinmaed.com', 39, 'Candidates', 'google', 'success', '::1', 'node', 'Google login successful', '2025-08-12 13:34:05'),
+(6, 'ralphjangallegos@gmail.com', 1, 'HR Administrator', 'google', 'success', '::1', 'node', 'Google login successful', '2025-08-12 13:51:55'),
+(7, 'ralphjanpelino@gmail.com', 40, 'Candidates', 'google', 'success', '::1', 'node', 'Google login successful', '2025-08-12 13:52:16'),
+(8, 'ralphjanpelino@gmail.com', 40, 'Candidates', 'google', 'success', '::1', 'node', 'Google login successful', '2025-08-13 03:34:28'),
+(9, 'ralphjangallegos@gmail.com', 1, 'HR Administrator', 'google', 'success', '::1', 'node', 'Google login successful', '2025-08-13 03:35:02'),
+(10, 'ralp.pelino11@gmail.com', 24, 'Candidates', 'password', 'success', '::1', 'node', 'Password login successful', '2025-08-13 03:42:15'),
+(11, 'ralp.pelino11@gmail.com', NULL, NULL, 'password', 'failure', '::1', 'node', 'Invalid credentials', '2025-08-13 03:43:24');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tblmanagementapproval`
 --
 
@@ -4532,6 +4839,17 @@ CREATE TABLE `tblnotifications` (
   `notification_date` datetime DEFAULT NULL,
   `notification_read` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tblnotifications`
+--
+
+INSERT INTO `tblnotifications` (`notification_id`, `notification_candId`, `notification_appId`, `notification_statusId`, `notification_message`, `notification_date`, `notification_read`) VALUES
+(1, 40, 1, 1, 'Your application status has been updated to \"Pending\".', '2025-08-04 15:15:47', 0),
+(2, 40, 1, 2, 'Your application status has been updated to \"Processed\".', '2025-08-11 14:53:59', 0),
+(3, 40, 1, 6, 'You have been scheduled for an interview on August 27, 2025 1:00 PM.', '2025-08-11 14:54:22', 0),
+(4, 40, 1, 5, 'Your application status has been updated to \"Exam\".', '2025-08-11 14:54:34', 0),
+(9, 40, 1, 9, 'Your application status has been updated to \"Failed Exam\".', '2025-08-11 15:17:02', 0);
 
 -- --------------------------------------------------------
 
@@ -4795,7 +5113,8 @@ ALTER TABLE `tbl2fa_verification`
 ALTER TABLE `tblapplications`
   ADD PRIMARY KEY (`app_id`),
   ADD KEY `personal_info_id` (`app_candId`),
-  ADD KEY `apply_position_id` (`app_jobMId`);
+  ADD KEY `apply_position_id` (`app_jobMId`),
+  ADD KEY `app_branchId` (`app_branchId`);
 
 --
 -- Indexes for table `tblapplicationstatus`
@@ -4835,6 +5154,13 @@ ALTER TABLE `tblbicheckresult`
 ALTER TABLE `tblbireport`
   ADD PRIMARY KEY (`bireport_id`),
   ADD KEY `bireport _hrId` (`bireport _hrId`);
+
+--
+-- Indexes for table `tblbranch`
+--
+ALTER TABLE `tblbranch`
+  ADD PRIMARY KEY (`branch_id`),
+  ADD KEY `branch_userId` (`branch_userId`);
 
 --
 -- Indexes for table `tblcandconsent`
@@ -4879,7 +5205,9 @@ ALTER TABLE `tblcandemppoints`
 -- Indexes for table `tblcandidates`
 --
 ALTER TABLE `tblcandidates`
-  ADD PRIMARY KEY (`cand_id`);
+  ADD PRIMARY KEY (`cand_id`),
+  ADD UNIQUE KEY `unique_google_id` (`cand_google_id`),
+  ADD KEY `idx_cand_google_id` (`cand_google_id`);
 
 --
 -- Indexes for table `tblcandknowledge`
@@ -5031,6 +5359,15 @@ ALTER TABLE `tblexamresult`
   ADD KEY `examR_jobMId` (`examR_jobMId`);
 
 --
+-- Indexes for table `tblexamschedule`
+--
+ALTER TABLE `tblexamschedule`
+  ADD PRIMARY KEY (`examS_id`),
+  ADD KEY `examS_appId` (`examS_appId`),
+  ADD KEY `examS_candId` (`examS_candId`),
+  ADD KEY `examS_hrId` (`examS_hrId`);
+
+--
 -- Indexes for table `tblexamtype`
 --
 ALTER TABLE `tblexamtype`
@@ -5123,6 +5460,14 @@ ALTER TABLE `tblinterviewschedule`
   ADD KEY `intsched_jobId` (`intsched_jobId`),
   ADD KEY `intsched_candId` (`intsched_candId`),
   ADD KEY `intsched_hrId` (`intsched_hrId`);
+
+--
+-- Indexes for table `tbljobbranch`
+--
+ALTER TABLE `tbljobbranch`
+  ADD PRIMARY KEY (`jobB_id`),
+  ADD KEY `jobB_jobMId` (`jobB_jobMId`),
+  ADD KEY `jobB_branchId` (`jobB_branchId`);
 
 --
 -- Indexes for table `tbljoboffer`
@@ -5244,6 +5589,16 @@ ALTER TABLE `tbllicensetype`
   ADD KEY `license_type_hrId` (`license_type_hrId`);
 
 --
+-- Indexes for table `tblloginlogs`
+--
+ALTER TABLE `tblloginlogs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_email_created_at` (`email`,`created_at`),
+  ADD KEY `idx_user_id_created_at` (`user_id`,`created_at`),
+  ADD KEY `idx_status_created_at` (`status`,`created_at`),
+  ADD KEY `idx_method_created_at` (`method`,`created_at`);
+
+--
 -- Indexes for table `tblmanagementapproval`
 --
 ALTER TABLE `tblmanagementapproval`
@@ -5357,13 +5712,13 @@ ALTER TABLE `tbl2fasetting`
 -- AUTO_INCREMENT for table `tblapplications`
 --
 ALTER TABLE `tblapplications`
-  MODIFY `app_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `app_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblapplicationstatus`
 --
 ALTER TABLE `tblapplicationstatus`
-  MODIFY `appS_id` int(50) NOT NULL AUTO_INCREMENT;
+  MODIFY `appS_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tblapprovalstatus`
@@ -5390,6 +5745,12 @@ ALTER TABLE `tblbireport`
   MODIFY `bireport_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `tblbranch`
+--
+ALTER TABLE `tblbranch`
+  MODIFY `branch_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `tblcandconsent`
 --
 ALTER TABLE `tblcandconsent`
@@ -5399,31 +5760,31 @@ ALTER TABLE `tblcandconsent`
 -- AUTO_INCREMENT for table `tblcandeducbackground`
 --
 ALTER TABLE `tblcandeducbackground`
-  MODIFY `educ_back_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `educ_back_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT for table `tblcandeducpoints`
 --
 ALTER TABLE `tblcandeducpoints`
-  MODIFY `candEduc_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `candEduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblcandemploymenthistory`
 --
 ALTER TABLE `tblcandemploymenthistory`
-  MODIFY `empH_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `empH_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `tblcandemppoints`
 --
 ALTER TABLE `tblcandemppoints`
-  MODIFY `candEmp_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `candEmp_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblcandidates`
 --
 ALTER TABLE `tblcandidates`
-  MODIFY `cand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `cand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT for table `tblcandknowledge`
@@ -5435,49 +5796,49 @@ ALTER TABLE `tblcandknowledge`
 -- AUTO_INCREMENT for table `tblcandknowpoints`
 --
 ALTER TABLE `tblcandknowpoints`
-  MODIFY `candKnow_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `candKnow_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblcandlicense`
 --
 ALTER TABLE `tblcandlicense`
-  MODIFY `license_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `license_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tblcandlicensepoints`
 --
 ALTER TABLE `tblcandlicensepoints`
-  MODIFY `candLic_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `candLic_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblcandresume`
 --
 ALTER TABLE `tblcandresume`
-  MODIFY `canres_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=119;
+  MODIFY `canres_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=145;
 
 --
 -- AUTO_INCREMENT for table `tblcandskillpoints`
 --
 ALTER TABLE `tblcandskillpoints`
-  MODIFY `candSkill_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `candSkill_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblcandskills`
 --
 ALTER TABLE `tblcandskills`
-  MODIFY `skills_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+  MODIFY `skills_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
 
 --
 -- AUTO_INCREMENT for table `tblcandtraining`
 --
 ALTER TABLE `tblcandtraining`
-  MODIFY `training_id` int(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `training_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `tblcandtrainpoints`
 --
 ALTER TABLE `tblcandtrainpoints`
-  MODIFY `candTrain_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `candTrain_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblcolorstatus`
@@ -5489,7 +5850,7 @@ ALTER TABLE `tblcolorstatus`
 -- AUTO_INCREMENT for table `tblcourses`
 --
 ALTER TABLE `tblcourses`
-  MODIFY `courses_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
+  MODIFY `courses_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=136;
 
 --
 -- AUTO_INCREMENT for table `tblcoursescategory`
@@ -5507,13 +5868,13 @@ ALTER TABLE `tblcoursetype`
 -- AUTO_INCREMENT for table `tblexam`
 --
 ALTER TABLE `tblexam`
-  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `exam_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `tblexamcandidateanswer`
 --
 ALTER TABLE `tblexamcandidateanswer`
-  MODIFY `examcandA_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `examcandA_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `tblexamchoices`
@@ -5537,7 +5898,13 @@ ALTER TABLE `tblexamquestiontype`
 -- AUTO_INCREMENT for table `tblexamresult`
 --
 ALTER TABLE `tblexamresult`
-  MODIFY `examR_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `examR_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tblexamschedule`
+--
+ALTER TABLE `tblexamschedule`
+  MODIFY `examS_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `tblexamtype`
@@ -5561,13 +5928,13 @@ ALTER TABLE `tblhr`
 -- AUTO_INCREMENT for table `tblinstitution`
 --
 ALTER TABLE `tblinstitution`
-  MODIFY `institution_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2426;
+  MODIFY `institution_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2438;
 
 --
 -- AUTO_INCREMENT for table `tblinterviewcandpoints`
 --
 ALTER TABLE `tblinterviewcandpoints`
-  MODIFY `interviewP_id` int(50) NOT NULL AUTO_INCREMENT;
+  MODIFY `interviewP_id` int(50) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tblinterviewcategory`
@@ -5591,19 +5958,25 @@ ALTER TABLE `tblinterviewcriteriamaster`
 -- AUTO_INCREMENT for table `tblinterviewpassingpercent`
 --
 ALTER TABLE `tblinterviewpassingpercent`
-  MODIFY `passing_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `passing_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `tblinterviewresult`
 --
 ALTER TABLE `tblinterviewresult`
-  MODIFY `interviewR_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `interviewR_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tblinterviewschedule`
 --
 ALTER TABLE `tblinterviewschedule`
-  MODIFY `intsched_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `intsched_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tbljobbranch`
+--
+ALTER TABLE `tbljobbranch`
+  MODIFY `jobB_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbljoboffer`
@@ -5621,13 +5994,13 @@ ALTER TABLE `tbljobofferstatus`
 -- AUTO_INCREMENT for table `tbljobpassing`
 --
 ALTER TABLE `tbljobpassing`
-  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `passing_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `tbljobseducation`
 --
 ALTER TABLE `tbljobseducation`
-  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `jeduc_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `tbljobsknowledge`
@@ -5639,37 +6012,37 @@ ALTER TABLE `tbljobsknowledge`
 -- AUTO_INCREMENT for table `tbljobslicense`
 --
 ALTER TABLE `tbljobslicense`
-  MODIFY `jlicense_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `jlicense_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tbljobsmaster`
 --
 ALTER TABLE `tbljobsmaster`
-  MODIFY `jobM_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `jobM_id` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `tbljobsmasterduties`
 --
 ALTER TABLE `tbljobsmasterduties`
-  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `duties_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT for table `tbljobsskills`
 --
 ALTER TABLE `tbljobsskills`
-  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `jskills_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `tbljobstrainings`
 --
 ALTER TABLE `tbljobstrainings`
-  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `jtrng_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `tbljobsworkexperience`
 --
 ALTER TABLE `tbljobsworkexperience`
-  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `jwork_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `tblknown_devices`
@@ -5694,6 +6067,12 @@ ALTER TABLE `tbllicensemaster`
 --
 ALTER TABLE `tbllicensetype`
   MODIFY `license_type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tblloginlogs`
+--
+ALTER TABLE `tblloginlogs`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tblmanagementapproval`
@@ -5723,7 +6102,7 @@ ALTER TABLE `tblmedicalmaster`
 -- AUTO_INCREMENT for table `tblnotifications`
 --
 ALTER TABLE `tblnotifications`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tblpersonalknowledge`
@@ -5782,7 +6161,8 @@ ALTER TABLE `companyprofile`
 --
 ALTER TABLE `tblapplications`
   ADD CONSTRAINT `tblapplications_ibfk_1` FOREIGN KEY (`app_candId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `tblapplications_ibfk_2` FOREIGN KEY (`app_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
+  ADD CONSTRAINT `tblapplications_ibfk_2` FOREIGN KEY (`app_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`),
+  ADD CONSTRAINT `tblapplications_ibfk_3` FOREIGN KEY (`app_branchId`) REFERENCES `tblbranch` (`branch_id`);
 
 --
 -- Constraints for table `tblapplicationstatus`
@@ -5819,10 +6199,10 @@ ALTER TABLE `tblbireport`
   ADD CONSTRAINT `tblbireport_ibfk_1` FOREIGN KEY (`bireport _hrId`) REFERENCES `tblhr` (`hr_id`);
 
 --
--- Constraints for table `tblcandconsent`
+-- Constraints for table `tblbranch`
 --
-ALTER TABLE `tblcandconsent`
-  ADD CONSTRAINT `tblcandconsent_ibfk_1` FOREIGN KEY (`cons_candId`) REFERENCES `tblcandidates` (`cand_id`) ON DELETE CASCADE;
+ALTER TABLE `tblbranch`
+  ADD CONSTRAINT `tblbranch_ibfk_1` FOREIGN KEY (`branch_userId`) REFERENCES `tblhr` (`hr_id`);
 
 --
 -- Constraints for table `tblcandeducbackground`
@@ -5833,394 +6213,12 @@ ALTER TABLE `tblcandeducbackground`
   ADD CONSTRAINT `tblcandeducbackground_ibfk_3` FOREIGN KEY (`educ_institutionId`) REFERENCES `tblinstitution` (`institution_id`);
 
 --
--- Constraints for table `tblcandeducpoints`
---
-ALTER TABLE `tblcandeducpoints`
-  ADD CONSTRAINT `tblcandeducpoints_ibfk_2` FOREIGN KEY (`candEduc_educId`) REFERENCES `tblcoursescategory` (`course_categoryId`),
-  ADD CONSTRAINT `tblcandeducpoints_ibfk_7` FOREIGN KEY (`candEduc_appId`) REFERENCES `tblapplications` (`app_id`);
-
---
--- Constraints for table `tblcandemploymenthistory`
---
-ALTER TABLE `tblcandemploymenthistory`
-  ADD CONSTRAINT `tblcandemploymenthistory_ibfk_1` FOREIGN KEY (`empH_candId`) REFERENCES `tblcandidates` (`cand_id`);
-
---
--- Constraints for table `tblcandemppoints`
---
-ALTER TABLE `tblcandemppoints`
-  ADD CONSTRAINT `tblcandemppoints_ibfk_1` FOREIGN KEY (`candEmp_appId`) REFERENCES `tblapplications` (`app_id`),
-  ADD CONSTRAINT `tblcandemppoints_ibfk_2` FOREIGN KEY (`candEmp_jworkId`) REFERENCES `tbljobsworkexperience` (`jwork_id`);
-
---
--- Constraints for table `tblcandknowledge`
---
-ALTER TABLE `tblcandknowledge`
-  ADD CONSTRAINT `tblcandknowledge_ibfk_1` FOREIGN KEY (`canknow_canId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblcandknowledge_ibfk_2` FOREIGN KEY (`canknow_knowledgeId`) REFERENCES `tblpersonalknowledge` (`knowledge_id`);
-
---
--- Constraints for table `tblcandknowpoints`
---
-ALTER TABLE `tblcandknowpoints`
-  ADD CONSTRAINT `tblcandknowpoints_ibfk_1` FOREIGN KEY (`candKnow_appId`) REFERENCES `tblapplications` (`app_id`),
-  ADD CONSTRAINT `tblcandknowpoints_ibfk_2` FOREIGN KEY (`candKnow_perKId`) REFERENCES `tblpersonalknowledge` (`knowledge_id`);
-
---
--- Constraints for table `tblcandlicense`
---
-ALTER TABLE `tblcandlicense`
-  ADD CONSTRAINT `tblcandlicense_ibfk_1` FOREIGN KEY (`license_canId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblcandlicense_ibfk_2` FOREIGN KEY (`license_masterId`) REFERENCES `tbllicensemaster` (`license_master_id`);
-
---
--- Constraints for table `tblcandlicensepoints`
---
-ALTER TABLE `tblcandlicensepoints`
-  ADD CONSTRAINT `tblcandlicensepoints_ibfk_1` FOREIGN KEY (`candLic_appId`) REFERENCES `tblapplications` (`app_id`),
-  ADD CONSTRAINT `tblcandlicensepoints_ibfk_2` FOREIGN KEY (`candLic_licenseId`) REFERENCES `tbllicensemaster` (`license_master_id`);
-
---
--- Constraints for table `tblcandskillpoints`
---
-ALTER TABLE `tblcandskillpoints`
-  ADD CONSTRAINT `tblcandskillpoints_ibfk_1` FOREIGN KEY (`candSkill_appId`) REFERENCES `tblapplications` (`app_id`),
-  ADD CONSTRAINT `tblcandskillpoints_ibfk_2` FOREIGN KEY (`candSkill_jobSkillsId`) REFERENCES `tbljobsskills` (`jskills_id`);
-
---
--- Constraints for table `tblcandskills`
---
-ALTER TABLE `tblcandskills`
-  ADD CONSTRAINT `tblcandskills_ibfk_1` FOREIGN KEY (`skills_candId`) REFERENCES `tblcandidates` (`cand_id`);
-
---
--- Constraints for table `tblcandtraining`
---
-ALTER TABLE `tblcandtraining`
-  ADD CONSTRAINT `tblcandtraining_ibfk_1` FOREIGN KEY (`training_candId`) REFERENCES `tblcandidates` (`cand_id`);
-
---
--- Constraints for table `tblcandtrainpoints`
---
-ALTER TABLE `tblcandtrainpoints`
-  ADD CONSTRAINT `tblcandtrainpoints_ibfk_1` FOREIGN KEY (`candTrain_appId`) REFERENCES `tblapplications` (`app_id`),
-  ADD CONSTRAINT `tblcandtrainpoints_ibfk_2` FOREIGN KEY (`candTrain_trngId`) REFERENCES `tbljobstrainings` (`jtrng_id`);
-
---
--- Constraints for table `tblcolorstatus`
---
-ALTER TABLE `tblcolorstatus`
-  ADD CONSTRAINT `tblcolorstatus_ibfk_1` FOREIGN KEY (`colorS_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblcourses`
---
-ALTER TABLE `tblcourses`
-  ADD CONSTRAINT `tblcourses_ibfk_1` FOREIGN KEY (`courses_courseTypeId`) REFERENCES `tblcoursetype` (`crs_type_id`),
-  ADD CONSTRAINT `tblcourses_ibfk_2` FOREIGN KEY (`courses_coursecategoryId`) REFERENCES `tblcoursescategory` (`course_categoryId`),
-  ADD CONSTRAINT `tblcourses_ibfk_3` FOREIGN KEY (`courses_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblcoursescategory`
---
-ALTER TABLE `tblcoursescategory`
-  ADD CONSTRAINT `tblcoursescategory_ibfk_1` FOREIGN KEY (`course_categoryhrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblcoursetype`
---
-ALTER TABLE `tblcoursetype`
-  ADD CONSTRAINT `tblcoursetype_ibfk_1` FOREIGN KEY (`crs_type_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblexam`
---
-ALTER TABLE `tblexam`
-  ADD CONSTRAINT `tblexam_ibfk_1` FOREIGN KEY (`exam_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tblexam_ibfk_2` FOREIGN KEY (`exam_typeId`) REFERENCES `tblexamtype` (`examT_id`),
-  ADD CONSTRAINT `tblexam_ibfk_3` FOREIGN KEY (`exam_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblexamcandidateanswer`
---
-ALTER TABLE `tblexamcandidateanswer`
-  ADD CONSTRAINT `tblexamcandidateanswer_ibfk_1` FOREIGN KEY (`examcandA_choiceId`) REFERENCES `tblexamchoices` (`examC_id`),
-  ADD CONSTRAINT `tblexamcandidateanswer_ibfk_2` FOREIGN KEY (`examcandA_questionId`) REFERENCES `tblexamquestion` (`examQ_id`),
-  ADD CONSTRAINT `tblexamcandidateanswer_ibfk_3` FOREIGN KEY (`examcandA_resultId`) REFERENCES `tblexamresult` (`examR_id`);
-
---
--- Constraints for table `tblexamchoices`
---
-ALTER TABLE `tblexamchoices`
-  ADD CONSTRAINT `tblexamchoices_ibfk_1` FOREIGN KEY (`examC_questionId`) REFERENCES `tblexamquestion` (`examQ_id`),
-  ADD CONSTRAINT `tblexamchoices_ibfk_2` FOREIGN KEY (`examC_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblexamquestion`
---
-ALTER TABLE `tblexamquestion`
-  ADD CONSTRAINT `tblexamquestion_ibfk_1` FOREIGN KEY (`examQ_examId`) REFERENCES `tblexam` (`exam_id`),
-  ADD CONSTRAINT `tblexamquestion_ibfk_2` FOREIGN KEY (`examQ_typeId`) REFERENCES `tblexamquestiontype` (`questionT_id`),
-  ADD CONSTRAINT `tblexamquestion_ibfk_3` FOREIGN KEY (`examQ_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblexamquestiontype`
---
-ALTER TABLE `tblexamquestiontype`
-  ADD CONSTRAINT `tblexamquestiontype_ibfk_1` FOREIGN KEY (`questionT_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblexamresult`
---
-ALTER TABLE `tblexamresult`
-  ADD CONSTRAINT `tblexamresult_ibfk_1` FOREIGN KEY (`examR_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblexamresult_ibfk_2` FOREIGN KEY (`examR_examId`) REFERENCES `tblexam` (`exam_id`),
-  ADD CONSTRAINT `tblexamresult_ibfk_3` FOREIGN KEY (`examR_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`);
-
---
--- Constraints for table `tblexamtype`
---
-ALTER TABLE `tblexamtype`
-  ADD CONSTRAINT `tblexamtype_ibfk_1` FOREIGN KEY (`examT_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblforgotpassword`
---
-ALTER TABLE `tblforgotpassword`
-  ADD CONSTRAINT `tblforgotpassword_ibfk_1` FOREIGN KEY (`forgotpass_candId`) REFERENCES `tblcandidates` (`cand_id`);
-
---
--- Constraints for table `tblhr`
---
-ALTER TABLE `tblhr`
-  ADD CONSTRAINT `tblhr_ibfk_1` FOREIGN KEY (`hr_userLevel`) REFERENCES `tbluserlevel` (`userL_id`),
-  ADD CONSTRAINT `tblhr_ibfk_2` FOREIGN KEY (`hr_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblinstitution`
---
-ALTER TABLE `tblinstitution`
-  ADD CONSTRAINT `tblinstitution_ibfk_1` FOREIGN KEY (`institution_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblinterviewcandpoints`
---
-ALTER TABLE `tblinterviewcandpoints`
-  ADD CONSTRAINT `tblinterviewcandpoints_ibfk_1` FOREIGN KEY (`interviewP_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblinterviewcandpoints_ibfk_2` FOREIGN KEY (`interviewP_criteriaId`) REFERENCES `tblinterviewcriteriamaster` (`inter_criteria_id`),
-  ADD CONSTRAINT `tblinterviewcandpoints_ibfk_3` FOREIGN KEY (`interviewP_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`);
-
---
--- Constraints for table `tblinterviewcategory`
---
-ALTER TABLE `tblinterviewcategory`
-  ADD CONSTRAINT `tblinterviewcategory_ibfk_1` FOREIGN KEY (`interview_categ_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblinterviewcriteria`
---
-ALTER TABLE `tblinterviewcriteria`
-  ADD CONSTRAINT `tblinterviewcriteria_ibfk_1` FOREIGN KEY (`criteria_inter_categId`) REFERENCES `tblinterviewcategory` (`interview_categ_id`),
-  ADD CONSTRAINT `tblinterviewcriteria_ibfk_2` FOREIGN KEY (`criteria_inter_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblinterviewcriteriamaster`
---
-ALTER TABLE `tblinterviewcriteriamaster`
-  ADD CONSTRAINT `tblinterviewcriteriamaster_ibfk_1` FOREIGN KEY (`inter_criteria_criteriaId`) REFERENCES `tblinterviewcriteria` (`criteria_inter_id`),
-  ADD CONSTRAINT `tblinterviewcriteriamaster_ibfk_2` FOREIGN KEY (`inter_criteria_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tblinterviewcriteriamaster_ibfk_3` FOREIGN KEY (`inter_criteria_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblinterviewpassingpercent`
---
-ALTER TABLE `tblinterviewpassingpercent`
-  ADD CONSTRAINT `tblinterviewpassingpercent_ibfk_1` FOREIGN KEY (`passing_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tblinterviewpassingpercent_ibfk_2` FOREIGN KEY (`passing_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblinterviewresult`
---
-ALTER TABLE `tblinterviewresult`
-  ADD CONSTRAINT `tblinterviewresult_ibfk_1` FOREIGN KEY (`interviewR_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblinterviewresult_ibfk_2` FOREIGN KEY (`interviewR_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tblinterviewresult_ibfk_3` FOREIGN KEY (`interviewR_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblinterviewschedule`
---
-ALTER TABLE `tblinterviewschedule`
-  ADD CONSTRAINT `tblinterviewschedule_ibfk_1` FOREIGN KEY (`intsched_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tblinterviewschedule_ibfk_2` FOREIGN KEY (`intsched_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblinterviewschedule_ibfk_3` FOREIGN KEY (`intsched_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljoboffer`
---
-ALTER TABLE `tbljoboffer`
-  ADD CONSTRAINT `tbljoboffer_ibfk_1` FOREIGN KEY (`joboffer_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tbljoboffer_ibfk_3` FOREIGN KEY (`joboffer_jobMId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljoboffer_ibfk_4` FOREIGN KEY (`joboffer_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobofferstatus`
---
-ALTER TABLE `tbljobofferstatus`
-  ADD CONSTRAINT `tbljobofferstatus_ibfk_1` FOREIGN KEY (`jobofferS_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobpassing`
---
-ALTER TABLE `tbljobpassing`
-  ADD CONSTRAINT `tbljobpassing_ibfk_1` FOREIGN KEY (`passing_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljobpassing_ibfk_2` FOREIGN KEY (`passing_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobseducation`
---
-ALTER TABLE `tbljobseducation`
-  ADD CONSTRAINT `tbljobseducation_ibfk_1` FOREIGN KEY (`jeduc_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljobseducation_ibfk_2` FOREIGN KEY (`jeduc_categoryId`) REFERENCES `tblcoursescategory` (`course_categoryId`),
-  ADD CONSTRAINT `tbljobseducation_ibfk_3` FOREIGN KEY (`jeduc_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobsknowledge`
---
-ALTER TABLE `tbljobsknowledge`
-  ADD CONSTRAINT `tbljobsknowledge_ibfk_1` FOREIGN KEY (`jknow_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljobsknowledge_ibfk_2` FOREIGN KEY (`jknow_knowledgeId`) REFERENCES `tblpersonalknowledge` (`knowledge_id`),
-  ADD CONSTRAINT `tbljobsknowledge_ibfk_3` FOREIGN KEY (`jknow_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobslicense`
---
-ALTER TABLE `tbljobslicense`
-  ADD CONSTRAINT `tbljobslicense_ibfk_1` FOREIGN KEY (`jlicense_licenceMId`) REFERENCES `tbllicensemaster` (`license_master_id`),
-  ADD CONSTRAINT `tbljobslicense_ibfk_2` FOREIGN KEY (`jlicense_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljobslicense_ibfk_3` FOREIGN KEY (`jlicense_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobsmaster`
---
-ALTER TABLE `tbljobsmaster`
-  ADD CONSTRAINT `tbljobsmaster_ibfk_1` FOREIGN KEY (`jobM_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobsmasterduties`
---
-ALTER TABLE `tbljobsmasterduties`
-  ADD CONSTRAINT `tbljobsmasterduties_ibfk_1` FOREIGN KEY (`duties_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljobsmasterduties_ibfk_2` FOREIGN KEY (`duties_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobsskills`
---
-ALTER TABLE `tbljobsskills`
-  ADD CONSTRAINT `tbljobsskills_ibfk_1` FOREIGN KEY (`jskills_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljobsskills_ibfk_3` FOREIGN KEY (`jskills_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobstrainings`
---
-ALTER TABLE `tbljobstrainings`
-  ADD CONSTRAINT `tbljobstrainings_ibfk_1` FOREIGN KEY (`jtrng_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljobstrainings_ibfk_3` FOREIGN KEY (`jtrng_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbljobsworkexperience`
---
-ALTER TABLE `tbljobsworkexperience`
-  ADD CONSTRAINT `tbljobsworkexperience_ibfk_1` FOREIGN KEY (`jwork_jobId`) REFERENCES `tbljobsmaster` (`jobM_id`),
-  ADD CONSTRAINT `tbljobsworkexperience_ibfk_2` FOREIGN KEY (`jwork_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbllicensemaster`
---
-ALTER TABLE `tbllicensemaster`
-  ADD CONSTRAINT `tbllicensemaster_ibfk_1` FOREIGN KEY (`license_master_typeId`) REFERENCES `tbllicensetype` (`license_type_id`),
-  ADD CONSTRAINT `tbllicensemaster_ibfk_2` FOREIGN KEY (`license_master_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tbllicensetype`
---
-ALTER TABLE `tbllicensetype`
-  ADD CONSTRAINT `tbllicensetype_ibfk_1` FOREIGN KEY (`license_type_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblmanagementapproval`
---
-ALTER TABLE `tblmanagementapproval`
-  ADD CONSTRAINT `tblmanagementapproval_ibfk_3` FOREIGN KEY (`approval_medicalMId`) REFERENCES `tblmedicalmaster` (`medicalM_id`),
-  ADD CONSTRAINT `tblmanagementapproval_ibfk_4` FOREIGN KEY (`approval_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblmanagementapprovalstatus`
---
-ALTER TABLE `tblmanagementapprovalstatus`
-  ADD CONSTRAINT `tblmanagementapprovalstatus_ibfk_1` FOREIGN KEY (`managementAS_approveId`) REFERENCES `tblmanagementapproval` (`approval_id`),
-  ADD CONSTRAINT `tblmanagementapprovalstatus_ibfk_2` FOREIGN KEY (`managementAS_approveSId`) REFERENCES `tblapprovalstatus` (`approvalS_id`),
-  ADD CONSTRAINT `tblmanagementapprovalstatus_ibfk_3` FOREIGN KEY (`managementAS_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblmedicalclassification`
---
-ALTER TABLE `tblmedicalclassification`
-  ADD CONSTRAINT `tblmedicalclassification_ibfk_1` FOREIGN KEY (`medicalC_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblmedicalmaster`
---
-ALTER TABLE `tblmedicalmaster`
-  ADD CONSTRAINT `tblmedicalmaster_ibfk_1` FOREIGN KEY (`medicalM_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblmedicalmaster_ibfk_2` FOREIGN KEY (`medicalM_medicalCId`) REFERENCES `tblmedicalclassification` (`medicalC_id`),
-  ADD CONSTRAINT `tblmedicalmaster_ibfk_3` FOREIGN KEY (`medicalM_hrId`) REFERENCES `tblhr` (`hr_id`),
-  ADD CONSTRAINT `tblmedicalmaster_ibfk_4` FOREIGN KEY (`medicalM_jobMid`) REFERENCES `tbljobsmaster` (`jobM_id`);
-
---
--- Constraints for table `tblnotifications`
---
-ALTER TABLE `tblnotifications`
-  ADD CONSTRAINT `tblnotifications_ibfk_1` FOREIGN KEY (`notification_candId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `tblnotifications_ibfk_2` FOREIGN KEY (`notification_appId`) REFERENCES `tblapplications` (`app_id`),
-  ADD CONSTRAINT `tblnotifications_ibfk_3` FOREIGN KEY (`notification_statusId`) REFERENCES `tblstatus` (`status_id`);
-
---
--- Constraints for table `tblpersonalknowledge`
---
-ALTER TABLE `tblpersonalknowledge`
-  ADD CONSTRAINT `tblpersonalknowledge_ibfk_1` FOREIGN KEY (`knowledge_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblpersonaltraining`
---
-ALTER TABLE `tblpersonaltraining`
-  ADD CONSTRAINT `tblpersonaltraining_ibfk_1` FOREIGN KEY (`perT_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblstatus`
---
-ALTER TABLE `tblstatus`
-  ADD CONSTRAINT `tblstatus_ibfk_1` FOREIGN KEY (`status_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `tblstatusjoboffer`
---
-ALTER TABLE `tblstatusjoboffer`
-  ADD CONSTRAINT `tblstatusjoboffer_ibfk_1` FOREIGN KEY (`statusjobO_jobofferId`) REFERENCES `tbljoboffer` (`joboffer_id`),
-  ADD CONSTRAINT `tblstatusjoboffer_ibfk_2` FOREIGN KEY (`statusjobO_statusId`) REFERENCES `tbljobofferstatus` (`jobofferS_id`);
-
---
--- Constraints for table `tbluserlevel`
---
-ALTER TABLE `tbluserlevel`
-  ADD CONSTRAINT `tbluserlevel_ibfk_1` FOREIGN KEY (`userL_hrId`) REFERENCES `tblhr` (`hr_id`);
-
---
--- Constraints for table `users`
---
-ALTER TABLE `users`
-  ADD CONSTRAINT `users_ibfk_2` FOREIGN KEY (`cand_userId`) REFERENCES `tblcandidates` (`cand_id`),
-  ADD CONSTRAINT `users_ibfk_3` FOREIGN KEY (`hr_userId`) REFERENCES `tblhr` (`hr_id`);
+-- Constraints for table `tblexamschedule`
+--
+ALTER TABLE `tblexamschedule`
+  ADD CONSTRAINT `tblexamschedule_ibfk_1` FOREIGN KEY (`examS_appId`) REFERENCES `tblapplications` (`app_id`),
+  ADD CONSTRAINT `tblexamschedule_ibfk_2` FOREIGN KEY (`examS_candId`) REFERENCES `tblcandidates` (`cand_id`),
+  ADD CONSTRAINT `tblexamschedule_ibfk_3` FOREIGN KEY (`examS_hrId`) REFERENCES `tblhr` (`hr_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
