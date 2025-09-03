@@ -3615,7 +3615,7 @@ class Admin
       $sendEmail = new SendEmail();
       $conn->beginTransaction();
       $data = json_decode($json, true);
-      $sql = "UPDATE tblexam SET exam_isActive = 0 WHERE exam_jobMId = :jobId";
+      $sql = "UPDATE tblexam SET exam_isActive = 0, exam_scheduleDate = NULL WHERE exam_jobMId = :jobId";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobId", $data['jobId']);
       $stmt->execute();
@@ -3642,6 +3642,43 @@ class Admin
         $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
       }
 
+      $conn->commit();
+      return 1;
+    } catch (\Throwable $th) {
+      $conn->rollBack();
+      return $th;
+    }
+  }
+
+  function updateExamSchedule($json)
+  {
+    // {"examId":17,"date":"2025-09-06","jobId":25}
+    include "connection.php";
+    include "send_email.php";
+    try {
+      $conn->beginTransaction();
+      $sendEmail = new SendEmail();
+      $data = json_decode($json, true);
+      $sql = "UPDATE tblexam SET exam_scheduleDate = :date WHERE exam_id = :examId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":date", $data['date']);
+      $stmt->bindParam(":examId", $data['examId']);
+      $stmt->execute();
+
+      $sql = "SELECT a.cand_email FROM tblcandidates a 
+              INNER JOIN tblapplications b ON a.cand_id = b.app_candId
+              INNER JOIN tblapplicationstatus c ON b.app_id = c.appS_appId
+              WHERE b.app_jobMId = :jobId AND c.appS_statusId = 5";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $data['jobId']);
+      $stmt->execute();
+      $candidates = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+      foreach ($candidates as $cand) {
+        $emailSubject = "Your exam is scheduled!";
+        $emailBody = "The scheduled date is: " . $data['date'];
+        $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+      }
       $conn->commit();
       return 1;
     } catch (\Throwable $th) {
@@ -4131,6 +4168,9 @@ switch ($operation) {
     break;
   case "scheduleExam":
     echo $admin->scheduleExam($json);
+    break;
+  case "updateExamSchedule":
+    echo $admin->updateExamSchedule($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
