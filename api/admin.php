@@ -2239,7 +2239,6 @@ class Admin
         $stmt2->bindParam(':intsched_date', $date);
         $stmt2->execute();
 
-        $formattedDate = date('M d, Y - g:ia', strtotime($date));
         $emailSubject = "You have been selected for an interview";
         $emailBody = "Hello " . $candidate['fullName'] . "! You have been selected for an interview.
         <br><br> The interview date is: " . $formattedDate;
@@ -3609,15 +3608,46 @@ class Admin
 
   function scheduleExam($json)
   {
-    // {"examId":17,"date":"2025-09-06","jobId":25}
+    // {"examId":17,"date":"2025-09-08","jobId":25}
     include "connection.php";
-    $data = json_decode($json, true);
-    $sql = "UPDATE tblexam SET exam_scheduleDate = :date WHERE exam_id = :examId";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":date", $data['date']);
-    $stmt->bindParam(":examId", $data['examId']);
-    $stmt->execute();
-    return $stmt->rowCount() > 0 ? 1 : 0;
+    include "send_email.php";
+    try {
+      $sendEmail = new SendEmail();
+      $conn->beginTransaction();
+      $data = json_decode($json, true);
+      $sql = "UPDATE tblexam SET exam_isActive = 0 WHERE exam_jobMId = :jobId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $data['jobId']);
+      $stmt->execute();
+
+      $sql = "UPDATE tblexam SET exam_scheduleDate = :date, exam_isActive = 1 WHERE exam_id = :examId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":date", $data['date']);
+      $stmt->bindParam(":examId", $data['examId']);
+      $stmt->execute();
+      $stmt->rowCount() > 0 ? 1 : 0;
+
+      $sql = "SELECT a.cand_email FROM tblcandidates a 
+              INNER JOIN tblapplications b ON a.cand_id = b.app_candId
+              INNER JOIN tblapplicationstatus c ON b.app_id = c.appS_appId
+              WHERE b.app_jobMId = :jobId AND c.appS_statusId = 5";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $data['jobId']);
+      $stmt->execute();
+      $candidates = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+
+      foreach ($candidates as $cand) {
+        $emailSubject = "Your exam is scheduled!";
+        $emailBody = "The scheduled date is: " . $data['date'];
+        $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+      }
+
+      $conn->commit();
+      return 1;
+    } catch (\Throwable $th) {
+      $conn->rollBack();
+      return $th;
+    }
   }
 } //admin
 
