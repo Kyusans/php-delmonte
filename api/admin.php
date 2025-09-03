@@ -3606,7 +3606,20 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
   }
-} // admin
+
+  function scheduleExam($json)
+  {
+    // {"examId":17,"date":"2025-09-06","jobId":25}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "UPDATE tblexam SET exam_scheduleDate = :date WHERE exam_id = :examId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":date", $data['date']);
+    $stmt->bindParam(":examId", $data['examId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
+} //admin
 
 function uploadImage()
 {
@@ -4085,6 +4098,9 @@ switch ($operation) {
     break;
   case "getSelectedExam":
     echo json_encode($admin->getSelectedExam($json));
+    break;
+  case "scheduleExam":
+    echo $admin->scheduleExam($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
