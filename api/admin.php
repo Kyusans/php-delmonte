@@ -128,8 +128,8 @@ class Admin
       $examName = "Untitled Exam";
       $examJobMId = $jobMasterId;
 
-      $sql = "INSERT INTO tblexam(exam_name, exam_typeId, exam_duration, exam_jobMId, exam_createdAt, exam_updatedAt)
-              VALUES (:exam_name, 2, 120, :exam_jobMId, :exam_createdAt, :exam_updatedAt)";
+      $sql = "INSERT INTO tblexam(exam_name, exam_isActive, exam_typeId, exam_duration, exam_jobMId, exam_createdAt, exam_updatedAt)
+              VALUES (:exam_name, 1, 2, 120, :exam_jobMId, :exam_createdAt, :exam_updatedAt)";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":exam_name", $examName);
       $stmt->bindParam(":exam_jobMId", $examJobMId);
@@ -1265,11 +1265,15 @@ class Admin
 
   function scoreInterviewApplicant($json)
   {
+    // {"masterData":{"jobId":25,"candId":41,"status":1,"percentageScore":100,"score":10,"totalScore":10},"scoreData":[{"jobId":25,"criteriaId":82,"candId":41,"points":10}]}
+
     include "connection.php";
+    include "send_email.php";
     $data = json_decode($json, true);
     $masterData = $data['masterData'];
     $scoreData = $data['scoreData'];
     $conn->beginTransaction();
+    $sendEmail = new SendEmail();
     try {
       $sql = "INSERT INTO tblinterviewcandpoints(interviewP_jobId, interviewP_criteriaId, interviewP_candId, interviewP_points)
               VALUES(:jobId, :criteriaId, :candId, :points)";
@@ -1293,9 +1297,27 @@ class Admin
         ':totalPoints' => $masterData['totalScore'],
         ':status' => $masterData['status']
       ]);
-
+      $sql = "SELECT exam_scheduleDate FROM tblexam WHERE exam_jobMId = :jobId AND exam_isActive = 1";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":jobId", $masterData['jobId']);
+      $stmt->execute();
+      $sql = "SELECT cand_email FROM tblcandidates WHERE cand_id = :candId";
+      $stmt2 = $conn->prepare($sql);
+      $stmt2->bindParam(":candId", $masterData['candId']);
+      $stmt2->execute();
+      $email = $stmt2->rowCount() > 0 ? $stmt2->fetch(PDO::FETCH_ASSOC)["cand_email"] : [];
+      $examDate = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["exam_scheduleDate"] : 0;
+      if ($examDate != 0) {
+        $emailSubject = "Your exam is scheduled!";
+        $emailBody = "The scheduled date is: " . $examDate;
+        $sendEmail->sendEmail($email, $emailSubject, $emailBody);
+      } else {
+        $emailSubject = "Exam is not yet scheduled!";
+        $emailBody = "Please wait for the scheduled date.";
+        $sendEmail->sendEmail($email, $emailSubject, $emailBody);
+      }
       $conn->commit();
-      return $stmt->rowCount() > 0 ? 1 : 0;
+      return 1;
     } catch (PDOException $e) {
       $conn->rollBack();
       return $e->getMessage();
@@ -2158,6 +2180,7 @@ class Admin
 
   function getInterviewCandidates($json)
   {
+    // {"jobId": 25}
     include "connection.php";
     $data = json_decode($json, true);
 
@@ -3634,12 +3657,14 @@ class Admin
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobId", $data['jobId']);
       $stmt->execute();
-      $candidates = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+      $candidates = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
-      foreach ($candidates as $cand) {
-        $emailSubject = "Your exam is scheduled!";
-        $emailBody = "The scheduled date is: " . $data['date'];
-        $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+      if ($candidates != 0) {
+        foreach ($candidates as $cand) {
+          $emailSubject = "Your exam is scheduled!";
+          $emailBody = "The scheduled date is: " . $data['date'];
+          $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+        }
       }
 
       $conn->commit();
@@ -3672,12 +3697,14 @@ class Admin
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobId", $data['jobId']);
       $stmt->execute();
-      $candidates = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+      $candidates = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
 
-      foreach ($candidates as $cand) {
-        $emailSubject = "Your exam is scheduled!";
-        $emailBody = "The scheduled date is: " . $data['date'];
-        $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+      if ($candidates != 0) {
+        foreach ($candidates as $cand) {
+          $emailSubject = "Your exam is scheduled!";
+          $emailBody = "The scheduled date is: " . $data['date'];
+          $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
+        }
       }
       $conn->commit();
       return 1;
