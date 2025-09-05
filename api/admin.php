@@ -1297,23 +1297,149 @@ class Admin
         ':totalPoints' => $masterData['totalScore'],
         ':status' => $masterData['status']
       ]);
+      // Get exam schedule date
       $sql = "SELECT exam_scheduleDate FROM tblexam WHERE exam_jobMId = :jobId AND exam_isActive = 1";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobId", $masterData['jobId']);
       $stmt->execute();
+      $examDate = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["exam_scheduleDate"] : 0;
+      
+      // Get candidate email
       $sql = "SELECT cand_email FROM tblcandidates WHERE cand_id = :candId";
       $stmt2 = $conn->prepare($sql);
       $stmt2->bindParam(":candId", $masterData['candId']);
       $stmt2->execute();
       $email = $stmt2->rowCount() > 0 ? $stmt2->fetch(PDO::FETCH_ASSOC)["cand_email"] : [];
-      $examDate = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["exam_scheduleDate"] : 0;
+      
+      // Get job title
+      $sql = "SELECT jobM_title FROM tbljobsmaster WHERE jobM_id = :jobId";
+      $stmt3 = $conn->prepare($sql);
+      $stmt3->bindParam(":jobId", $masterData['jobId']);
+      $stmt3->execute();
+      $jobTitle = $stmt3->rowCount() > 0 ? $stmt3->fetch(PDO::FETCH_ASSOC)["jobM_title"] : "Unknown Position";
+      // URL encode the job title for the exam link
+      $encodedJobTitle = rawurlencode($jobTitle);
+      $examLink = "http://localhost:3000/candidatesDashboard/exam/" . $encodedJobTitle;
+      
       if ($examDate != 0) {
-        $emailSubject = "Your exam is scheduled!";
-        $emailBody = "The scheduled date is: " . $examDate;
+        $emailSubject = "🎯 Exam Scheduled - " . $jobTitle;
+        $emailBody = '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Exam Notification</title>
+            <style>
+                body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+                .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+                .header { background: linear-gradient(135deg, #1e5631 0%, #2d5a3d 100%); color: white; padding: 30px; text-align: center; }
+                .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
+                .content { padding: 40px 30px; }
+                .job-title { background-color: #1e5631; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2d5a3d; }
+                .job-title h2 { margin: 0; color: white; font-size: 22px; }
+                .exam-info { background-color: #1e5631; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2d5a3d; }
+                .exam-info h3 { margin: 0 0 10px 0; color: white; font-size: 18px; }
+                .exam-date { font-size: 16px; color: white; font-weight: 500; }
+                .cta-button { display: inline-block; background: linear-gradient(135deg, #1e5631 0%, #2d5a3d 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: 600; font-size: 16px; margin: 20px 0; transition: transform 0.2s; }
+                .cta-button:hover { transform: translateY(-2px); }
+                .footer { background-color: #f0f8f0; padding: 20px; text-align: center; color: #1e5631; font-size: 14px; }
+                .divider { height: 1px; background-color: #e9ecef; margin: 30px 0; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>🎯 Exam Notification</h1>
+                </div>
+                <div class="content">
+                    <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Congratulations! Your interview has been completed and your exam has been scheduled.</p>
+                    
+                    <div class="job-title">
+                        <h2>📋 Position: ' . htmlspecialchars($jobTitle) . '</h2>
+                    </div>
+                    
+                    <div class="exam-info">
+                        <h3>📅 Exam Schedule</h3>
+                        <div class="exam-date">Date: ' . date("F j, Y \a\\t g:i A", strtotime($examDate)) . '</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="' . $examLink . '" class="cta-button" style="color: white;">🚀 Take Your Exam</a>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <p style="font-size: 14px; color: #666; line-height: 1.6;">
+                        <strong>Important Notes:</strong><br>
+                        • Please ensure you have a stable internet connection<br>
+                        • Complete the exam within the scheduled time<br>
+                        • Contact our support team if you encounter any issues
+                    </p>
+                </div>
+                <div class="footer">
+                    <p>Good luck with your exam!<br>Del Monte Foods Inc.</p>
+                </div>
+            </div>
+        </body>
+        </html>';
         $sendEmail->sendEmail($email, $emailSubject, $emailBody);
       } else {
-        $emailSubject = "Exam is not yet scheduled!";
-        $emailBody = "Please wait for the scheduled date.";
+        $emailSubject = "⏳ Exam Pending - " . $jobTitle;
+        $emailBody = '
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Exam Update</title>
+            <style>
+                body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+                .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+                .header { background: linear-gradient(135deg, #1e5631 0%, #2d5a3d 100%); color: white; padding: 30px; text-align: center; }
+                .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
+                .content { padding: 40px 30px; }
+                .job-title { background-color: #1e5631; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2d5a3d; }
+                .job-title h2 { margin: 0; color: white; font-size: 22px; }
+                .pending-info { background-color: #1e5631; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2d5a3d; }
+                .pending-info h3 { margin: 0 0 10px 0; color: white; font-size: 18px; }
+                .pending-text { font-size: 16px; color: white; }
+                .footer { background-color: #f0f8f0; padding: 20px; text-align: center; color: #1e5631; font-size: 14px; }
+                .divider { height: 1px; background-color: #e9ecef; margin: 30px 0; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>⏳ Exam Update</h1>
+                </div>
+                <div class="content">
+                    <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Thank you for completing your interview. We are currently processing your application.</p>
+                    
+                    <div class="job-title">
+                        <h2>📋 Position: ' . htmlspecialchars($jobTitle) . '</h2>
+                    </div>
+                    
+                    <div class="pending-info">
+                        <h3>📅 Exam Status</h3>
+                        <div class="pending-text">Your exam is not yet scheduled. Please wait for further notification with the scheduled date and time.</div>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <p style="font-size: 14px; color: #666; line-height: 1.6;">
+                        <strong>What happens next?</strong><br>
+                        • We will review your interview results<br>
+                        • You will receive an email with your exam schedule<br>
+                        • Please check your email regularly for updates
+                    </p>
+                </div>
+                <div class="footer">
+                    <p>Thank you for your patience!<br>Del Monte Foods Inc.</p>
+                </div>
+            </div>
+        </body>
+        </html>';
         $sendEmail->sendEmail($email, $emailSubject, $emailBody);
       }
       $conn->commit();
@@ -2262,6 +2388,7 @@ class Admin
         $stmt2->bindParam(':intsched_date', $date);
         $stmt2->execute();
 
+        $formattedDate = date('F j, Y g:iA', strtotime($date));
         $emailSubject = "You have been selected for an interview";
         $emailBody = "Hello " . $candidate['fullName'] . "! You have been selected for an interview.
         <br><br> The interview date is: " . $formattedDate;
@@ -3289,14 +3416,19 @@ class Admin
 
     if ($applications != 0) {
       foreach ($applications as $app) {
-        $sql = "SELECT a.status_id, a.status_name, b.appS_date 
-              FROM tblstatus a 
-              INNER JOIN tblapplicationstatus b ON b.appS_statusId = a.status_id
-              WHERE b.appS_appId = :appId
-              ORDER BY b.appS_date DESC
+        $sql = "SELECT s.status_id, s.status_name, a.appS_date
+              FROM tblapplicationstatus a
+              INNER JOIN tblstatus s ON s.status_id = a.appS_statusId
+              WHERE a.appS_appId = :appId
+              AND a.appS_id = (
+                SELECT MAX(sub.appS_id) 
+                FROM tblapplicationstatus sub 
+                WHERE sub.appS_appId = :appId2
+              )
               LIMIT 1";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":appId", $app["app_id"]);
+        $stmt->bindParam(":appId2", $app["app_id"]);
         $stmt->execute();
         $statusData = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : null;
 
@@ -3306,6 +3438,7 @@ class Admin
         }
 
         $sql = "SELECT CONCAT(cand_lastname, ', ', cand_firstname, ' ', COALESCE(cand_middleName, '')) AS full_name FROM tblcandidates WHERE cand_id = :candId";
+        
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":candId", $app["app_candId"]);
         $stmt->execute();
@@ -3373,7 +3506,7 @@ class Admin
       if ($e->getCode() == '23000') {
         return $e;
       }
-      throw 0;
+      throw new Exception("Error processing job cancellation: " . $e->getMessage());
     }
   }
 
@@ -3410,7 +3543,7 @@ class Admin
       if ($e->getCode() == '23000') {
         return $e;
       }
-      throw 0;
+       throw new Exception("Error processing job reactivation: " . $e->getMessage());
     }
   }
 
@@ -3702,7 +3835,7 @@ class Admin
       if ($candidates != 0) {
         foreach ($candidates as $cand) {
           $emailSubject = "Your exam is scheduled!";
-          $emailBody = "The scheduled date is: " . $data['date'];
+          $emailBody = "The exam scheduled date is: " . $data['date'];
           $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
         }
       }
