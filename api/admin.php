@@ -2920,7 +2920,10 @@ class Admin
   function getCandidateEducations($candId)
   {
     include "connection.php";
-    $sql = "SELECT * FROM tblcandeducbackground WHERE educ_canId = :candId";
+    $sql = "SELECT a.*, b.courses_name, c.course_categoryName FROM tblcandeducbackground a
+            INNER JOIN tblcourses b ON b.courses_id = a.educ_coursesId
+            INNER JOIN tblcoursescategory c ON c.course_categoryId = b.courses_coursecategoryId
+            WHERE educ_canId = :candId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":candId", $candId);
     $stmt->execute();
