@@ -1303,14 +1303,14 @@ class Admin
       $stmt->bindParam(":jobId", $masterData['jobId']);
       $stmt->execute();
       $examDate = $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)["exam_scheduleDate"] : 0;
-      
+
       // Get candidate email
       $sql = "SELECT cand_email FROM tblcandidates WHERE cand_id = :candId";
       $stmt2 = $conn->prepare($sql);
       $stmt2->bindParam(":candId", $masterData['candId']);
       $stmt2->execute();
       $email = $stmt2->rowCount() > 0 ? $stmt2->fetch(PDO::FETCH_ASSOC)["cand_email"] : [];
-      
+
       // Get job title
       $sql = "SELECT jobM_title FROM tbljobsmaster WHERE jobM_id = :jobId";
       $stmt3 = $conn->prepare($sql);
@@ -1320,7 +1320,7 @@ class Admin
       // URL encode the job title for the exam link
       $encodedJobTitle = rawurlencode($jobTitle);
       $examLink = "http://localhost:3000/candidatesDashboard/exam/" . $encodedJobTitle;
-      
+
       if ($examDate != 0) {
         $emailSubject = "🎯 Exam Scheduled - " . $jobTitle;
         $emailBody = '
@@ -2831,18 +2831,29 @@ class Admin
     $returnValue = [];
 
     // Fetch raw candidates
-    $sql = "SELECT cand_id, cand_lastname, cand_firstname, cand_middlename, cand_email
-            FROM tblcandidates c
-            WHERE c.cand_isEmployed = 0
-              AND NOT EXISTS (
-                  SELECT 1 FROM tblapplications a WHERE a.app_candId = c.cand_id AND a.app_jobMId = :jobId
-              )
-              AND EXISTS (
-                  SELECT 1 FROM tblcandresume cr WHERE cr.canres_candId = c.cand_id
-              )";
+    // Conditions:
+    //  - Not currently employed
+    //  - Not already applied to this job
+    //  - Has uploaded resume
+    //  - Has applied to any job within last 6 months
+    $sql = "
+        SELECT DISTINCT c.cand_id, c.cand_lastname, c.cand_firstname, c.cand_middlename, c.cand_email
+        FROM tblcandidates c
+        INNER JOIN tblcandresume cr ON cr.canres_candId = c.cand_id
+        WHERE c.cand_isEmployed = 0
+          AND NOT EXISTS (
+              SELECT 1 FROM tblapplications a WHERE a.app_candId = c.cand_id AND a.app_jobMId = :jobId
+          )
+          AND EXISTS (
+              SELECT 1 
+              FROM tblapplications a2 
+              WHERE a2.app_candId = c.cand_id 
+                AND a2.app_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+          )
+    ";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":jobId", $jobId);
+    $stmt->bindParam(":jobId", $jobId, PDO::PARAM_INT);
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -2851,6 +2862,7 @@ class Admin
       $candId = $candidate['cand_id'];
       $fullName = $candidate['cand_lastname'] . ", " . $candidate['cand_firstname'] . " " . $candidate['cand_middlename'];
       $email = $candidate['cand_email'];
+      // Get candidate qualifications from your existing helper
       $candQualifications = $this->getCandidateQualifications($candId);
 
       $formattedCandidates[] = [
@@ -2860,6 +2872,8 @@ class Admin
         'candQualifications' => $candQualifications
       ];
     }
+
+    // Get job qualifications
     $jobQualifications = $this->getJobQualifications($jobId);
 
     $returnValue = [
@@ -2869,6 +2883,7 @@ class Admin
 
     return !empty($returnValue["candidates"]) ? $returnValue : 0;
   }
+
 
   // function getPotentialCandidates($json)
   // {
@@ -3441,7 +3456,7 @@ class Admin
         }
 
         $sql = "SELECT CONCAT(cand_lastname, ', ', cand_firstname, ' ', COALESCE(cand_middleName, '')) AS full_name FROM tblcandidates WHERE cand_id = :candId";
-        
+
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(":candId", $app["app_candId"]);
         $stmt->execute();
@@ -3546,7 +3561,7 @@ class Admin
       if ($e->getCode() == '23000') {
         return $e;
       }
-       throw new Exception("Error processing job reactivation: " . $e->getMessage());
+      throw new Exception("Error processing job reactivation: " . $e->getMessage());
     }
   }
 
