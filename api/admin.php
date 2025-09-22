@@ -2979,6 +2979,16 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
+
+  function getCandidateLicenses($candId){
+    include "connection.php";
+    $sql = "SELECT * FROM tblcandlicense WHERE license_canId  = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
   function getCandidateQualifications($candId)
   {
     include "connection.php";
@@ -2987,12 +2997,14 @@ class Admin
     $skills = $this->getCandidateSkills($candId);
     $trainings = $this->getCandidateTrainings($candId);
     $employments = $this->getCandidateExperiences($candId);
+    $license = $this->getCandidateLicenses($candId);
 
     $candQualifications = [
       'educations' => $educations,
       'skills' => $skills,
       'trainings' => $trainings,
-      'employments' => $employments
+      'employments' => $employments,
+      'licenses' => $license
     ];
     return $candQualifications ? $candQualifications : 0;
   }
@@ -3005,12 +3017,14 @@ class Admin
     $skills = $this->getJobSkills(json_encode(["jobId" => $jobId]));
     $trainings = $this->getJobTraining(json_encode(["jobId" => $jobId]));
     $employments = $this->getJobExperience(json_encode(["jobId" => $jobId]));
+    $license = $this->getJobLicense(json_encode(["jobId" => $jobId]));
 
     $jobQualifications = [
       'educations' => json_decode($educations) ?: [],
       'skills' => json_decode($skills) ?: [],
       'trainings' => json_decode($trainings) ?: [],
-      'employments' => json_decode($employments) ?: []
+      'employments' => json_decode($employments) ?: [],
+      'licenses' => $license ?: []
     ];
 
     return $jobQualifications ? $jobQualifications : 0;
