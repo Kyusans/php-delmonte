@@ -2831,24 +2831,28 @@ class Admin
     $returnValue = [];
 
     // Fetch raw candidates
-    // Conditions:
-    //  - Not currently employed
-    //  - Not already applied to this job
-    //  - Has uploaded resume
-    //  - Has applied to any job within last 6 months
+    // - Has uploaded a resume
+    // - Not employed
+    // - Not already applied to this job
+    // - Active in last 6 months (applied to any job)
     $sql = "
         SELECT DISTINCT c.cand_id, c.cand_lastname, c.cand_firstname, c.cand_middlename, c.cand_email
         FROM tblcandidates c
         INNER JOIN tblcandresume cr ON cr.canres_candId = c.cand_id
         WHERE c.cand_isEmployed = 0
           AND NOT EXISTS (
-              SELECT 1 FROM tblapplications a WHERE a.app_candId = c.cand_id AND a.app_jobMId = :jobId
-          )
-          AND EXISTS (
               SELECT 1 
-              FROM tblapplications a2 
-              WHERE a2.app_candId = c.cand_id 
-                AND a2.app_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+              FROM tblapplications a 
+              WHERE a.app_candId = c.cand_id AND a.app_jobMId = :jobId
+          )
+          AND (
+            EXISTS (
+                SELECT 1 
+                FROM tblapplications a2 
+                WHERE a2.app_candId = c.cand_id 
+                  AND a2.app_datetime >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+            )
+            OR NOT EXISTS (SELECT 1 FROM tblapplications a3 WHERE a3.app_candId = c.cand_id)
           )
     ";
 
@@ -2862,7 +2866,8 @@ class Admin
       $candId = $candidate['cand_id'];
       $fullName = $candidate['cand_lastname'] . ", " . $candidate['cand_firstname'] . " " . $candidate['cand_middlename'];
       $email = $candidate['cand_email'];
-      // Get candidate qualifications from your existing helper
+
+      // ✅ keep your existing helper
       $candQualifications = $this->getCandidateQualifications($candId);
 
       $formattedCandidates[] = [
@@ -2873,7 +2878,7 @@ class Admin
       ];
     }
 
-    // Get job qualifications
+    // ✅ keep your existing helper
     $jobQualifications = $this->getJobQualifications($jobId);
 
     $returnValue = [
