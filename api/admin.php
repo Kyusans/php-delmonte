@@ -2980,7 +2980,8 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 
-  function getCandidateLicenses($candId){
+  function getCandidateLicenses($candId)
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblcandlicense WHERE license_canId  = :candId";
     $stmt = $conn->prepare($sql);
@@ -3020,12 +3021,13 @@ class Admin
     $license = $this->getJobLicense(json_encode(["jobId" => $jobId]));
 
     $jobQualifications = [
-      'educations' => json_decode($educations) ?: [],
-      'skills' => json_decode($skills) ?: [],
-      'trainings' => json_decode($trainings) ?: [],
-      'employments' => json_decode($employments) ?: [],
-      'licenses' => $license ?: []
+      'educations' => is_string($educations) ? json_decode($educations, true) : $educations,
+      'skills' => is_string($skills) ? json_decode($skills, true) : $skills,
+      'trainings' => is_string($trainings) ? json_decode($trainings, true) : $trainings,
+      'employments' => is_string($employments) ? json_decode($employments, true) : $employments,
+      'licenses' => is_string($license) ? json_decode($license, true) : $license
     ];
+
 
     return $jobQualifications ? $jobQualifications : 0;
   }
@@ -3380,6 +3382,18 @@ class Admin
         $totalPoints += $skill["jskills_points"];
       }
     }
+
+    $sql = "SELECT jlicense_points FROM tbljobslicense WHERE jlicense_jobId = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $jobId);
+    $stmt->execute();
+    $licenses = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+    if ($licenses != 0) {
+      foreach ($licenses as $license) {
+        $totalPoints += $license["jlicense_points"];
+      }
+    }
+
     return $totalPoints;
   }
 
@@ -3430,6 +3444,9 @@ class Admin
         $totalPoints += $train["candTrain_points"];
       }
     }
+
+
+
     return $totalPoints;
   }
 
@@ -3596,7 +3613,7 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+    return $stmt->rowCount() > 0 ? json_encode($stmt->fetchAll(PDO::FETCH_ASSOC)) : [];
   }
 
   function updateJobLicense($json)
@@ -4316,7 +4333,7 @@ switch ($operation) {
     echo $admin->updateJobLicense($json);
     break;
   case "getJobLicense":
-    echo json_encode($admin->getJobLicense($json));
+    echo $admin->getJobLicense($json);
     break;
   case "deleteJobLicense":
     echo $admin->deleteJobLicense($json);
