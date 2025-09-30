@@ -3917,7 +3917,7 @@ class Admin
     $conn->beginTransaction();
     try {
       $isPassed = $data['isPassed'] == true ? 1 : 0;
-      $sql = "INSERT INTO tblbireport(bireport_candId, bireport_statusId, bireport_recommendation, bireport _hrId, bireport_datetime) 
+      $sql = "INSERT INTO tblbireport(bireport_candId, bireport_statusId, bireport_recommendation, bireport_hrId, bireport_datetime) 
       VALUES (:bireport_candId, :bireport_statusId, :bireport_recommendation, :bireport_hrId, NOW())";
       $stmt = $conn->prepare($sql);
       $data = json_decode($json, true);
