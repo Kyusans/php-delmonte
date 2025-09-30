@@ -3900,6 +3900,15 @@ class Admin
       return $th;
     }
   }
+
+  function getBGCheckCategory(){
+    include "connection.php";
+    $sql = "SELECT * FROM tblbackgroundcheckcategory";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
 } //admin
 
 function uploadImage()
@@ -4385,6 +4394,9 @@ switch ($operation) {
     break;
   case "updateExamSchedule":
     echo $admin->updateExamSchedule($json);
+    break;
+  case "getBGCheckCategory":
+    echo json_encode($admin->getBGCheckCategory());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
