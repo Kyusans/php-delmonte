@@ -3901,12 +3901,48 @@ class Admin
     }
   }
 
-  function getBGCheckCategory(){
+  function getBGCheckCategory()
+  {
     include "connection.php";
     $sql = "SELECT * FROM tblbackgroundcheckcategory";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
+  function backgroundCheckCandidate($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $conn->beginTransaction();
+    try {
+      $isPassed = $data['isPassed'] == true ? 1 : 0;
+      $sql = "INSERT INTO tblbireport(bireport_candId, bireport_statusId, bireport_recommendation, bireport _hrId, bireport_datetime) 
+      VALUES (:bireport_candId, :bireport_statusId, :bireport_recommendation, :bireport_hrId, NOW())";
+      $stmt = $conn->prepare($sql);
+      $data = json_decode($json, true);
+      $stmt->bindParam(":bireport_candId", $data['candId']);
+      $stmt->bindParam(":bireport_statusId", $isPassed);
+      $stmt->bindParam(":bireport_recommendation", $data['remarks']);
+      $stmt->bindParam(":bireport_hrId", $data['hrId']);
+      $stmt->execute();
+      $reportId = $conn->lastInsertId();
+      $sql = "INSERT INTO tblbicheckresult(biC_bireportId, biC_employmentCheck, biC_educationCheck, biC_characterCheck, biC_creditCheck, biC_datetime, biC_hrId ) 
+              VALUES (:biC_bireportId, :biC_employmentCheck, :biC_educationCheck, :biC_characterCheck, :biC_creditCheck, NOW(), :biC_hrId)";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":biC_bireportId", $reportId);
+      $stmt->bindParam(":biC_employmentCheck", $data['employmentCheck']);
+      $stmt->bindParam(":biC_educationCheck", $data['educationCheck']);
+      $stmt->bindParam(":biC_characterCheck", $data['characterCheck']);
+      $stmt->bindParam(":biC_creditCheck", $data['creditCheck']);
+      $stmt->bindParam(":biC_hrId", $data['hrId']);
+      $stmt->execute();
+      $conn->commit();
+      return 1;
+    } catch (PDOException $th) {
+      $conn->rollBack();
+      return $th;
+    }
   }
 
 } //admin
@@ -4397,6 +4433,9 @@ switch ($operation) {
     break;
   case "getBGCheckCategory":
     echo json_encode($admin->getBGCheckCategory());
+    break;
+  case "backgroundCheckCandidate":
+    echo json_encode($admin->backgroundCheckCandidate($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
