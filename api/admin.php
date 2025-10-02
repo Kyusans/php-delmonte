@@ -3972,6 +3972,54 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
   }
+
+  function updateBackgroundCheckCandidate($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $conn->beginTransaction();
+
+    try {
+      $isPassed = $data['isPassed'] == true ? 1 : 0;
+      $reportId = $data['reportId']; 
+
+      $sql = "UPDATE tblbireport 
+                SET bireport_statusId = :bireport_statusId, 
+                    bireport_recommendation = :bireport_recommendation, 
+                    bireport_hrId = :bireport_hrId, 
+                    bireport_datetime = NOW()
+                WHERE bireport_id = :bireport_id";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":bireport_statusId", $isPassed);
+      $stmt->bindParam(":bireport_recommendation", $data['remarks']);
+      $stmt->bindParam(":bireport_hrId", $data['hrId']);
+      $stmt->bindParam(":bireport_id", $reportId);
+      $stmt->execute();
+
+      $sql = "UPDATE tblbicheckresult 
+                SET biC_employmentCheck = :biC_employmentCheck, 
+                    biC_educationCheck = :biC_educationCheck, 
+                    biC_characterCheck = :biC_characterCheck, 
+                    biC_creditCheck = :biC_creditCheck, 
+                    biC_hrId = :biC_hrId, 
+                    biC_datetime = NOW()
+                WHERE biC_bireportId = :biC_bireportId";
+      $stmt = $conn->prepare($sql);
+      $stmt->bindParam(":biC_employmentCheck", $data['employmentCheck']);
+      $stmt->bindParam(":biC_educationCheck", $data['educationCheck']);
+      $stmt->bindParam(":biC_characterCheck", $data['characterCheck']);
+      $stmt->bindParam(":biC_creditCheck", $data['creditCheck']);
+      $stmt->bindParam(":biC_hrId", $data['hrId']);
+      $stmt->bindParam(":biC_bireportId", $reportId);
+      $stmt->execute();
+
+      $conn->commit();
+      return 1;
+    } catch (PDOException $th) {
+      $conn->rollBack();
+      return $th;
+    }
+  }
 } //admin
 
 function uploadImage()
@@ -4469,6 +4517,9 @@ switch ($operation) {
     break;
   case "getBGCheckReport":
     echo json_encode($admin->getBGCheckReport($json));
+    break;
+  case "updateBackgroundCheckCandidate":
+    echo json_encode($admin->updateBackgroundCheckCandidate($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
