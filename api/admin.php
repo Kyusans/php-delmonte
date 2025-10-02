@@ -3957,6 +3957,21 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
+
+  function getBGCheckReport($json)
+  {
+    // {"candId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+    $candId = $data['candId'];
+    $sql = "SELECT a.*, b.* FROM tblbireport a
+            LEFT JOIN tblbicheckresult b ON a.bireport_id = b.biC_bireportId
+            WHERE bireport_candId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : [];
+  }
 } //admin
 
 function uploadImage()
@@ -4451,6 +4466,9 @@ switch ($operation) {
     break;
   case "hasBGCheck":
     echo json_encode($admin->hasBGCheck($json));
+    break;
+  case "getBGCheckReport":
+    echo json_encode($admin->getBGCheckReport($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
