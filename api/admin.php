@@ -1050,6 +1050,8 @@ class Admin
     $stmt->execute();
     $isMedicalChecked = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
+    $hasBGCheck = $this->hasBGCheck($candId);
+
     $medicalClassification = $this->getCandMedClassification($candId);
     $candEducationalBackground = $this->fetchEducationalBackground($candId);
     $candEmploymentHistory = $this->fetchEmploymentHistory($candId);
@@ -1065,6 +1067,7 @@ class Admin
     ];
 
     $returnValue = [
+      "hasBGCheck" => $hasBGCheck,
       "medicalClassification" => $medicalClassification,
       "medicalChecked" => $isMedicalChecked["isMedicalChecked"],
       "jobOffered" => $isJobOffered["isJobOffered"],
@@ -3945,6 +3948,15 @@ class Admin
     }
   }
 
+  function hasBGCheck($candId)
+  {
+    include "connection.php";
+    $sql = "SELECT * FROM tblbireport WHERE bireport_candId = :candId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":candId", $candId);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -4436,6 +4448,9 @@ switch ($operation) {
     break;
   case "backgroundCheckCandidate":
     echo json_encode($admin->backgroundCheckCandidate($json));
+    break;
+  case "hasBGCheck":
+    echo json_encode($admin->hasBGCheck($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
