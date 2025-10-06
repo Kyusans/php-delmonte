@@ -4,18 +4,33 @@ include "headers.php";
 
 class Manager
 {
-  function getUnfitMedicalCandidates(){
+  function getUnfitMedicalCandidates()
+  {
     include "connection.php";
-    $sql = 'SELECT a.medicalM_id, a.medicalM_jobMId, a.medicalM_candId, CONCAT(c.cand_lastname, ", ", c.cand_middlename, " ",c.cand_firstname) as cand_fullName, CONCAT(d.hr_lastname, ", ", d.hr_firstname, " ",d.hr_middlename) as hr_fullName,  b.medicalC_type, b.medicalC_name FROM tblmedicalmaster a
-            INNER JOIN tblmedicalclassification b ON b.medicalC_id = a.medicalM_medicalCId
-            INNER JOIN tblcandidates c ON c.cand_id = a.medicalM_candId
-            INNER JOIN tblhr d ON d.hr_id = a.medicalM_hrId
-            WHERE a.medicalM_medicalCId > 2';
+    $sql = 'SELECT 
+              a.medicalM_id, 
+              a.medicalM_jobMId, 
+              a.medicalM_candId, 
+              app.app_id AS application_id,
+              CONCAT(c.cand_lastname, ", ", c.cand_middlename, " ", c.cand_firstname) AS cand_fullName, 
+              CONCAT(d.hr_lastname, ", ", d.hr_firstname, " ", d.hr_middlename) AS hr_fullName,  
+              b.medicalC_type, 
+              b.medicalC_name
+          FROM tblmedicalmaster a
+          LEFT JOIN tblmedicalclassification b 
+              ON b.medicalC_id = a.medicalM_medicalCId
+          LEFT JOIN tblcandidates c 
+              ON c.cand_id = a.medicalM_candId
+          LEFT JOIN tblhr d 
+              ON d.hr_id = a.medicalM_hrId
+          LEFT JOIN tblapplications app 
+              ON app.app_candId = a.medicalM_candId 
+             AND app.app_jobMId = a.medicalM_jobMId
+          WHERE a.medicalM_medicalCId > 2';
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
-
 } //manager
 
 function recordExists($value, $table, $column)

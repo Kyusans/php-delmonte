@@ -985,57 +985,57 @@ class Admin
     $candidateInformation = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
     $sql = "SELECT 
-            c.course_categoryName, 
-            IFNULL(a.candEduc_points, 0) AS candEduc_points, 
-            IFNULL(b.jeduc_points, 0) AS jeduc_points 
-          FROM tblcandeducpoints a 
-          INNER JOIN tbljobseducation b ON b.jeduc_id = a.candEduc_educId
-          INNER JOIN tblcoursescategory c ON c.course_categoryId = b.jeduc_categoryId
-          WHERE a.candEduc_appId = :appId";
+              c.course_categoryName, 
+              IFNULL(a.candEduc_points, 0) AS candEduc_points, 
+              IFNULL(b.jeduc_points, 0) AS jeduc_points 
+            FROM tblcandeducpoints a 
+            INNER JOIN tbljobseducation b ON b.jeduc_id = a.candEduc_educId
+            INNER JOIN tblcoursescategory c ON c.course_categoryId = b.jeduc_categoryId
+            WHERE a.candEduc_appId = :appId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':appId', $appId);
     $stmt->execute();
     $education = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
     $sql = "SELECT 
-            b.jwork_responsibilities, 
-            IFNULL(a.candEmp_points, 0) AS candEmp_points, 
-            IFNULL(b.jwork_points, 0) AS jwork_points 
-          FROM tblcandemppoints a 
-          INNER JOIN tbljobsworkexperience b ON b.jwork_id = a.candEmp_jworkId
-          WHERE candEmp_appId = :appId";
+              b.jwork_responsibilities, 
+              IFNULL(a.candEmp_points, 0) AS candEmp_points, 
+              IFNULL(b.jwork_points, 0) AS jwork_points 
+            FROM tblcandemppoints a 
+            INNER JOIN tbljobsworkexperience b ON b.jwork_id = a.candEmp_jworkId
+            WHERE candEmp_appId = :appId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':appId', $appId);
     $stmt->execute();
     $experience = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
     $sql = "SELECT 
-            b.jskills_text, 
-            IFNULL(a.candSkill_points, 0) AS candSkill_points, 
-            IFNULL(b.jskills_points, 0) AS jskills_points 
-          FROM tblcandskillpoints a
-          INNER JOIN tbljobsskills b ON b.jskills_id = a.candSkill_jobSkillsId
-          WHERE candSkill_appId = :appId";
+              b.jskills_text, 
+              IFNULL(a.candSkill_points, 0) AS candSkill_points, 
+              IFNULL(b.jskills_points, 0) AS jskills_points 
+            FROM tblcandskillpoints a
+            INNER JOIN tbljobsskills b ON b.jskills_id = a.candSkill_jobSkillsId
+            WHERE candSkill_appId = :appId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':appId', $appId);
     $stmt->execute();
     $skills = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
     $sql = "SELECT 
-            b.jtrng_text, 
-            IFNULL(a.candTrain_points, 0) AS candTrain_points, 
-            IFNULL(b.jtrng_points, 0) AS jtrng_points 
-          FROM tblcandtrainpoints a 
-          INNER JOIN tbljobstrainings b ON b.jtrng_id = a.candTrain_trngId
-          WHERE candTrain_appId = :appId";
+              b.jtrng_text, 
+              IFNULL(a.candTrain_points, 0) AS candTrain_points, 
+              IFNULL(b.jtrng_points, 0) AS jtrng_points 
+            FROM tblcandtrainpoints a 
+            INNER JOIN tbljobstrainings b ON b.jtrng_id = a.candTrain_trngId
+            WHERE candTrain_appId = :appId";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':appId', $appId);
     $stmt->execute();
     $training = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
     $sql = "SELECT COUNT(`joboffer_id`) AS isJobOffered 
-          FROM tbljoboffer 
-          WHERE `joboffer_candId` = :cand_id AND `joboffer_jobMId` = :job_id";
+            FROM tbljoboffer 
+            WHERE `joboffer_candId` = :cand_id AND `joboffer_jobMId` = :job_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $candId);
     $stmt->bindParam(':job_id', $jobId);
@@ -1043,15 +1043,26 @@ class Admin
     $isJobOffered = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
     $sql = "SELECT COUNT(medicalM_id) as isMedicalChecked 
-          FROM tblmedicalmaster 
-          WHERE `medicalM_candId` = :cand_id";
+            FROM tblmedicalmaster 
+            WHERE `medicalM_candId` = :cand_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $candId);
     $stmt->execute();
     $isMedicalChecked = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
 
-    $hasBGCheck = $this->hasBGCheck($candId);
+    $sql = "SELECT h.hr_id, CONCAT(h.hr_firstname, ' ', h.hr_lastname) AS hr_name, h.hr_email
+            FROM tblapplicationstatus s
+            LEFT JOIN tblhr h ON h.hr_id = s.appS_hrId
+            WHERE s.appS_appId = :appId
+              AND s.appS_statusId = 2
+            ORDER BY s.appS_date DESC
+            LIMIT 1";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':appId', $appId);
+    $stmt->execute();
+    $processedBy = $stmt->fetch(PDO::FETCH_ASSOC)["hr_name"] ?: null;
 
+    $hasBGCheck = $this->hasBGCheck($candId);
     $medicalClassification = $this->getCandMedClassification($candId);
     $candEducationalBackground = $this->fetchEducationalBackground($candId);
     $candEmploymentHistory = $this->fetchEmploymentHistory($candId);
@@ -1067,6 +1078,7 @@ class Admin
     ];
 
     $returnValue = [
+      "processedBy" => $processedBy ?? 0,
       "hasBGCheck" => $hasBGCheck,
       "medicalClassification" => $medicalClassification,
       "medicalChecked" => $isMedicalChecked["isMedicalChecked"],
@@ -1077,11 +1089,12 @@ class Admin
       "employmentHistory" => $candEmploymentHistory,
       "licenses" => $candLicenses,
       "skills" => $candSkills,
-      "training" => $candTraining
+      "training" => $candTraining,
     ];
 
     return json_encode($returnValue);
   }
+
 
   function getPotentialCandidateProfile($json)
   {
@@ -1237,23 +1250,105 @@ class Admin
     return $stmt->rowCount() > 0 ? 1 : 0;
   }
 
+
+  function checkIsProcessedHR($json)
+  {
+    // {"appId": 1, "hrId": 1}
+    include "connection.php";
+    $data = json_decode($json, true);
+
+    $appId = $data['appId'] ?? null;
+    $hrId = $data['hrId'] ?? null;
+
+    $sqlRole = "SELECT ul.userL_id 
+                FROM tblhr h
+                INNER JOIN tbluserlevel ul ON ul.userL_id = h.hr_userLevel
+                WHERE h.hr_id = :hrId";
+    $stmtRole = $conn->prepare($sqlRole);
+    $stmtRole->bindParam(":hrId", $hrId);
+    $stmtRole->execute();
+    $hrRole = $stmtRole->fetchColumn();
+
+
+
+    if (in_array((int)$hrRole, [5, 6])) {
+
+      $sqlProcessed = "SELECT appS_hrId 
+                        FROM tblapplicationstatus 
+                        WHERE appS_appId = :appId 
+                          AND appS_statusId = 2
+                        ORDER BY appS_date DESC 
+                        LIMIT 1";
+      $stmtProcessed = $conn->prepare($sqlProcessed);
+      $stmtProcessed->bindParam(":appId", $appId);
+      $stmtProcessed->execute();
+      $processedBy = $stmtProcessed->fetch(PDO::FETCH_ASSOC);
+
+      if ($processedBy['appS_hrId'] != $hrId) {
+        return -1;
+      }
+    }
+
+    return 1;
+  }
+
+
   function changeApplicantStatus($json)
   {
     // {"jobId": 12, "candId": 12, "status": 4, "hrId": 1}
     include "connection.php";
     $data = json_decode($json, true);
-    $appId = $this->applicationIds($data['jobId'], $data['candId']);
-    $id = json_encode($appId[0]['app_id']);
+    $appIdArr = $this->applicationIds($data['jobId'], $data['candId']);
+    $appId = $appIdArr[0]['app_id'] ?? null;
+
+    // 🔹 Step 1: Check if there’s already a “Processed” HR for this applicant
+    $sqlCheckProcessed = "SELECT COUNT(*) 
+                          FROM tblapplicationstatus 
+                          WHERE appS_appId = :appId 
+                            AND appS_statusId = 2";
+    $stmtCheckProcessed = $conn->prepare($sqlCheckProcessed);
+    $stmtCheckProcessed->bindParam(":appId", $appId);
+    $stmtCheckProcessed->execute();
+    $processedExists = $stmtCheckProcessed->fetchColumn();
+
+    // 🔹 Step 2: If none, insert this HR as the “Processed” HR
+    if ($processedExists == 0) {
+      $dateProcessed = $this->getCurrentDate();
+      $sqlInsertProcessed = "INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date, appS_hrId)
+                              VALUES (:appId, 2, :date, :hrId)";
+      $stmtInsertProcessed = $conn->prepare($sqlInsertProcessed);
+      $stmtInsertProcessed->bindParam(":appId", $appId);
+      $stmtInsertProcessed->bindParam(":date", $dateProcessed);
+      $stmtInsertProcessed->bindParam(":hrId", $data["hrId"]);
+      $stmtInsertProcessed->execute();
+    }
+
+    // 🔹 Step 3: Validate HR authorization
+    $checkData = json_encode([
+      "appId" => $appId,
+      "hrId" => $data["hrId"]
+    ]);
+
+    $isAuthorized = $this->checkIsProcessedHR($checkData);
+    if ($isAuthorized == -1) {
+      return -1;
+    }
+
+    // 🔹 Step 4: Proceed to insert the new status
     $date = $this->getCurrentDate();
-    $sql = "INSERT tblapplicationstatus(appS_appId, appS_statusId, appS_date, appS_hrId) VALUES(:id, :status, :date, :hrId)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(":status", $data['status']);
-    $stmt->bindParam(":id", $id);
-    $stmt->bindParam(":date", $date);
-    $stmt->bindParam(":hrId", $data["hrId"]);
-    $stmt->execute();
-    return $stmt->rowCount() > 0 ? 1 : 0;
+    $sqlInsert = "INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date, appS_hrId)
+                  VALUES (:appId, :status, :date, :hrId)";
+    $stmtInsert = $conn->prepare($sqlInsert);
+    $stmtInsert->bindParam(":appId", $appId);
+    $stmtInsert->bindParam(":status", $data['status']);
+    $stmtInsert->bindParam(":date", $date);
+    $stmtInsert->bindParam(":hrId", $data["hrId"]);
+    $stmtInsert->execute();
+
+    return $stmtInsert->rowCount() > 0 ? 1 : 0;
   }
+
+
 
   function applicationIds($jobId, $candId)
   {
@@ -3981,7 +4076,7 @@ class Admin
 
     try {
       $isPassed = $data['isPassed'] == true ? 1 : 0;
-      $reportId = $data['reportId']; 
+      $reportId = $data['reportId'];
 
       $sql = "UPDATE tblbireport 
                 SET bireport_statusId = :bireport_statusId, 
@@ -4520,6 +4615,9 @@ switch ($operation) {
     break;
   case "updateBackgroundCheckCandidate":
     echo json_encode($admin->updateBackgroundCheckCandidate($json));
+    break;
+  case "checkIsProcessedHR":
+    echo json_encode($admin->checkIsProcessedHR($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
