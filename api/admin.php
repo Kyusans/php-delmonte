@@ -1298,56 +1298,18 @@ class Admin
     // {"jobId": 12, "candId": 12, "status": 4, "hrId": 1}
     include "connection.php";
     $data = json_decode($json, true);
-    $appIdArr = $this->applicationIds($data['jobId'], $data['candId']);
-    $appId = $appIdArr[0]['app_id'] ?? null;
-
-    // 🔹 Step 1: Check if there’s already a “Processed” HR for this applicant
-    $sqlCheckProcessed = "SELECT COUNT(*) 
-                          FROM tblapplicationstatus 
-                          WHERE appS_appId = :appId 
-                            AND appS_statusId = 2";
-    $stmtCheckProcessed = $conn->prepare($sqlCheckProcessed);
-    $stmtCheckProcessed->bindParam(":appId", $appId);
-    $stmtCheckProcessed->execute();
-    $processedExists = $stmtCheckProcessed->fetchColumn();
-
-    // 🔹 Step 2: If none, insert this HR as the “Processed” HR
-    if ($processedExists == 0) {
-      $dateProcessed = $this->getCurrentDate();
-      $sqlInsertProcessed = "INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date, appS_hrId)
-                              VALUES (:appId, 2, :date, :hrId)";
-      $stmtInsertProcessed = $conn->prepare($sqlInsertProcessed);
-      $stmtInsertProcessed->bindParam(":appId", $appId);
-      $stmtInsertProcessed->bindParam(":date", $dateProcessed);
-      $stmtInsertProcessed->bindParam(":hrId", $data["hrId"]);
-      $stmtInsertProcessed->execute();
-    }
-
-    // 🔹 Step 3: Validate HR authorization
-    $checkData = json_encode([
-      "appId" => $appId,
-      "hrId" => $data["hrId"]
-    ]);
-
-    $isAuthorized = $this->checkIsProcessedHR($checkData);
-    if ($isAuthorized == -1) {
-      return -1;
-    }
-
-    // 🔹 Step 4: Proceed to insert the new status
+    $appId = $this->applicationIds($data['jobId'], $data['candId']);
+    $id = json_encode($appId[0]['app_id']);
     $date = $this->getCurrentDate();
-    $sqlInsert = "INSERT INTO tblapplicationstatus (appS_appId, appS_statusId, appS_date, appS_hrId)
-                  VALUES (:appId, :status, :date, :hrId)";
-    $stmtInsert = $conn->prepare($sqlInsert);
-    $stmtInsert->bindParam(":appId", $appId);
-    $stmtInsert->bindParam(":status", $data['status']);
-    $stmtInsert->bindParam(":date", $date);
-    $stmtInsert->bindParam(":hrId", $data["hrId"]);
-    $stmtInsert->execute();
-
-    return $stmtInsert->rowCount() > 0 ? 1 : 0;
+    $sql = "INSERT tblapplicationstatus(appS_appId, appS_statusId, appS_date, appS_hrId) VALUES(:id, :status, :date, :hrId)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":status", $data['status']);
+    $stmt->bindParam(":id", $id);
+    $stmt->bindParam(":date", $date);
+    $stmt->bindParam(":hrId", $data["hrId"]);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? 1 : 0;
   }
-
 
 
   function applicationIds($jobId, $candId)
