@@ -1260,37 +1260,49 @@ class Admin
     $appId = $data['appId'] ?? null;
     $hrId = $data['hrId'] ?? null;
 
+    $sqlCand = "SELECT c.cand_isEmployed
+              FROM tblapplications a
+              INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
+              WHERE a.app_id = :appId";
+    $stmtCand = $conn->prepare($sqlCand);
+    $stmtCand->bindParam(":appId", $appId);
+    $stmtCand->execute();
+    $candData = $stmtCand->fetch(PDO::FETCH_ASSOC);
+
+    if ($candData && (int)$candData['cand_isEmployed'] === 1) {
+      return -2;
+    }
+
     $sqlRole = "SELECT ul.userL_id 
-                FROM tblhr h
-                INNER JOIN tbluserlevel ul ON ul.userL_id = h.hr_userLevel
-                WHERE h.hr_id = :hrId";
+              FROM tblhr h
+              INNER JOIN tbluserlevel ul ON ul.userL_id = h.hr_userLevel
+              WHERE h.hr_id = :hrId";
     $stmtRole = $conn->prepare($sqlRole);
     $stmtRole->bindParam(":hrId", $hrId);
     $stmtRole->execute();
     $hrRole = $stmtRole->fetchColumn();
 
-
-
     if (in_array((int)$hrRole, [5, 6])) {
-
       $sqlProcessed = "SELECT appS_hrId 
-                        FROM tblapplicationstatus 
-                        WHERE appS_appId = :appId 
-                          AND appS_statusId = 2
-                        ORDER BY appS_date DESC 
-                        LIMIT 1";
+                     FROM tblapplicationstatus 
+                     WHERE appS_appId = :appId 
+                       AND appS_statusId = 2
+                     ORDER BY appS_date DESC 
+                     LIMIT 1";
       $stmtProcessed = $conn->prepare($sqlProcessed);
       $stmtProcessed->bindParam(":appId", $appId);
       $stmtProcessed->execute();
       $processedBy = $stmtProcessed->fetch(PDO::FETCH_ASSOC);
 
-      if ($processedBy['appS_hrId'] != $hrId) {
+      if ($processedBy && $processedBy['appS_hrId'] != $hrId) {
         return -1;
       }
     }
 
+    // 🔹 Step 4: Authorized
     return 1;
   }
+
 
 
   function changeApplicantStatus($json)
