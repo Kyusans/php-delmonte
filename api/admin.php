@@ -3,6 +3,92 @@ include "headers.php";
 
 class Admin
 {
+  function getDelMonteEmailTemplate($title, $message, $code = null, $expiry = null, $footer = null)
+  {
+    $delMonteGreen = "#0A6338";
+    $delMonteRed = "#C41E3A";
+    $lightGreen = "#E8F5E8";
+    $lightRed = "#FDF2F2";
+
+    $codeSection = "";
+    if ($code) {
+      $codeSection = '
+        <div style="background-color: ' . $lightGreen . '; border: 2px solid ' . $delMonteGreen . '; border-radius: 12px; padding: 25px; margin: 30px 0; text-align: center;">
+          <div style="font-size: 36px; font-weight: bold; color: ' . $delMonteGreen . '; letter-spacing: 8px; font-family: \'Courier New\', monospace;">
+            ' . $code . '
+          </div>
+          ' . ($expiry ? '<p style="color: #666; font-size: 14px; margin: 15px 0 0 0;">' . $expiry . '</p>' : '') . '
+        </div>';
+    }
+
+    $footerSection = "";
+    if ($footer) {
+      $footerSection = '
+        <div style="background-color: ' . $lightRed . '; border-left: 4px solid ' . $delMonteRed . '; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+          <p style="color: #666666; font-size: 14px; margin: 0; line-height: 1.6;">
+            ' . $footer . '
+          </p>
+        </div>';
+    }
+
+    return '
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>' . $title . '</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f8f9fa; font-family: \'Segoe UI\', Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, ' . $delMonteGreen . ' 0%, #0D7A42 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+                <div style="display: inline-block; background-color: #ffffff; padding: 15px 25px; border-radius: 50px; margin-bottom: 20px;">
+                    <h1 style="color: ' . $delMonteRed . '; font-size: 28px; margin: 0; font-weight: bold; letter-spacing: 1px;">
+                        DEL MONTE
+                    </h1>
+                    <p style="color: ' . $delMonteRed . '; font-size: 14px; margin: 5px 0 0 0; font-weight: 600;">
+                        PHILIPPINES
+                    </p>
+                </div>
+                <h2 style="color: #ffffff; font-size: 24px; margin: 0; font-weight: 600;">' . $title . '</h2>
+            </div>
+            
+            <!-- Content -->
+            <div style="padding: 40px 30px;">
+                <div style="color: #333333; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                    ' . $message . '
+                </div>
+                
+                ' . $codeSection . '
+                
+                ' . $footerSection . '
+            </div>
+            
+            <!-- Footer -->
+            <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-radius: 0 0 8px 8px; border-top: 1px solid #e9ecef;">
+                <div style="margin-bottom: 20px;">
+                    <p style="color: #666666; font-size: 14px; margin: 0 0 10px 0;">
+                        Need assistance? Contact our support team:
+                    </p>
+                    <a href="mailto:support@delmontephil.com" style="color: ' . $delMonteGreen . '; text-decoration: none; font-weight: bold; font-size: 16px;">
+                        support@delmontephil.com
+                    </a>
+                </div>
+                
+                <div style="border-top: 1px solid #dee2e6; padding-top: 20px;">
+                    <p style="color: #999999; font-size: 12px; margin: 0 0 5px 0;">
+                        &copy; ' . date('Y') . ' Del Monte Philippines, Inc. All rights reserved.
+                    </p>
+                    <p style="color: #999999; font-size: 12px; margin: 0;">
+                        JY Campos Centre, 9th Avenue corner 30th Street, Bonifacio Global City, Taguig City, Philippines
+                    </p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>';
+  }
 
   function recordExists($value, $table, $column)
   {
@@ -1370,7 +1456,7 @@ class Admin
         ':status' => $masterData['status']
       ]);
       // Get exam schedule date
-      $sql = "SELECT exam_scheduleDate FROM tblexam WHERE exam_jobMId = :jobId AND exam_isActive = 1";
+      $sql = "SELECT exam_scheduleDate FROM tblexam WHERE exam_jobMId = :jobId";
       $stmt = $conn->prepare($sql);
       $stmt->bindParam(":jobId", $masterData['jobId']);
       $stmt->execute();
@@ -1391,127 +1477,17 @@ class Admin
       $jobTitle = $stmt3->rowCount() > 0 ? $stmt3->fetch(PDO::FETCH_ASSOC)["jobM_title"] : "Unknown Position";
       // URL encode the job title for the exam link
       $encodedJobTitle = rawurlencode($jobTitle);
-      $examLink = "http://localhost:3000/candidatesDashboard/exam/" . $encodedJobTitle;
+      $examLink = "https://delmonte-careers.vercel.app/candidatesDashboard/" . $encodedJobTitle;
 
       if ($examDate != 0) {
-        $emailSubject = "🎯 Exam Scheduled - " . $jobTitle;
-        $emailBody = '
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Exam Notification</title>
-            <style>
-                body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-                .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-                .header { background: linear-gradient(135deg, #1e5631 0%, #2d5a3d 100%); color: white; padding: 30px; text-align: center; }
-                .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
-                .content { padding: 40px 30px; }
-                .job-title { background-color: #1e5631; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2d5a3d; }
-                .job-title h2 { margin: 0; color: white; font-size: 22px; }
-                .exam-info { background-color: #1e5631; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2d5a3d; }
-                .exam-info h3 { margin: 0 0 10px 0; color: white; font-size: 18px; }
-                .exam-date { font-size: 16px; color: white; font-weight: 500; }
-                .cta-button { display: inline-block; background: linear-gradient(135deg, #1e5631 0%, #2d5a3d 100%); color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: 600; font-size: 16px; margin: 20px 0; transition: transform 0.2s; }
-                .cta-button:hover { transform: translateY(-2px); }
-                .footer { background-color: #f0f8f0; padding: 20px; text-align: center; color: #1e5631; font-size: 14px; }
-                .divider { height: 1px; background-color: #e9ecef; margin: 30px 0; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>🎯 Exam Notification</h1>
-                </div>
-                <div class="content">
-                    <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Congratulations! Your interview has been completed and your exam has been scheduled.</p>
-                    
-                    <div class="job-title">
-                        <h2>📋 Position: ' . htmlspecialchars($jobTitle) . '</h2>
-                    </div>
-                    
-                    <div class="exam-info">
-                        <h3>📅 Exam Schedule</h3>
-                        <div class="exam-date">Date: ' . date("F j, Y \a\\t g:i A", strtotime($examDate)) . '</div>
-                    </div>
-                    
-                    <div style="text-align: center; margin: 30px 0;">
-                        <a href="' . $examLink . '" class="cta-button" style="color: white;">🚀 Take Your Exam</a>
-                    </div>
-                    
-                    <div class="divider"></div>
-                    
-                    <p style="font-size: 14px; color: #666; line-height: 1.6;">
-                        <strong>Important Notes:</strong><br>
-                        • Please ensure you have a stable internet connection<br>
-                        • Complete the exam within the scheduled time<br>
-                        • Contact our support team if you encounter any issues
-                    </p>
-                </div>
-                <div class="footer">
-                    <p>Good luck with your exam!<br>Del Monte Foods Inc.</p>
-                </div>
-            </div>
-        </body>
-        </html>';
+        $emailSubject = "🎯 Del Monte Philippines - Exam Scheduled";
+        $message = "Congratulations! Your interview has been completed and your exam has been scheduled.<br><br><strong>Position:</strong> " . htmlspecialchars($jobTitle) . "<br><br><strong>Exam Date:</strong> " . date("F j, Y \a\\t g:i A", strtotime($examDate)) . "<br><br>Please click the link below to access your exam:<br><a href='" . $examLink . "' style='color: #0A6338; text-decoration: none; font-weight: bold; background-color: #E8F5E8; padding: 10px 20px; border-radius: 5px; display: inline-block; margin: 10px 0;'>🚀 Take Your Exam</a><br><br><strong>Important Notes:</strong><br>• Please ensure you have a stable internet connection<br>• Complete the exam within the scheduled time<br>• Contact our support team if you encounter any issues";
+        $emailBody = $this->getDelMonteEmailTemplate("Exam Scheduled", $message, null, null, "Good luck with your exam! We believe in your potential and look forward to your success.");
         $sendEmail->sendEmail($email, $emailSubject, $emailBody);
       } else {
-        $emailSubject = "⏳ Exam Pending - " . $jobTitle;
-        $emailBody = '
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Exam Update</title>
-            <style>
-                body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
-                .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-                .header { background: linear-gradient(135deg, #1e5631 0%, #2d5a3d 100%); color: white; padding: 30px; text-align: center; }
-                .header h1 { margin: 0; font-size: 28px; font-weight: 600; }
-                .content { padding: 40px 30px; }
-                .job-title { background-color: #1e5631; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2d5a3d; }
-                .job-title h2 { margin: 0; color: white; font-size: 22px; }
-                .pending-info { background-color: #1e5631; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #2d5a3d; }
-                .pending-info h3 { margin: 0 0 10px 0; color: white; font-size: 18px; }
-                .pending-text { font-size: 16px; color: white; }
-                .footer { background-color: #f0f8f0; padding: 20px; text-align: center; color: #1e5631; font-size: 14px; }
-                .divider { height: 1px; background-color: #e9ecef; margin: 30px 0; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1>⏳ Exam Update</h1>
-                </div>
-                <div class="content">
-                    <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Thank you for completing your interview. We are currently processing your application.</p>
-                    
-                    <div class="job-title">
-                        <h2>📋 Position: ' . htmlspecialchars($jobTitle) . '</h2>
-                    </div>
-                    
-                    <div class="pending-info">
-                        <h3>📅 Exam Status</h3>
-                        <div class="pending-text">Your exam is not yet scheduled. Please wait for further notification with the scheduled date and time.</div>
-                    </div>
-                    
-                    <div class="divider"></div>
-                    
-                    <p style="font-size: 14px; color: #666; line-height: 1.6;">
-                        <strong>What happens next?</strong><br>
-                        • We will review your interview results<br>
-                        • You will receive an email with your exam schedule<br>
-                        • Please check your email regularly for updates
-                    </p>
-                </div>
-                <div class="footer">
-                    <p>Thank you for your patience!<br>Del Monte Foods Inc.</p>
-                </div>
-            </div>
-        </body>
-        </html>';
+        $emailSubject = "⏳ Del Monte Philippines - Exam Pending";
+        $message = "Thank you for completing your interview. We are currently processing your application.<br><br><strong>Position:</strong> " . htmlspecialchars($jobTitle) . "<br><br><strong>Exam Status:</strong> Your exam is not yet scheduled. Please wait for further notification with the scheduled date and time.<br><br><strong>What happens next?</strong><br>• We will review your interview results<br>• You will receive an email with your exam schedule<br>• Please check your email regularly for updates";
+        $emailBody = $this->getDelMonteEmailTemplate("Exam Pending", $message, null, null, "Thank you for your patience! We appreciate your interest in joining Del Monte Philippines.");
         $sendEmail->sendEmail($email, $emailSubject, $emailBody);
       }
       $conn->commit();
@@ -2461,9 +2437,9 @@ class Admin
         $stmt2->execute();
 
         $formattedDate = date('F j, Y g:iA', strtotime($date));
-        $emailSubject = "You have been selected for an interview";
-        $emailBody = "Hello " . $candidate['fullName'] . "! You have been selected for an interview.
-        <br><br> The interview date is: " . $formattedDate;
+        $emailSubject = "🎯 Del Monte Philippines - Interview Invitation";
+        $message = "Hello " . $candidate['fullName'] . "!<br><br>Congratulations! You have been selected for an interview for the position of <strong>" . $jobTitle . "</strong>.<br><br><strong>Interview Date:</strong> " . $formattedDate . "<br><br>Please prepare for your interview and arrive 15 minutes early.";
+        $emailBody = $this->getDelMonteEmailTemplate("Interview Invitation", $message, null, null, "We look forward to meeting you and discussing your potential role at Del Monte Philippines.");
         $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
 
         $stmt->bindParam(':appS_appId', $id);
@@ -3114,9 +3090,9 @@ class Admin
     $sendEmail = new SendEmail();
     try {
       foreach ($data['candidates'] as $candidate) {
-        $emailSubject = "Delmonte Job Offer: $jobName";
-        $emailBody = "Dear " . $candidate['fullName'] . "! You are qualified for the '$jobName' at Delmonte, and we would like to invite you to apply.
-      Please visit our website for more information.";
+        $emailSubject = "🌟 Del Monte Philippines - Job Opportunity";
+        $message = "Dear " . $candidate['fullName'] . "!<br><br>We are excited to inform you that you are qualified for the position of <strong>'$jobName'</strong> at Del Monte Philippines!<br><br>We would like to invite you to apply for this exciting opportunity. Please visit our website to submit your application and learn more about this position.";
+        $emailBody = $this->getDelMonteEmailTemplate("Job Opportunity", $message, null, null, "Join our team and be part of Del Monte Philippines' commitment to excellence and growth.");
         $sendEmail->sendEmail($candidate['candEmail'], $emailSubject, $emailBody);
       }
       return 1;
@@ -3619,8 +3595,9 @@ class Admin
       $candidate = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
       if (!empty($candidate)) {
         foreach ($candidate as $cand) {
-          $emailSubject = "Job Cancelled";
-          $emailBody = "The job you applied for has been cancelled by the HR.";
+          $emailSubject = "⚠️ Del Monte Philippines - Job Update";
+          $message = "We regret to inform you that the job position you applied for has been cancelled by our HR department.<br><br>We apologize for any inconvenience this may cause. Please feel free to apply for other available positions that match your qualifications.";
+          $emailBody = $this->getDelMonteEmailTemplate("Job Cancellation", $message, null, null, "We appreciate your interest in Del Monte Philippines and encourage you to explore other opportunities with us.");
           $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
         }
       }
@@ -3658,8 +3635,9 @@ class Admin
       $candidate = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
       if (!empty($candidate)) {
         foreach ($candidate as $cand) {
-          $emailSubject = "Job Reactivated";
-          $emailBody = "The job you applied for has been reactivated by the HR.";
+          $emailSubject = "✅ Del Monte Philippines - Job Reactivated";
+          $message = "Great news! The job position you applied for has been reactivated by our HR department.<br><br>Your application is now active again and will be considered for the position. Please check your email regularly for any updates regarding your application status.";
+          $emailBody = $this->getDelMonteEmailTemplate("Job Reactivated", $message, null, null, "Thank you for your continued interest in Del Monte Philippines. We look forward to reviewing your application.");
           $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
         }
       }
@@ -3920,8 +3898,9 @@ class Admin
 
       if ($candidates != 0) {
         foreach ($candidates as $cand) {
-          $emailSubject = "Your exam is scheduled!";
-          $emailBody = "The scheduled date is: " . $data['date'];
+          $emailSubject = "📝 Del Monte Philippines - Exam Scheduled";
+          $message = "Your exam has been scheduled!<br><br><strong>Exam Date:</strong> " . $data['date'] . "<br><br>Please arrive 15 minutes early and bring a valid ID. Good luck with your exam!";
+          $emailBody = $this->getDelMonteEmailTemplate("Exam Scheduled", $message, null, null, "We wish you the best of luck in your exam. Prepare well and showcase your skills!");
           $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
         }
       }
@@ -3960,8 +3939,9 @@ class Admin
 
       if ($candidates != 0) {
         foreach ($candidates as $cand) {
-          $emailSubject = "Your exam is scheduled!";
-          $emailBody = "The exam scheduled date is: " . $data['date'];
+          $emailSubject = "📝 Del Monte Philippines - Exam Rescheduled";
+          $message = "Your exam has been rescheduled!<br><br><strong>New Exam Date:</strong> " . $data['date'] . "<br><br>Please note the new date and time. Arrive 15 minutes early and bring a valid ID.";
+          $emailBody = $this->getDelMonteEmailTemplate("Exam Rescheduled", $message, null, null, "We apologize for any inconvenience. Please update your calendar with the new exam date.");
           $sendEmail->sendEmail($cand['cand_email'], $emailSubject, $emailBody);
         }
       }
@@ -4088,6 +4068,21 @@ class Admin
       $conn->rollBack();
       return $th;
     }
+  }
+
+  function updateExamStatus($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $examId = $data['examId'];
+    $isActive = $data['isActive'];
+
+    $sql = "UPDATE tblexam SET exam_isActive = :isActive WHERE exam_id = :examId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':isActive', $isActive);
+    $stmt->bindParam(':examId', $examId);
+
+    return $stmt->execute() ? 1 : 0;
   }
 } //admin
 
@@ -4592,6 +4587,9 @@ switch ($operation) {
     break;
   case "checkIsProcessedHR":
     echo json_encode($admin->checkIsProcessedHR($json));
+    break;
+  case "updateExamStatus":
+    echo $admin->updateExamStatus($json);
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
