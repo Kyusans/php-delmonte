@@ -1064,6 +1064,12 @@ class Admin
     $candId = $applicationData['app_candId'];
     $jobId = $applicationData['app_jobMId'];
 
+    $sql = "SELECT jobM_title FROM tbljobsmaster WHERE jobM_id = :jobId";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':jobId', $jobId);
+    $stmt->execute();
+    $jobTitle = $stmt->fetch(PDO::FETCH_ASSOC)['jobM_title'] ?: [];
+
     $sql = "SELECT * FROM tblcandidates WHERE cand_id = :cand_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':cand_id', $candId);
@@ -1164,6 +1170,7 @@ class Admin
     ];
 
     $returnValue = [
+      "jobTitle" => $jobTitle,
       "processedBy" => $processedBy ?? 0,
       "hasBGCheck" => $hasBGCheck,
       "medicalClassification" => $medicalClassification,
