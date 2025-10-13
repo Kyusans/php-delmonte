@@ -4113,14 +4113,18 @@ class Admin
   {
     include "connection.php";
     $data = json_decode($json, true);
-    $sql = "SELECT b.app_id, c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', COALESCE(c.cand_middlename, '')) AS fullName, d.status_name
-            FROM tblapplicationstatus a
-            INNER JOIN tblapplications b ON b.app_id = a.appS_appId
-            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
-            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
-            WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
-            AND (a.appS_statusId = 12) AND b.app_jobMId = :jobId
-            ORDER BY c.cand_id DESC";
+    $sql = 'SELECT a.app_id, c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", COALESCE(c.cand_middlename, "")) AS fullName,
+            DATE_FORMAT(b.appS_date, "%b %d, %Y %l:%i %p") as appS_date,
+            (SELECT s.status_name
+            FROM tblapplicationstatus ast
+            INNER JOIN tblstatus s ON s.status_id = ast.appS_statusId
+            WHERE ast.appS_appId = a.app_id
+            ORDER BY ast.appS_id DESC
+            LIMIT 1) as status
+            FROM tblapplications a
+            INNER JOIN tblapplicationstatus b ON b.appS_appId = a.app_id
+            INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
+            WHERE a.app_jobMId = :jobId AND b.appS_statusId = 12';
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
