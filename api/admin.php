@@ -250,7 +250,12 @@ class Admin
       $data = [];
       include "connection.php";
       $conn->beginTransaction();
-      $sql = "SELECT * FROM tblcoursescategory";
+      $sql = "
+        SELECT * FROM tblcoursescategory
+        ORDER BY 
+            CASE WHEN course_categoryId = 35 THEN 0 ELSE 1 END,
+            course_categoryName ASC
+    ";
       $stmt = $conn->prepare($sql);
       $stmt->execute();
       $data['courseCategory'] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
@@ -619,7 +624,12 @@ class Admin
     $stmt->execute();
     $returnValue["courses"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 
-    $sql = "SELECT * FROM tblcoursescategory";
+    $sql = "
+        SELECT * FROM tblcoursescategory
+        ORDER BY 
+            CASE WHEN course_categoryId = 35 THEN 0 ELSE 1 END,
+            course_categoryName ASC
+    ";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $returnValue["courseCategory"] = $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
@@ -1850,11 +1860,17 @@ class Admin
   function getCourseCategory()
   {
     include "connection.php";
-    $sql = "SELECT * FROM tblcoursescategory";
+    $sql = "
+        SELECT * FROM tblcoursescategory
+        ORDER BY 
+            CASE WHEN course_categoryId = 35 THEN 0 ELSE 1 END,
+            course_categoryName ASC
+    ";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
+
 
   function getCourse()
   {
@@ -3649,6 +3665,7 @@ class Admin
         }
       }
       $conn->commit();
+      return 1;
     } catch (PDOException $e) {
       $conn->rollBack();
       if ($e->getCode() == '23000') {
@@ -4090,6 +4107,24 @@ class Admin
     $stmt->bindParam(':examId', $examId);
 
     return $stmt->execute() ? 1 : 0;
+  }
+
+  function getCancelledCandidates($json)
+  {
+    include "connection.php";
+    $data = json_decode($json, true);
+    $sql = "SELECT b.app_id, c.cand_id, CONCAT(c.cand_lastname, ', ', c.cand_firstname, ' ', COALESCE(c.cand_middlename, '')) AS fullName, d.status_name
+            FROM tblapplicationstatus a
+            INNER JOIN tblapplications b ON b.app_id = a.appS_appId
+            INNER JOIN tblcandidates c ON c.cand_id = b.app_candId
+            INNER JOIN tblstatus d ON d.status_id = a.appS_statusId
+            WHERE a.appS_id = (SELECT MAX(sub.appS_id) FROM tblapplicationstatus sub WHERE sub.appS_appId = a.appS_appId)
+            AND (a.appS_statusId = 12) AND b.app_jobMId = :jobId
+            ORDER BY c.cand_id DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(":jobId", $data['jobId']);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
   }
 } //admin
 
@@ -4597,6 +4632,9 @@ switch ($operation) {
     break;
   case "updateExamStatus":
     echo $admin->updateExamStatus($json);
+    break;
+  case "getCancelledCandidates":
+    echo json_encode($admin->getCancelledCandidates($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
