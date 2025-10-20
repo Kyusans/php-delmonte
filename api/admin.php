@@ -4145,8 +4145,13 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getNumberOfJobs(){
-    
+  function getNumberOfJobs()
+  {
+    include "connection.php";
+    $sql = "SELECT COUNT(jobM_id) AS total_jobs FROM tbljobsmaster";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
   }
 } //admin
 
@@ -4660,6 +4665,9 @@ switch ($operation) {
     break;
   case "getJobApplicantsReport":
     echo json_encode($admin->getJobApplicantsReport($json));
+    break;
+  case "getNumberOfJobs":
+    echo json_encode($admin->getNumberOfJobs());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
