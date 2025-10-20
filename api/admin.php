@@ -4114,13 +4114,7 @@ class Admin
     include "connection.php";
     $data = json_decode($json, true);
     $sql = 'SELECT a.app_id, c.cand_id, CONCAT(c.cand_lastname, ", ", c.cand_firstname, " ", COALESCE(c.cand_middlename, "")) AS fullName,
-            DATE_FORMAT(b.appS_date, "%b %d, %Y %l:%i %p") as appS_date,
-            (SELECT s.status_name
-            FROM tblapplicationstatus ast
-            INNER JOIN tblstatus s ON s.status_id = ast.appS_statusId
-            WHERE ast.appS_appId = a.app_id
-            ORDER BY ast.appS_id DESC
-            LIMIT 1) as status
+            DATE_FORMAT(b.appS_date, "%b %d, %Y %l:%i %p") as appS_date
             FROM tblapplications a
             INNER JOIN tblapplicationstatus b ON b.appS_appId = a.app_id
             INNER JOIN tblcandidates c ON c.cand_id = a.app_candId
@@ -4129,6 +4123,30 @@ class Admin
     $stmt->bindParam(":jobId", $data['jobId']);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
+  function getJobApplicantsReport()
+  {
+    include "connection.php";
+
+    $sql = "SELECT 
+                j.jobM_id,
+                j.jobM_title,
+                COUNT(a.app_id) AS total_applicants
+            FROM tbljobsmaster j
+            LEFT JOIN tblapplications a 
+                ON a.app_jobMId = j.jobM_id
+            GROUP BY j.jobM_id, j.jobM_title
+            ORDER BY total_applicants DESC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
+  }
+
+  function getNumberOfJobs(){
+    
   }
 } //admin
 
@@ -4639,6 +4657,9 @@ switch ($operation) {
     break;
   case "getCancelledCandidates":
     echo json_encode($admin->getCancelledCandidates($json));
+    break;
+  case "getJobApplicantsReport":
+    echo json_encode($admin->getJobApplicantsReport($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
