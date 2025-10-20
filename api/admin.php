@@ -4183,6 +4183,17 @@ class Admin
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
   }
+
+  function getNumberOfCandidates()
+  {
+    include "connection.php";
+    $sql = "SELECT COUNT(*) AS total_candidates
+            FROM tblcandidates
+            WHERE cand_isEmployed = 0";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
+  }
 } //admin
 
 function uploadImage()
@@ -4704,6 +4715,9 @@ switch ($operation) {
     break;
   case "getNumberOfEmployedCandidates":
     echo json_encode($admin->getNumberOfEmployedCandidates());
+    break;
+  case "getNumberOfCandidates":
+    echo json_encode($admin->getNumberOfCandidates());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
