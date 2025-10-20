@@ -4194,6 +4194,47 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['total_candidates'] : 0;
   }
 
+
+  function getApplicantAndEmployedReport()
+  {
+    include "connection.php";
+
+    $sql = "
+        SELECT ds.date,
+               COALESCE(apps.applications, 0) AS applications,
+               COALESCE(emp.employed, 0) AS employed
+        FROM (
+            -- All unique dates from either applications or employment events
+            SELECT DATE(a.app_datetime) AS date
+            FROM tblapplications a
+            UNION
+            SELECT DATE(s.appS_date) AS date
+            FROM tblapplicationstatus s
+            WHERE s.appS_statusId = 11
+        ) AS ds
+        LEFT JOIN (
+            -- Count applications by application date
+            SELECT DATE(a.app_datetime) AS date, COUNT(*) AS applications
+            FROM tblapplications a
+            GROUP BY DATE(a.app_datetime)
+        ) AS apps ON apps.date = ds.date
+        LEFT JOIN (
+            -- Count employed by employment status date
+            SELECT DATE(s.appS_date) AS date, COUNT(DISTINCT a.app_candId) AS employed
+            FROM tblapplicationstatus s
+            JOIN tblapplications a ON s.appS_appId = a.app_id
+            WHERE s.appS_statusId = 11
+            GROUP BY DATE(s.appS_date)
+        ) AS emp ON emp.date = ds.date
+        ORDER BY ds.date;
+    ";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+  }
+
+
   function getReports()
   {
     include "connection.php";
@@ -4738,6 +4779,9 @@ switch ($operation) {
     break;
   case "getReports":
     echo json_encode($admin->getReports());
+    break;
+  case "getApplicantAndEmployedReport":
+    echo json_encode($admin->getApplicantAndEmployedReport($json));
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
