@@ -4145,16 +4145,15 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getNumberOfJobsThisMonth()
+  function getNumberOfActiveJobs()
   {
     include "connection.php";
     $sql = "SELECT COUNT(jobM_id) AS total_jobs
             FROM tbljobsmaster
-            WHERE MONTH(jobM_createdAt) = MONTH(CURDATE())
-            AND YEAR(jobM_createdAt) = YEAR(CURDATE())";
+            WHERE jobM_status = 1";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['total_jobs'] : 0;
   }
 
 
@@ -4170,7 +4169,7 @@ class Admin
     $stmt = $conn->prepare($sql);
     $stmt->execute();
 
-    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : ['total_new_candidates' => 0];
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['total_new_candidates'] : 0;
   }
 
   function getNumberOfEmployedCandidates()
@@ -4181,7 +4180,7 @@ class Admin
             WHERE cand_isEmployed = 1";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['total_employed'] : 0;
   }
 
   function getNumberOfCandidates()
@@ -4192,7 +4191,25 @@ class Admin
             WHERE cand_isEmployed = 0";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
-    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC)['total_candidates'] : 0;
+  }
+
+  function getReports()
+  {
+    include "connection.php";
+    $getJobApplicantsReport = $this->getJobApplicantsReport();
+    $getNumberOfActiveJobs = $this->getNumberOfActiveJobs();
+    $getNewCandidatesThisMonth = $this->getNewCandidatesThisMonth();
+    $getNumberOfEmployedCandidates = $this->getNumberOfEmployedCandidates();
+    $getNumberOfCandidates = $this->getNumberOfCandidates();
+
+    return [
+      "jobApplicantsReport" =>  $getJobApplicantsReport,
+      "totalJobs" => $getNumberOfActiveJobs,
+      "totalNewCandidates" => $getNewCandidatesThisMonth,
+      "totalEmployed" => $getNumberOfEmployedCandidates,
+      "totalCandidates" => $getNumberOfCandidates
+    ];
   }
 } //admin
 
@@ -4707,8 +4724,8 @@ switch ($operation) {
   case "getJobApplicantsReport":
     echo json_encode($admin->getJobApplicantsReport($json));
     break;
-  case "getNumberOfJobsThisMonth":
-    echo json_encode($admin->getNumberOfJobsThisMonth());
+  case "getNumberOfActiveJobs":
+    echo json_encode($admin->getNumberOfActiveJobs());
     break;
   case "getNewCandidatesThisMonth":
     echo json_encode($admin->getNewCandidatesThisMonth());
@@ -4718,6 +4735,9 @@ switch ($operation) {
     break;
   case "getNumberOfCandidates":
     echo json_encode($admin->getNumberOfCandidates());
+    break;
+  case "getReports":
+    echo json_encode($admin->getReports());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
