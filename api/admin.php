@@ -4145,13 +4145,32 @@ class Admin
     return $stmt->rowCount() > 0 ? $stmt->fetchAll(PDO::FETCH_ASSOC) : 0;
   }
 
-  function getNumberOfJobs()
+  function getNumberOfJobsThisMonth()
   {
     include "connection.php";
-    $sql = "SELECT COUNT(jobM_id) AS total_jobs FROM tbljobsmaster";
+    $sql = "SELECT COUNT(jobM_id) AS total_jobs
+            FROM tbljobsmaster
+            WHERE MONTH(jobM_createdAt) = MONTH(CURDATE())
+            AND YEAR(jobM_createdAt) = YEAR(CURDATE())";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : 0;
+  }
+
+
+  function getNewCandidatesThisMonth()
+  {
+    include "connection.php";
+
+    $sql = "SELECT COUNT(*) AS total_new_candidates
+            FROM tblcandidates
+            WHERE MONTH(cand_createdDatetime) = MONTH(CURDATE())
+            AND YEAR(cand_createdDatetime) = YEAR(CURDATE())";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+
+    return $stmt->rowCount() > 0 ? $stmt->fetch(PDO::FETCH_ASSOC) : ['total_new_candidates' => 0];
   }
 } //admin
 
@@ -4666,8 +4685,11 @@ switch ($operation) {
   case "getJobApplicantsReport":
     echo json_encode($admin->getJobApplicantsReport($json));
     break;
-  case "getNumberOfJobs":
-    echo json_encode($admin->getNumberOfJobs());
+  case "getNumberOfJobsThisMonth":
+    echo json_encode($admin->getNumberOfJobsThisMonth());
+    break;
+  case "getNewCandidatesThisMonth":
+    echo json_encode($admin->getNewCandidatesThisMonth());
     break;
   default:
     echo "WALAY '$operation' NGA OPERATION SA UBOS HAHAHAHA BOBO";
